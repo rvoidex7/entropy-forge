@@ -1,11 +1,11 @@
-//! # Entropy Weaver
+//! # Entropy Forge
 //!
 //! A pluggable entropy framework for cryptographic applications with built-in
 //! quality testing and visualization.
 //!
 //! ## Overview
 //!
-//! Entropy Weaver provides a clean trait-based interface for working with any
+//! Entropy Forge provides a clean trait-based interface for working with any
 //! entropy source (RNG). The framework offers three main capabilities:
 //!
 //! 1. **Use**: Cryptographic operations (stream cipher, key derivation)
@@ -15,8 +15,8 @@
 //! ## Quick Start
 //!
 //! ```rust
-//! use entropy_weaver::entropy::{EntropySource, SystemEntropy};
-//! use entropy_weaver::crypto::StreamCipher;
+//! use entropy_forge::entropy::{EntropySource, SystemEntropy};
+//! use entropy_forge::crypto::StreamCipher;
 //!
 //! let entropy = SystemEntropy::new();
 //! let mut cipher = StreamCipher::new(entropy);
@@ -30,7 +30,7 @@
 //! Implement the `EntropySource` trait to plug in your own RNG:
 //!
 //! ```rust
-//! use entropy_weaver::entropy::EntropySource;
+//! use entropy_forge::entropy::EntropySource;
 //!
 //! struct MyRNG {
 //!     // Your state

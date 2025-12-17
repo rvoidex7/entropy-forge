@@ -1,11 +1,11 @@
 //! Basic usage example
 
-use entropy_weaver::entropy::{EntropySource, SystemEntropy};
-use entropy_weaver::crypto::StreamCipher;
-use entropy_weaver::quality::QualityMetrics;
+use entropy_forge::entropy::{EntropySource, SystemEntropy};
+use entropy_forge::crypto::StreamCipher;
+use entropy_forge::quality::QualityMetrics;
 
 fn main() {
-    println!("=== Entropy Weaver - Basic Usage ===\n");
+    println!("=== Entropy Forge - Basic Usage ===\n");
     
     // Create entropy source
     let mut entropy = SystemEntropy::new();
@@ -20,7 +20,7 @@ fn main() {
     // Use with stream cipher
     println!("\n--- Stream Cipher Example ---");
     let mut cipher = StreamCipher::new(SystemEntropy::new());
-    let plaintext = b"Hello, Entropy Weaver!";
+    let plaintext = b"Hello, Entropy Forge!";
     let ciphertext = cipher.process(plaintext);
     println!("Plaintext:  {}", String::from_utf8_lossy(plaintext));
     println!("Ciphertext: {}", hex::encode(&ciphertext));

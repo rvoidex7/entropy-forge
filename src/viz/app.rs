@@ -7,7 +7,7 @@ use crate::quality::{QualityMetrics, NistTests};
 use crate::bench::{PerformanceBench, BenchmarkResult};
 
 /// Main application state
-pub struct EntropyWeaverApp {
+pub struct EntropyForgeApp {
     // Entropy source
     entropy: Box<dyn EntropySource>,
     
@@ -39,7 +39,7 @@ enum Tab {
     Benchmark,
 }
 
-impl Default for EntropyWeaverApp {
+impl Default for EntropyForgeApp {
     fn default() -> Self {
         Self {
             entropy: Box::new(SystemEntropy::new()),
@@ -59,11 +59,11 @@ impl Default for EntropyWeaverApp {
     }
 }
 
-impl eframe::App for EntropyWeaverApp {
+impl eframe::App for EntropyForgeApp {
     fn update(&mut self, ctx: &egui::Context, _frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
             // Header
-            ui.heading("🔐 Entropy Weaver");
+            ui.heading("🔐 Entropy Forge");
             ui.label(format!("Source: {}", self.entropy.name()));
             ui.add_space(5.0);
             ui.separator();
@@ -90,7 +90,7 @@ impl eframe::App for EntropyWeaverApp {
     }
 }
 
-impl EntropyWeaverApp {
+impl EntropyForgeApp {
     /// Render the "Use" tab (stream cipher)
     fn render_use_tab(&mut self, ui: &mut egui::Ui) {
         ui.heading("Stream Cipher");

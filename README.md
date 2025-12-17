@@ -1,4 +1,4 @@
-# 🔐 Entropy Weaver
+# 🔐 Entropy Forge
 
 Pluggable entropy framework for cryptographic applications with built-in quality testing and visualization.
 
@@ -18,7 +18,7 @@ Pluggable entropy framework for cryptographic applications with built-in quality
 ### Run the GUI
 
 ```bash
-cargo run --release
+cargo run --release --features gui
 ```
 
 ### Run Examples
@@ -39,8 +39,8 @@ cargo run --example quality_check
 ### Using the Default Source
 
 ```rust
-use entropy_weaver::entropy::SystemEntropy;
-use entropy_weaver::crypto::StreamCipher;
+use entropy_forge::entropy::SystemEntropy;
+use entropy_forge::crypto::StreamCipher;
 
 let entropy = SystemEntropy::new();
 let mut cipher = StreamCipher::new(entropy);
@@ -52,7 +52,7 @@ let ciphertext = cipher.process(plaintext);
 ### Implementing a Custom Source
 
 ```rust
-use entropy_weaver::entropy::EntropySource;
+use entropy_forge::entropy::EntropySource;
 
 struct MyRNG {
     state: u64,
@@ -76,7 +76,7 @@ impl EntropySource for MyRNG {
 ### Testing Entropy Quality
 
 ```rust
-use entropy_weaver::quality::QualityMetrics;
+use entropy_forge::quality::QualityMetrics;
 
 let mut source = SystemEntropy::new();
 let metrics = QualityMetrics::analyze(&mut source, 100_000);
@@ -89,7 +89,7 @@ println!("Quality Score: {:.1}/100", metrics.overall_score());
 ### Running NIST Tests
 
 ```rust
-use entropy_weaver::quality::NistTests;
+use entropy_forge::quality::NistTests;
 
 let mut data = vec![0u8; 100_000];
 source.fill_bytes(&mut data);
@@ -106,7 +106,7 @@ for (name, p_value) in results {
 
 ## Design Philosophy
 
-Entropy Weaver is designed to work with **any** entropy source through a clean trait interface. Whether you're using:
+Entropy Forge is designed to work with **any** entropy source through a clean trait interface. Whether you're using:
 
 - System RNG (`/dev/urandom`, `BCryptGenRandom`, etc.)
 - Hardware RNG (TPM, RDRAND, etc.)
@@ -126,7 +126,7 @@ The framework provides:
 ## Architecture
 
 ```
-entropy-weaver/
+entropy-forge/
 ├── entropy/      # EntropySource trait + implementations
 ├── crypto/       # Stream cipher, key derivation
 ├── quality/      # Metrics, NIST tests
@@ -174,7 +174,7 @@ impl EntropySource for ChaoticRNG {
     }
 }
 
-// Use with Entropy Weaver
+// Use with Entropy Forge
 let mut source = ChaoticRNG::new();
 let metrics = QualityMetrics::analyze(&mut source, 1_000_000);
 // Expect: ~7.75 bits/byte, excellent NIST scores

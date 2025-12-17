@@ -1,7 +1,7 @@
 //! Entropy source trait and implementations
 //!
 //! This module defines the core `EntropySource` trait that allows any RNG
-//! to be used throughout the Entropy Weaver framework.
+//! to be used throughout the Entropy Forge framework.
 
 mod system;
 mod mock;
@@ -12,13 +12,13 @@ pub use mock::MockEntropy;
 /// Core trait for entropy sources
 ///
 /// Any random number generator can implement this trait to be used with
-/// Entropy Weaver. The framework will use your RNG for cryptographic
+/// Entropy Forge. The framework will use your RNG for cryptographic
 /// operations, quality testing, and benchmarking.
 ///
 /// # Examples
 ///
 /// ```
-/// use entropy_weaver::entropy::EntropySource;
+/// use entropy_forge::entropy::EntropySource;
 ///
 /// struct MyRNG {
 ///     state: u64,

@@ -1,23 +1,23 @@
 //! Entropy Forge - GUI Application
 
 use eframe::egui;
-use entropy_forge::viz::EntropyWeaverApp;
+use entropy_forge::viz::EntropyForgeApp;
 
 fn main() -> Result<(), eframe::Error> {
     let options = eframe::NativeOptions {
         viewport: egui::ViewportBuilder::default()
             .with_inner_size([900.0, 700.0])
             .with_min_inner_size([700.0, 500.0])
-            .with_title("Entropy Weaver")
+            .with_title("Entropy Forge")
             .with_icon(load_icon()),
         ..Default::default()
     };
     
     eframe::run_native(
-        "Entropy Weaver",
+        "Entropy Forge",
         options,
         Box::new(|_cc| {
-            Ok(Box::new(EntropyWeaverApp::default()))
+            Ok(Box::new(EntropyForgeApp::default()))
         }),
     )
 }

@@ -2,4 +2,4 @@
 
 mod app;
 
-pub use app::EntropyWeaverApp;
+pub use app::EntropyForgeApp;
