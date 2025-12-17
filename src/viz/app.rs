@@ -109,15 +109,17 @@ impl EntropyWeaverApp {
         
         // Encrypt button
         if ui.button("🔒 Encrypt / Decrypt").clicked() {
-            let mut cipher = StreamCipher::new(&mut *self.entropy);
+            // Create a temporary entropy source for the cipher
+            let temp_entropy = SystemEntropy::new();
+            let mut cipher = StreamCipher::new(temp_entropy);
             let output = cipher.process(self.cipher_input.as_bytes());
-            
+
             self.cipher_output = if self.cipher_hex {
                 hex::encode(&output)
             } else {
                 String::from_utf8_lossy(&output).to_string()
             };
-            
+
             self.cipher_state = cipher.state().to_vec();
         }
         
@@ -148,18 +150,14 @@ impl EntropyWeaverApp {
                         }
                         
                         let color = egui::Color32::from_rgb(byte, byte, byte);
-                        let (rect, _) = ui.allocate_exact_size(
+                        let (rect, response) = ui.allocate_exact_size(
                             egui::vec2(30.0, 30.0),
                             egui::Sense::hover()
                         );
                         ui.painter().rect_filled(rect, 2.0, color);
-                        
+
                         // Tooltip
-                        if ui.rect_contains_pointer(rect) {
-                            egui::show_tooltip_at_pointer(ui.ctx(), egui::Id::new("state_tooltip"), |ui| {
-                                ui.label(format!("Byte {}: 0x{:02X} ({})", i, byte, byte));
-                            });
-                        }
+                        response.on_hover_text(format!("Byte {}: 0x{:02X} ({})", i, byte, byte));
                     }
                 });
         }

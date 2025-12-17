@@ -1,6 +1,6 @@
 //! NIST SP 800-22 statistical tests (simplified implementations)
 
-use statrs::distribution::{ChiSquared, ContinuousCDF, Normal};
+use statrs::distribution::{ChiSquared, ContinuousCDF};
 
 /// NIST SP 800-22 statistical tests
 ///

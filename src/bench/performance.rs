@@ -44,7 +44,7 @@ impl PerformanceBench {
     /// println!("Throughput: {:.2} MB/s", result.throughput_mbps);
     /// println!("Latency: {:.2} µs/byte", result.latency_us);
     /// ```
-    pub fn benchmark<E: EntropySource>(source: &mut E, total_bytes: usize) -> BenchmarkResult {
+    pub fn benchmark<E: ?Sized + EntropySource>(source: &mut E, total_bytes: usize) -> BenchmarkResult {
         let mut buffer = vec![0u8; total_bytes];
         
         let start = Instant::now();
@@ -64,7 +64,7 @@ impl PerformanceBench {
     }
     
     /// Run multiple iterations and return average
-    pub fn benchmark_avg<E: EntropySource>(
+    pub fn benchmark_avg<E: ?Sized + EntropySource>(
         source: &mut E,
         bytes_per_iteration: usize,
         iterations: usize,

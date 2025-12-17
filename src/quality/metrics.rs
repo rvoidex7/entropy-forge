@@ -170,7 +170,7 @@ impl QualityMetrics {
     /// println!("Shannon Entropy: {:.4} bits/byte", metrics.shannon_entropy);
     /// println!("Min-Entropy: {:.4} bits/byte", metrics.min_entropy);
     /// ```
-    pub fn analyze<E: EntropySource>(source: &mut E, sample_size: usize) -> Self {
+    pub fn analyze<E: ?Sized + EntropySource>(source: &mut E, sample_size: usize) -> Self {
         let mut data = vec![0u8; sample_size];
         source.fill_bytes(&mut data);
         
@@ -212,7 +212,7 @@ impl QualityMetrics {
         let mean_score = ((127.5 - mean_diff) / 127.5) * 100.0;
         
         // Weighted average
-        (shannon_score * 0.5 + min_entropy_score * 0.3 + mean_score * 0.2)
+        shannon_score * 0.5 + min_entropy_score * 0.3 + mean_score * 0.2
     }
 }
 

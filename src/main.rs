@@ -1,7 +1,7 @@
-//! Entropy Weaver - GUI Application
+//! Entropy Forge - GUI Application
 
 use eframe::egui;
-use entropy_weaver::viz::EntropyWeaverApp;
+use entropy_forge::viz::EntropyWeaverApp;
 
 fn main() -> Result<(), eframe::Error> {
     let options = eframe::NativeOptions {
@@ -22,11 +22,11 @@ fn main() -> Result<(), eframe::Error> {
     )
 }
 
-fn load_icon() -> eframe::icon_data::IconData {
+fn load_icon() -> egui::IconData {
     // Simple 32x32 icon (can be replaced with actual icon)
     let icon_size = 32;
     let mut rgba = vec![0u8; icon_size * icon_size * 4];
-    
+
     // Create a simple pattern (can be customized)
     for y in 0..icon_size {
         for x in 0..icon_size {
@@ -38,8 +38,8 @@ fn load_icon() -> eframe::icon_data::IconData {
             rgba[idx + 3] = 255;   // A
         }
     }
-    
-    eframe::icon_data::IconData {
+
+    egui::IconData {
         rgba,
         width: icon_size as u32,
         height: icon_size as u32,

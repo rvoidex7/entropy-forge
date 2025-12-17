@@ -108,11 +108,11 @@ impl EntropySource for Box<dyn EntropySource> {
 }
 
 // Blanket implementation for mutable references
-impl<T: EntropySource> EntropySource for &mut T {
+impl<T: ?Sized + EntropySource> EntropySource for &mut T {
     fn fill_bytes(&mut self, dest: &mut [u8]) {
         (**self).fill_bytes(dest)
     }
-    
+
     fn name(&self) -> &str {
         (**self).name()
     }

@@ -1,11 +1,11 @@
 [package]
-name = "entropy-weaver"
+name = "entropy-forge"
 version = "0.1.0"
 edition = "2021"
-authors = ["Your Name <your.email@example.com>"]
+authors = ["rvoidex7"]
 license = "MIT"
 description = "Pluggable entropy framework with quality testing and visualization"
-repository = "https://github.com/yourusername/entropy-weaver"
+repository = "https://github.com/rvoidex7/entropy-forge"
 keywords = ["cryptography", "entropy", "rng", "visualization", "nist"]
 categories = ["cryptography", "visualization"]
 
@@ -19,9 +19,9 @@ hex = "0.4"
 # Math & Stats
 statrs = "0.17"
 
-# GUI
-egui = "0.29"
-eframe = "0.29"
+# GUI (optional)
+egui = { version = "0.29", optional = true }
+eframe = { version = "0.29", optional = true }
 
 # Utilities
 thiserror = "1.0"
@@ -31,10 +31,10 @@ criterion = "0.5"
 
 [features]
 default = ["gui"]
-gui = ["egui", "eframe"]
+gui = ["dep:egui", "dep:eframe"]
 
 [[bin]]
-name = "entropy-weaver"
+name = "entropy-forge"
 path = "src/main.rs"
 required-features = ["gui"]
 
