@@ -5,7 +5,7 @@ use crate::entropy::{EntropySource, SystemEntropy};
 use crate::crypto::StreamCipher;
 use crate::quality::{QualityMetrics, NistTests};
 use crate::bench::{PerformanceBench, BenchmarkResult};
-use crate::learn::EncryptionProcess;
+use crate::learn::{EncryptionProcess, EntropyProcess, NistProcess};
 
 /// Main application state
 pub struct EntropyForgeApp {
@@ -33,8 +33,19 @@ pub struct EntropyForgeApp {
     is_benchmarking: bool,
 
     // Learn tab state
+    learn_mode: LearnMode,
     learn_process: EncryptionProcess,
     learn_input: String,
+
+    entropy_process: EntropyProcess,
+    nist_process: NistProcess,
+}
+
+#[derive(PartialEq, Clone, Copy)]
+enum LearnMode {
+    XorCipher,
+    ShannonEntropy,
+    NistFrequency,
 }
 
 #[derive(PartialEq, Clone, Copy)]
@@ -61,8 +72,11 @@ impl Default for EntropyForgeApp {
             bench_result: None,
             bench_size: 1_000_000,
             is_benchmarking: false,
+            learn_mode: LearnMode::XorCipher,
             learn_process: EncryptionProcess::new(),
             learn_input: String::from("Hello"),
+            entropy_process: EntropyProcess::new(),
+            nist_process: NistProcess::new(),
         }
     }
 }
@@ -390,6 +404,23 @@ impl EntropyForgeApp {
 
     /// Render the "Learn" tab
     fn render_learn_tab(&mut self, ui: &mut egui::Ui) {
+        // Sub-tabs for Learn Mode
+        ui.horizontal(|ui| {
+            ui.selectable_value(&mut self.learn_mode, LearnMode::XorCipher, "XOR Cipher");
+            ui.selectable_value(&mut self.learn_mode, LearnMode::ShannonEntropy, "Shannon Entropy");
+            ui.selectable_value(&mut self.learn_mode, LearnMode::NistFrequency, "NIST Frequency");
+        });
+        ui.separator();
+        ui.add_space(10.0);
+
+        match self.learn_mode {
+            LearnMode::XorCipher => self.render_xor_visualizer(ui),
+            LearnMode::ShannonEntropy => self.render_entropy_visualizer(ui),
+            LearnMode::NistFrequency => self.render_nist_visualizer(ui),
+        }
+    }
+
+    fn render_xor_visualizer(&mut self, ui: &mut egui::Ui) {
         // Update animation state if playing
         let time = ui.input(|i| i.time);
         self.learn_process.update(time);
@@ -397,7 +428,7 @@ impl EntropyForgeApp {
             ui.ctx().request_repaint();
         }
 
-        ui.heading("Learn Cryptography");
+        ui.heading("Learn Cryptography: XOR Cipher");
         ui.label("Visualize how stream ciphers work step-by-step.");
         ui.add_space(10.0);
 
@@ -554,6 +585,330 @@ impl EntropyForgeApp {
 
         } else {
             ui.label("Enter text and click 'Start Visualization' to begin.");
+        }
+    }
+
+    fn render_entropy_visualizer(&mut self, ui: &mut egui::Ui) {
+        use crate::learn::entropy_visual::EntropyStepType;
+
+        // Update animation state if playing
+        let time = ui.input(|i| i.time);
+        self.entropy_process.update(time);
+        if self.entropy_process.is_playing {
+            ui.ctx().request_repaint();
+        }
+
+        ui.heading("Learn Shannon Entropy");
+        ui.label("Measures 'randomness' or 'unpredictability' of data.");
+        ui.add_space(10.0);
+
+        // Input Section
+        ui.horizontal(|ui| {
+            ui.label("Input:");
+            ui.text_edit_singleline(&mut self.entropy_process.input);
+            if ui.button("Calculate").clicked() {
+                self.entropy_process.start(&self.entropy_process.input.clone());
+            }
+        });
+
+        ui.add_space(20.0);
+
+        if let Some(step) = self.entropy_process.current_step() {
+             let total_steps = self.entropy_process.steps.len();
+             let current_idx = self.entropy_process.current_step_index + 1;
+
+             let step_title = match step.step_type {
+                 EntropyStepType::CountBytes => "Count Byte Frequencies",
+                 EntropyStepType::CalculateProbabilities => "Calculate Probabilities",
+                 EntropyStepType::CalculateContributions => "Calculate Entropy Contributions",
+                 EntropyStepType::SumEntropy => "Sum for Total Entropy",
+                 EntropyStepType::Interpret => "Interpretation",
+             };
+
+             ui.heading(format!("Step {} of {}: {}", current_idx, total_steps, step_title));
+
+             ui.add_space(10.0);
+
+             // Visualization Area
+             egui::Frame::canvas(ui.style()).show(ui, |ui| {
+                 ui.set_min_width(600.0);
+                 ui.vertical(|ui| {
+                    ui.add_space(10.0);
+
+                    // Show Frequency Table
+                    if !step.byte_counts.is_empty() {
+                         egui::Grid::new("entropy_grid").striped(true).spacing([20.0, 5.0]).show(ui, |ui| {
+                            ui.label(egui::RichText::new("Byte").strong());
+                            ui.label(egui::RichText::new("Count").strong());
+                            if step.step_type != EntropyStepType::CountBytes {
+                                ui.label(egui::RichText::new("Probability").strong());
+                                ui.label(egui::RichText::new("Contribution").strong());
+                            }
+                            ui.label(egui::RichText::new("Visual").strong());
+                            ui.end_row();
+
+                            // Sort bytes for consistent display
+                            let mut bytes: Vec<_> = step.byte_counts.keys().collect();
+                            bytes.sort();
+
+                            let max_count = step.byte_counts.values().max().copied().unwrap_or(1) as f32;
+
+                            for &byte in bytes {
+                                let count = step.byte_counts[&byte];
+                                let char_repr = if byte >= 32 && byte <= 126 {
+                                    (byte as char).to_string()
+                                } else {
+                                    format!("0x{:02X}", byte)
+                                };
+
+                                ui.label(format!("'{}'", char_repr));
+                                ui.label(format!("{}", count));
+
+                                if step.step_type != EntropyStepType::CountBytes {
+                                    let p = step.probabilities.get(&byte).unwrap_or(&0.0);
+                                    let contrib = step.entropy_contributions.get(&byte).unwrap_or(&0.0);
+
+                                    ui.label(format!("{:.3}", p));
+
+                                    if matches!(step.step_type, EntropyStepType::CalculateContributions | EntropyStepType::SumEntropy | EntropyStepType::Interpret) {
+                                         ui.label(format!("{:.3} bits", contrib));
+                                    } else {
+                                        ui.label("-");
+                                    }
+                                }
+
+                                // Bar chart
+                                let width = (count as f32 / max_count) * 100.0;
+                                let color = if count == 1 { egui::Color32::GREEN } else { egui::Color32::from_rgb(255, 100 + (155 - (count * 20).min(155)) as u8, 100) };
+                                let (rect, _) = ui.allocate_exact_size(egui::vec2(width, 15.0), egui::Sense::hover());
+                                ui.painter().rect_filled(rect, 2.0, color);
+                                ui.end_row();
+                            }
+                         });
+                    }
+
+                    ui.add_space(20.0);
+
+                    // Explanation / Formula area
+                    match step.step_type {
+                        EntropyStepType::CountBytes => {
+                            ui.label("We count how many times each unique byte appears in the input.");
+                        },
+                        EntropyStepType::CalculateProbabilities => {
+                            ui.label("Probability P(x) = Count(x) / Total Bytes");
+                            ui.label("This tells us how likely each character is to appear.");
+                        },
+                        EntropyStepType::CalculateContributions => {
+                            ui.label("Contribution = -P(x) * log2(P(x))");
+                            ui.label("Rare events provide MORE information (higher contribution) per occurrence.");
+                        },
+                        EntropyStepType::SumEntropy | EntropyStepType::Interpret => {
+                            ui.heading(format!("Total Entropy: {:.4} bits/byte", step.current_entropy_sum));
+                            ui.label(format!("Maximum Possible: {:.4} bits/byte", step.max_entropy));
+
+                            let efficiency = if step.max_entropy > 0.0 { (step.current_entropy_sum / step.max_entropy) * 100.0 } else { 0.0 };
+                             ui.label(format!("Efficiency: {:.1}%", efficiency));
+
+                             if step.step_type == EntropyStepType::Interpret {
+                                 ui.separator();
+                                 if step.current_entropy_sum < 2.0 {
+                                     ui.label("Low entropy. The input is very predictable.");
+                                 } else if efficiency > 80.0 {
+                                     ui.label("High entropy! The input looks quite random or uses many different characters.");
+                                 } else {
+                                     ui.label("Moderate entropy.");
+                                 }
+                             }
+                        }
+                    }
+                    ui.add_space(10.0);
+                 });
+             });
+
+             ui.add_space(20.0);
+
+             // Controls
+             ui.horizontal(|ui| {
+                if ui.button("⬅ Previous").clicked() {
+                    self.entropy_process.prev_step();
+                }
+
+                let play_label = if self.entropy_process.is_playing { "⏸ Pause" } else { "▶ Play" };
+                if ui.button(play_label).clicked() {
+                    self.entropy_process.toggle_play();
+                }
+
+                if ui.button("Next ➡").clicked() {
+                    self.entropy_process.next_step();
+                }
+
+                ui.add_space(20.0);
+                ui.label("Speed:");
+                ui.add(egui::Slider::new(&mut self.entropy_process.speed, 0.1..=5.0).text("steps/s"));
+            });
+        } else {
+             ui.label("Enter text (e.g., 'AAABBC') and click Calculate.");
+        }
+    }
+
+    fn render_nist_visualizer(&mut self, ui: &mut egui::Ui) {
+        use crate::learn::nist_visual::NistStepType;
+
+         // Update animation state if playing
+        let time = ui.input(|i| i.time);
+        self.nist_process.update(time);
+        if self.nist_process.is_playing {
+            ui.ctx().request_repaint();
+        }
+
+        ui.heading("Learn NIST Frequency Test");
+        ui.label("Checks if the number of 1s and 0s are approximately equal (like a fair coin flip).");
+        ui.add_space(10.0);
+
+        // Input Section
+        ui.horizontal(|ui| {
+            ui.label("Input:");
+            ui.text_edit_singleline(&mut self.nist_process.input_text);
+            if ui.button("Analyze").clicked() {
+                self.nist_process.start(&self.nist_process.input_text.clone());
+            }
+            if ui.button("Generate Random").clicked() {
+                self.nist_process.generate_random(16);
+            }
+        });
+
+        ui.add_space(20.0);
+
+        if let Some(step) = self.nist_process.current_step() {
+             let total_steps = self.nist_process.steps.len();
+             let current_idx = self.nist_process.current_step_index + 1;
+
+             let step_title = match step.step_type {
+                 NistStepType::ConvertToBits => "Convert to Bits",
+                 NistStepType::CountOnesZeros => "Count Ones and Zeros",
+                 NistStepType::CalculateStatistic => "Calculate Statistic",
+                 NistStepType::CalculatePValue => "Calculate P-Value",
+                 NistStepType::Interpret => "Interpretation",
+             };
+
+             ui.heading(format!("Step {} of {}: {}", current_idx, total_steps, step_title));
+             ui.add_space(10.0);
+
+             egui::Frame::canvas(ui.style()).show(ui, |ui| {
+                 ui.set_min_width(600.0);
+                 ui.vertical(|ui| {
+                     ui.add_space(10.0);
+
+                     // Bit visualization
+                     ui.label(egui::RichText::new("Bit Sequence:").strong());
+                     ui.horizontal_wrapped(|ui| {
+                         for (i, &bit) in step.bits.iter().enumerate() {
+                             if i > 0 && i % 8 == 0 {
+                                 ui.add_space(5.0);
+                             }
+                             let color = if bit == 1 { egui::Color32::GREEN } else { egui::Color32::LIGHT_GRAY };
+                             let text = egui::RichText::new(format!("{}", bit)).color(color).monospace().strong();
+                             ui.label(text);
+                         }
+                     });
+
+                     ui.add_space(10.0);
+                     ui.separator();
+                     ui.add_space(10.0);
+
+                     if step.step_type != NistStepType::ConvertToBits {
+                         ui.horizontal(|ui| {
+                             ui.vertical(|ui| {
+                                 ui.label("Ones:");
+                                 ui.heading(format!("{}", step.ones_count));
+                             });
+                             ui.add_space(40.0);
+                             ui.vertical(|ui| {
+                                 ui.label("Zeros:");
+                                 ui.heading(format!("{}", step.zeros_count));
+                             });
+                         });
+
+                         // Visual bar
+                         let total = step.bits.len() as f32;
+                         if total > 0.0 {
+                             let ones_pct = step.ones_count as f32 / total;
+                             ui.add_space(5.0);
+                             let (rect, _) = ui.allocate_exact_size(egui::vec2(300.0, 20.0), egui::Sense::hover());
+
+                             // Draw zeros background
+                             ui.painter().rect_filled(rect, 2.0, egui::Color32::LIGHT_GRAY);
+
+                             // Draw ones foreground
+                             let ones_width = rect.width() * ones_pct;
+                             let ones_rect = egui::Rect::from_min_size(rect.min, egui::vec2(ones_width, rect.height()));
+                             ui.painter().rect_filled(ones_rect, 2.0, egui::Color32::GREEN);
+
+                             // Center line (ideal)
+                             let center_x = rect.min.x + rect.width() * 0.5;
+                             ui.painter().line_segment(
+                                 [egui::pos2(center_x, rect.min.y), egui::pos2(center_x, rect.max.y)],
+                                 egui::Stroke::new(2.0, egui::Color32::BLACK)
+                             );
+
+                             ui.label(format!("Ratio: {:.1}% Ones (Ideal: 50%)", ones_pct * 100.0));
+                         }
+                     }
+
+                     ui.add_space(20.0);
+
+                     // Stats and interpretation
+                     if matches!(step.step_type, NistStepType::CalculateStatistic | NistStepType::CalculatePValue | NistStepType::Interpret) {
+                         ui.group(|ui| {
+                             ui.vertical(|ui| {
+                                 ui.label(format!("Sum (+1 for 1, -1 for 0): {}", step.sum));
+                                 ui.label(format!("S_obs (|Sum| / √n): {:.4}", step.s_obs));
+
+                                 if matches!(step.step_type, NistStepType::CalculatePValue | NistStepType::Interpret) {
+                                     ui.add_space(5.0);
+                                     ui.label(format!("P-Value (erfc(S_obs/√2)): {:.4}", step.p_value));
+                                 }
+
+                                 if step.step_type == NistStepType::Interpret {
+                                     ui.add_space(10.0);
+                                     if step.passed {
+                                         ui.colored_label(egui::Color32::GREEN, "✅ PASS: The sequence looks random.");
+                                     } else {
+                                         ui.colored_label(egui::Color32::RED, "❌ FAIL: The sequence has too many 1s or 0s.");
+                                     }
+                                     ui.label("(Threshold: P-value ≥ 0.01)");
+                                 }
+                             });
+                         });
+                     }
+
+                     ui.add_space(10.0);
+                 });
+             });
+
+             ui.add_space(20.0);
+
+             // Controls
+             ui.horizontal(|ui| {
+                if ui.button("⬅ Previous").clicked() {
+                    self.nist_process.prev_step();
+                }
+
+                let play_label = if self.nist_process.is_playing { "⏸ Pause" } else { "▶ Play" };
+                if ui.button(play_label).clicked() {
+                    self.nist_process.toggle_play();
+                }
+
+                if ui.button("Next ➡").clicked() {
+                    self.nist_process.next_step();
+                }
+
+                ui.add_space(20.0);
+                ui.label("Speed:");
+                ui.add(egui::Slider::new(&mut self.nist_process.speed, 0.1..=5.0).text("steps/s"));
+            });
+        } else {
+            ui.label("Enter text or generate random bytes to start.");
         }
     }
 }
