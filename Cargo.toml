@@ -1,0 +1,56 @@
+[package]
+name = "entropy-weaver"
+version = "0.1.0"
+edition = "2021"
+authors = ["Your Name <your.email@example.com>"]
+license = "MIT"
+description = "Pluggable entropy framework with quality testing and visualization"
+repository = "https://github.com/yourusername/entropy-weaver"
+keywords = ["cryptography", "entropy", "rng", "visualization", "nist"]
+categories = ["cryptography", "visualization"]
+
+[dependencies]
+# Crypto
+rand = "0.8"
+getrandom = "0.2"
+sha2 = "0.10"
+hex = "0.4"
+
+# Math & Stats
+statrs = "0.17"
+
+# GUI
+egui = "0.29"
+eframe = "0.29"
+
+# Utilities
+thiserror = "1.0"
+
+[dev-dependencies]
+criterion = "0.5"
+
+[features]
+default = ["gui"]
+gui = ["egui", "eframe"]
+
+[[bin]]
+name = "entropy-weaver"
+path = "src/main.rs"
+required-features = ["gui"]
+
+[[example]]
+name = "basic_usage"
+path = "examples/basic_usage.rs"
+
+[[example]]
+name = "custom_source"
+path = "examples/custom_source.rs"
+
+[[example]]
+name = "quality_check"
+path = "examples/quality_check.rs"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1
