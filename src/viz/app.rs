@@ -5,6 +5,7 @@ use crate::entropy::{EntropySource, SystemEntropy};
 use crate::crypto::StreamCipher;
 use crate::quality::{QualityMetrics, NistTests};
 use crate::bench::{PerformanceBench, BenchmarkResult};
+use crate::learn::EncryptionProcess;
 
 /// Main application state
 pub struct EntropyForgeApp {
@@ -30,6 +31,10 @@ pub struct EntropyForgeApp {
     bench_result: Option<BenchmarkResult>,
     bench_size: usize,
     is_benchmarking: bool,
+
+    // Learn tab state
+    learn_process: EncryptionProcess,
+    learn_input: String,
 }
 
 #[derive(PartialEq, Clone, Copy)]
@@ -37,6 +42,7 @@ enum Tab {
     Use,
     Test,
     Benchmark,
+    Learn,
 }
 
 impl Default for EntropyForgeApp {
@@ -55,6 +61,8 @@ impl Default for EntropyForgeApp {
             bench_result: None,
             bench_size: 1_000_000,
             is_benchmarking: false,
+            learn_process: EncryptionProcess::new(),
+            learn_input: String::from("Hello"),
         }
     }
 }
@@ -73,6 +81,7 @@ impl eframe::App for EntropyForgeApp {
                 ui.selectable_value(&mut self.current_tab, Tab::Use, "📝 Use");
                 ui.selectable_value(&mut self.current_tab, Tab::Test, "🔬 Test");
                 ui.selectable_value(&mut self.current_tab, Tab::Benchmark, "⚡ Benchmark");
+                ui.selectable_value(&mut self.current_tab, Tab::Learn, "🎓 Learn");
             });
             
             ui.separator();
@@ -84,6 +93,7 @@ impl eframe::App for EntropyForgeApp {
                     Tab::Use => self.render_use_tab(ui),
                     Tab::Test => self.render_test_tab(ui),
                     Tab::Benchmark => self.render_benchmark_tab(ui),
+                    Tab::Learn => self.render_learn_tab(ui),
                 }
             });
         });
@@ -344,6 +354,175 @@ impl EntropyForgeApp {
             ));
         } else {
             ui.label("Click 'Run Benchmark' to measure performance.");
+        }
+    }
+
+    /// Render the "Learn" tab
+    fn render_learn_tab(&mut self, ui: &mut egui::Ui) {
+        // Update animation state if playing
+        let time = ui.input(|i| i.time);
+        self.learn_process.update(time);
+        if self.learn_process.is_playing {
+            ui.ctx().request_repaint();
+        }
+
+        ui.heading("Learn Cryptography");
+        ui.label("Visualize how stream ciphers work step-by-step.");
+        ui.add_space(10.0);
+
+        // Input Section
+        ui.horizontal(|ui| {
+            ui.label("Input:");
+            ui.text_edit_singleline(&mut self.learn_input);
+            if ui.button("Start Visualization").clicked() {
+                self.learn_process.start(&self.learn_input);
+            }
+        });
+
+        ui.add_space(20.0);
+
+        // Visualization Section
+        if let Some(step) = self.learn_process.current_step() {
+            let total_steps = self.learn_process.steps.len();
+            let current_idx = self.learn_process.current_step_index + 1;
+
+            ui.heading(format!("Step {} of {}: Encrypting '{}'", current_idx, total_steps, step.character));
+            ui.add_space(10.0);
+
+            // Frame for visualization
+            egui::Frame::canvas(ui.style()).show(ui, |ui| {
+                ui.set_min_width(500.0);
+                ui.vertical_centered(|ui| {
+                    ui.add_space(10.0);
+
+                    let input_color = egui::Color32::from_rgb(100, 200, 255); // Cyan-ish
+                    let key_color = egui::Color32::from_rgb(255, 200, 100);   // Orange-ish
+                    let result_color = egui::Color32::from_rgb(100, 255, 100); // Green-ish
+
+                    // Input Row
+                    ui.horizontal(|ui| {
+                        ui.label(egui::RichText::new("Input:").strong());
+                        ui.add_space(20.0);
+                        ui.label(format!("'{}'", step.character));
+                        ui.label("=");
+                        ui.label(format!("{}", step.input_byte));
+                        ui.label("=");
+
+                        for bit_op in &step.bit_ops {
+                            let text = if bit_op.input_bit { "1" } else { "0" };
+                            ui.label(egui::RichText::new(text).color(input_color).font(egui::FontId::monospace(20.0)));
+                            ui.add_space(2.0);
+                        }
+                    });
+
+                    ui.add_space(5.0);
+                    ui.label(egui::RichText::new("↓").strong());
+                    ui.add_space(5.0);
+
+                    // Key Row
+                    ui.horizontal(|ui| {
+                        ui.label(egui::RichText::new("Key:  ").strong());
+                        ui.add_space(20.0);
+                        ui.label("   "); // align with char
+                        ui.label(" ");
+                        ui.label(format!("{}", step.keystream_byte));
+                        ui.label("=");
+
+                        for bit_op in &step.bit_ops {
+                            let text = if bit_op.key_bit { "1" } else { "0" };
+                            ui.label(egui::RichText::new(text).color(key_color).font(egui::FontId::monospace(20.0)));
+                            ui.add_space(2.0);
+                        }
+                    });
+
+                    ui.add_space(5.0);
+                    // XOR symbol row or line
+                    ui.separator();
+                    ui.add_space(5.0);
+
+                    // Result Row
+                    ui.horizontal(|ui| {
+                        ui.label(egui::RichText::new("XOR:  ").strong());
+                        ui.add_space(20.0);
+                        ui.label("   "); // align
+                        ui.label(" ");
+                        ui.label(format!("{}", step.result_byte));
+                        ui.label("=");
+
+                        for bit_op in &step.bit_ops {
+                            let text = if bit_op.result_bit { "1" } else { "0" };
+                            ui.label(egui::RichText::new(text).color(result_color).font(egui::FontId::monospace(20.0)));
+                            ui.add_space(2.0);
+                        }
+                    });
+
+                    ui.add_space(10.0);
+
+                    // Explanation of XOR for current step
+                    ui.label("Operation: 0⊕1=1, 1⊕0=1, 0⊕0=0, 1⊕1=0");
+                    ui.label("If bits are different, result is 1. If same, result is 0.");
+
+                    ui.add_space(10.0);
+                });
+            });
+
+            ui.add_space(20.0);
+
+            // Controls
+            ui.horizontal(|ui| {
+                if ui.button("⬅ Previous").clicked() {
+                    self.learn_process.prev_step();
+                }
+
+                let play_label = if self.learn_process.is_playing { "⏸ Pause" } else { "▶ Play" };
+                if ui.button(play_label).clicked() {
+                    self.learn_process.toggle_play();
+                }
+
+                if ui.button("Next ➡").clicked() {
+                    self.learn_process.next_step();
+                }
+
+                ui.add_space(20.0);
+                ui.label("Speed:");
+                ui.add(egui::Slider::new(&mut self.learn_process.speed, 0.1..=5.0).text("steps/s"));
+            });
+
+            ui.add_space(20.0);
+
+            // Progress/Output Summary
+            ui.group(|ui| {
+                ui.heading("Encryption Progress");
+                ui.horizontal_wrapped(|ui| {
+                    for (i, s) in self.learn_process.steps.iter().enumerate() {
+                        let text = format!("{:02X}", s.result_byte);
+                        let mut rich_text = egui::RichText::new(text).monospace();
+
+                        if i == self.learn_process.current_step_index {
+                            rich_text = rich_text.strong().color(egui::Color32::GREEN).background_color(egui::Color32::from_gray(60));
+                        } else if i < self.learn_process.current_step_index {
+                             rich_text = rich_text.color(egui::Color32::LIGHT_GRAY);
+                        } else {
+                             rich_text = rich_text.color(egui::Color32::DARK_GRAY);
+                        }
+
+                        ui.label(rich_text);
+                    }
+                });
+            });
+
+            // Educational Context
+            ui.add_space(20.0);
+            ui.collapsing("How it works", |ui| {
+                ui.label("1. Convert character to ASCII number (e.g., 'H' = 72)");
+                ui.label("2. Convert to binary (72 = 01001000)");
+                ui.label("3. Generate a random keystream byte from entropy source");
+                ui.label("4. XOR the input byte with the keystream byte");
+                ui.label("5. The result is the encrypted ciphertext byte");
+            });
+
+        } else {
+            ui.label("Enter text and click 'Start Visualization' to begin.");
         }
     }
 }
