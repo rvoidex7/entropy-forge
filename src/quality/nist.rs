@@ -258,7 +258,7 @@ impl NistTests {
     }
     
     // Helper: Complementary error function
-    fn erfc(x: f64) -> f64 {
+    pub fn erfc(x: f64) -> f64 {
         let z = x.abs();
         let t = 1.0 / (1.0 + 0.5 * z);
         
