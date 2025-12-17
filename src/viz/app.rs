@@ -101,6 +101,14 @@ impl eframe::App for EntropyForgeApp {
 }
 
 impl EntropyForgeApp {
+    /// Helper to render consistent educational tooltips
+    fn render_explanation_tooltip(ui: &mut egui::Ui, label: &str, text: &str) {
+        ui.horizontal(|ui| {
+            ui.label(label);
+            ui.label("ℹ").on_hover_text(text);
+        });
+    }
+
     /// Render the "Use" tab (stream cipher)
     fn render_use_tab(&mut self, ui: &mut egui::Ui) {
         ui.heading("Stream Cipher");
@@ -111,6 +119,11 @@ impl EntropyForgeApp {
         ui.horizontal(|ui| {
             ui.label("Input:");
             ui.text_edit_singleline(&mut self.cipher_input);
+            if ui.button("Help: How does this work?").clicked() {
+                self.current_tab = Tab::Learn;
+                self.learn_input = self.cipher_input.clone();
+                self.learn_process.start(&self.learn_input);
+            }
         });
         
         ui.checkbox(&mut self.cipher_hex, "Display output as hex");
@@ -225,10 +238,13 @@ impl EntropyForgeApp {
             ui.add_space(5.0);
             
             // Shannon entropy
-            ui.horizontal(|ui| {
-                ui.label("Shannon Entropy:");
-                ui.label(format!("{:.4} bits/byte", metrics.shannon_entropy));
-            });
+            Self::render_explanation_tooltip(
+                ui,
+                "Shannon Entropy:",
+                "Measures the unpredictability of data. \n8.0 bits/byte is perfect randomness.\nLower values mean patterns exist."
+            );
+            ui.label(format!("{:.4} bits/byte", metrics.shannon_entropy));
+
             let shannon_progress = (metrics.shannon_entropy / 8.0) as f32;
             ui.add(egui::ProgressBar::new(shannon_progress)
                 .text(format!("{:.1}%", shannon_progress * 100.0)));
@@ -236,10 +252,12 @@ impl EntropyForgeApp {
             ui.add_space(5.0);
             
             // Min-entropy
-            ui.horizontal(|ui| {
-                ui.label("Min-Entropy:");
-                ui.label(format!("{:.4} bits/byte", metrics.min_entropy));
-            });
+            Self::render_explanation_tooltip(
+                ui,
+                "Min-Entropy:",
+                "The worst-case entropy. \nCrucial for security guarantees.\nIf this is low, an attacker might guess the key."
+            );
+            ui.label(format!("{:.4} bits/byte", metrics.min_entropy));
             let min_progress = (metrics.min_entropy / 8.0) as f32;
             ui.add(egui::ProgressBar::new(min_progress)
                 .text(format!("{:.1}%", min_progress * 100.0)));
@@ -263,8 +281,13 @@ impl EntropyForgeApp {
             ui.add_space(20.0);
             
             // NIST tests
-            ui.heading("NIST SP 800-22 Tests");
-            ui.label("P-values ≥ 0.01 indicate randomness");
+            ui.horizontal(|ui| {
+                ui.heading("NIST SP 800-22 Tests");
+                ui.label("ℹ").on_hover_text(
+                    "Standard statistical tests used by the US government to certify random number generators.\nWe check if the data looks indistinguishable from a coin flip."
+                );
+            });
+            ui.label("P-values ≥ 0.01 indicate randomness (Pass)");
             ui.add_space(5.0);
             
             egui::Grid::new("nist_results")
@@ -333,7 +356,11 @@ impl EntropyForgeApp {
             
             // Throughput
             ui.horizontal(|ui| {
-                ui.label("Throughput:");
+                Self::render_explanation_tooltip(
+                    ui,
+                    "Throughput:",
+                    "How fast we can generate entropy.\nImportant for bulk encryption (e.g., file encryption, video streaming)."
+                );
                 ui.heading(format!("{:.2} MB/s", result.throughput_mbps));
             });
             
@@ -341,7 +368,11 @@ impl EntropyForgeApp {
             
             // Latency
             ui.horizontal(|ui| {
-                ui.label("Latency per byte:");
+                Self::render_explanation_tooltip(
+                    ui,
+                    "Latency per byte:",
+                    "Time to generate a single byte.\nImportant for real-time applications (e.g., key generation, handshakes)."
+                );
                 ui.label(format!("{:.2} µs", result.latency_us));
             });
             
