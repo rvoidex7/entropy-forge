@@ -51,6 +51,7 @@ pub mod entropy;
 pub mod crypto;
 pub mod quality;
 pub mod bench;
+pub mod learn;
 
 #[cfg(feature = "gui")]
 pub mod viz;
