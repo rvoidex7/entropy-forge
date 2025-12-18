@@ -1,0 +1,23 @@
+# Clippy configuration
+# Run with: cargo clippy
+
+[workspace]
+# Deny certain lints
+deny = [
+    "unsafe_code",
+]
+
+# Warn on these
+warn = [
+    "clippy::all",
+    "clippy::pedantic",
+    "clippy::nursery",
+]
+
+# Allow these (too noisy or not applicable)
+allow = [
+    "clippy::module_name_repetitions",
+    "clippy::must_use_candidate",
+    "clippy::missing_errors_doc",
+    "clippy::missing_panics_doc",
+]
