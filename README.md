@@ -1,9 +1,10 @@
 # 🔐 Entropy Forge
 
-Pluggable entropy framework for cryptographic applications with built-in quality testing and visualization.
+Pluggable entropy framework for cryptographic applications with built-in quality testing, visualization, and **interactive educational tools**.
 
 ![Rust](https://img.shields.io/badge/rust-%23000000.svg?style=for-the-badge&logo=rust&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg?style=for-the-badge)
+![CI](https://github.com/rvoidex7/entropy-forge/workflows/CI/badge.svg)
 
 ## Features
 
@@ -12,13 +13,20 @@ Pluggable entropy framework for cryptographic applications with built-in quality
 - **🔐 Cryptographic Use**: Stream cipher implementation using your entropy source
 - **📊 Real-time Visualization**: egui-based GUI for interactive exploration
 - **⚡ Performance Benchmarks**: Measure throughput and latency of entropy sources
+- **🎓 Interactive Learning**: Step-by-step visualizations of cryptographic operations
+
+## Screenshots
+
+| Use Tab | Test Tab | Learn Tab |
+|---------|----------|-----------|
+| Stream cipher encryption | Quality metrics & NIST tests | Step-by-step XOR visualization |
 
 ## Quick Start
 
 ### Run the GUI
 
 ```bash
-cargo run --release --features gui
+cargo run --release
 ```
 
 ### Run Examples
@@ -33,6 +41,35 @@ cargo run --example custom_source
 # Quality check with NIST tests
 cargo run --example quality_check
 ```
+
+## GUI Tabs
+
+### 📝 Use Tab
+Encrypt and decrypt data using the stream cipher with real-time keystream visualization.
+
+### 🔬 Test Tab
+Analyze entropy quality with:
+- Shannon Entropy (bits/byte)
+- Min-Entropy (conservative estimate)
+- Chi-Square uniformity test
+- NIST SP 800-22 statistical tests (Frequency, Runs, Longest Run, Serial, Chi-Square)
+
+### ⚡ Benchmark Tab
+Measure entropy source performance:
+- Throughput (MB/s)
+- Latency per byte (µs)
+
+### 🎓 Learn Tab
+**Interactive educational visualizations** that teach cryptographic concepts step-by-step:
+
+- **XOR Cipher Visualization**: See exactly how each character is encrypted
+  - Character → ASCII → Binary conversion
+  - Bit-by-bit XOR operation with color coding
+  - Keystream generation from entropy source
+  - Navigation controls (Previous/Next/Play/Pause)
+  - Adjustable animation speed
+
+Perfect for understanding how stream ciphers actually work!
 
 ## Usage
 
@@ -77,6 +114,7 @@ impl EntropySource for MyRNG {
 
 ```rust
 use entropy_forge::quality::QualityMetrics;
+use entropy_forge::entropy::SystemEntropy;
 
 let mut source = SystemEntropy::new();
 let metrics = QualityMetrics::analyze(&mut source, 100_000);
@@ -90,7 +128,9 @@ println!("Quality Score: {:.1}/100", metrics.overall_score());
 
 ```rust
 use entropy_forge::quality::NistTests;
+use entropy_forge::entropy::{EntropySource, SystemEntropy};
 
+let mut source = SystemEntropy::new();
 let mut data = vec![0u8; 100_000];
 source.fill_bytes(&mut data);
 
@@ -120,6 +160,7 @@ The framework provides:
 2. **Quality verification** (statistical tests, entropy metrics)
 3. **Performance measurement** (throughput, latency benchmarks)
 4. **Visual feedback** (real-time GUI, state visualization)
+5. **Educational tools** (step-by-step algorithm breakdowns)
 
 **High-quality entropy sources** (7.5+ bits/byte min-entropy) will show optimal performance across all metrics.
 
@@ -127,11 +168,15 @@ The framework provides:
 
 ```
 entropy-forge/
-├── entropy/      # EntropySource trait + implementations
-├── crypto/       # Stream cipher, key derivation
-├── quality/      # Metrics, NIST tests
-├── bench/        # Performance benchmarking
-└── viz/          # GUI visualization (egui)
+├── src/
+│   ├── entropy/      # EntropySource trait + implementations
+│   ├── crypto/       # Stream cipher, key derivation
+│   ├── quality/      # Metrics, NIST tests
+│   ├── bench/        # Performance benchmarking
+│   ├── learn/        # Educational visualizations
+│   └── viz/          # GUI components (egui)
+├── examples/         # Usage examples
+└── tests/            # Integration tests
 ```
 
 ## Quality Metrics
@@ -172,6 +217,10 @@ impl EntropySource for ChaoticRNG {
     fn fill_bytes(&mut self, dest: &mut [u8]) {
         // Evolve chaotic system, extract bytes...
     }
+    
+    fn name(&self) -> &str {
+        "Chaotic RNG (Rössler)"
+    }
 }
 
 // Use with Entropy Forge
@@ -185,11 +234,11 @@ let mut cipher = StreamCipher::new(source);
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please feel free to submit a Pull Request. See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## Acknowledgments
 
