@@ -21,7 +21,7 @@ statrs = "0.17"
 
 # GUI (optional)
 egui = { version = "0.29", optional = true }
-eframe = { version = "0.29", optional = true }
+eframe = { version = "0.33", optional = true }
 
 # Utilities
 thiserror = "1.0"
