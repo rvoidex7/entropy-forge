@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Entropy Forge</title>
+  <link rel="stylesheet" href="styles/main.css">
+  <link rel="stylesheet" href="styles/use-tab.css">
+  <link rel="stylesheet" href="styles/test-tab.css">
+  <link rel="stylesheet" href="styles/bench-tab.css">
+  <link rel="stylesheet" href="styles/learn-tab.css">
+  <link rel="stylesheet" href="styles/responsive.css">
+</head>
+<body>
+  <div id="app">
+    <header id="app-header">
+      <h1>🔐 Entropy Forge</h1>
+      <div id="source-info">Source: System RNG</div>
+    </header>
+    <nav id="tab-bar">
+      <button class="tab-btn active" data-tab="use">📝 Use</button>
+      <button class="tab-btn" data-tab="test">🔬 Test</button>
+      <button class="tab-btn" data-tab="benchmark">⚡ Benchmark</button>
+      <button class="tab-btn" data-tab="learn">🎓 Learn</button>
+    </nav>
+    <main id="tab-content">
+      <section id="tab-use" class="tab-panel">
+        <h2>Stream Cipher</h2>
+        <p>Encrypt or decrypt data using the entropy source as keystream.</p>
+
+        <div class="flex-col">
+          <div>
+            <label for="use-input" class="text-muted">Input:</label>
+            <textarea id="use-input" placeholder="Enter plaintext to encrypt...">Hello, World!</textarea>
+          </div>
+
+          <div class="use-controls flex-row">
+            <label class="flex-row">
+              <input type="checkbox" id="use-hex-check" checked> Show as Hex
+            </label>
+            <div class="spacer"></div>
+            <button id="use-encrypt-btn" class="primary-btn">🔒 Encrypt / Decrypt</button>
+          </div>
+
+          <div>
+            <label class="text-muted">Output:</label>
+            <textarea id="use-output" class="font-mono" readonly></textarea>
+          </div>
+
+          <div>
+            <h3>Cipher State (first 64 bytes of keystream)</h3>
+            <div id="use-keystream-grid"></div>
+          </div>
+
+          <div>
+            <a href="#" id="use-help-link">ℹ Help: How does this work?</a>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-test" class="tab-panel hidden">
+        <h2>Quality Analysis</h2>
+        <p>Analyze entropy quality with statistical tests.</p>
+
+        <div class="flex-col">
+          <div>
+            <label class="text-muted">Sample size:</label>
+            <div class="flex-row" style="margin-top: 8px;">
+              <input type="range" id="test-size-slider" min="3" max="6" step="0.1" value="4" style="flex-grow: 1;">
+              <span id="test-size-label" class="font-mono">10,000 bytes</span>
+            </div>
+          </div>
+
+          <button id="test-run-btn" class="primary-btn">🔬 Run All Tests</button>
+
+          <div id="test-results-section" class="hidden flex-col">
+            <div>
+              <h3>Entropy Metrics</h3>
+              <div id="test-metrics-container" class="flex-col">
+                <div id="test-shannon-bar"></div>
+                <div id="test-min-bar"></div>
+
+                <div class="metric-row">
+                  <div class="metric-label">Mean byte value</div>
+                  <div id="test-mean-val" class="font-mono"></div>
+                </div>
+                <div class="metric-row">
+                  <div class="metric-label">Chi-square</div>
+                  <div id="test-chi-val" class="font-mono"></div>
+                </div>
+                <div class="metric-row">
+                  <div class="metric-label">Longest run</div>
+                  <div id="test-run-val" class="font-mono"></div>
+                </div>
+
+                <div id="test-score-bar"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="flex-row">
+                <h3>NIST SP 800-22 Tests</h3>
+                <span class="tooltip-icon" data-tooltip="Standard statistical tests used by the US government to certify random number generators. We check if the data looks indistinguishable from a coin flip.">ℹ</span>
+              </div>
+              <p class="text-muted" style="font-size: var(--text-sm);">P-values ≥ 0.01 indicate randomness (Pass)</p>
+
+              <table class="nist-table">
+                <thead>
+                  <tr>
+                    <th>Test</th>
+                    <th>P-Value</th>
+                    <th>Result</th>
+                  </tr>
+                </thead>
+                <tbody id="test-nist-tbody">
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="tab-benchmark" class="tab-panel hidden">
+        <h2>Performance Benchmark</h2>
+        <p>Measure entropy generation speed.</p>
+
+        <div class="flex-col">
+          <div>
+            <label class="text-muted">Benchmark size:</label>
+            <div class="flex-row" style="margin-top: 8px;">
+              <!-- 10,000 to 10,000,000 => log10 is 4 to 7 -->
+              <input type="range" id="bench-size-slider" min="4" max="7" step="0.1" value="6" style="flex-grow: 1;">
+              <span id="bench-size-label" class="font-mono">1,000,000 bytes</span>
+            </div>
+          </div>
+
+          <button id="bench-run-btn" class="primary-btn">⚡ Run Benchmark</button>
+
+          <div id="bench-results-section" class="hidden flex-col">
+            <h3>Results</h3>
+
+            <div class="bench-metric-row">
+              <div class="bench-metric-label">
+                Throughput
+                <span class="tooltip-icon" data-tooltip="Speed for bulk operations like file encryption and video streaming.">ℹ</span>
+              </div>
+              <div id="bench-throughput-val" class="bench-metric-value"></div>
+            </div>
+
+            <div class="bench-metric-row">
+              <div class="bench-metric-label">
+                Latency
+                <span class="tooltip-icon" data-tooltip="Per-byte delay relevant to key generation and protocol handshakes.">ℹ</span>
+              </div>
+              <div id="bench-latency-val" class="bench-metric-value"></div>
+            </div>
+
+            <div class="bench-metric-row">
+              <div class="bench-metric-label">Bytes Generated</div>
+              <div id="bench-bytes-val" class="bench-metric-value text-muted"></div>
+            </div>
+
+            <div class="bench-metric-row">
+              <div class="bench-metric-label">Total Time</div>
+              <div id="bench-duration-val" class="bench-metric-value text-muted"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="tab-learn" class="tab-panel hidden">
+        <h2>Interactive Visualizations</h2>
+
+        <div class="sub-tab-bar">
+          <button class="sub-tab-btn active" data-subtab="xor">XOR Cipher</button>
+          <button class="sub-tab-btn" data-subtab="entropy">Shannon Entropy</button>
+          <button class="sub-tab-btn" data-subtab="nist">NIST Frequency</button>
+        </div>
+
+        <div id="learn-xor" class="sub-tab-panel">
+          <div class="flex-row">
+            <input type="text" id="xor-input" placeholder="Type text to visualize..." style="flex-grow: 1;">
+            <button id="xor-start-btn" class="primary-btn">Start Visualization</button>
+          </div>
+
+          <div id="xor-viz-section" class="hidden" style="margin-top: var(--space-md);">
+            <h3 id="xor-step-header"></h3>
+
+            <div class="learn-viz-box flex-col font-mono">
+              <div class="xor-row text-cyan">
+                <span class="xor-row-label">Input:</span>
+                <span id="xor-in-char" class="xor-row-char"></span>
+                <span id="xor-in-dec" class="xor-row-dec"></span>
+                <span id="xor-in-bin"></span>
+              </div>
+              <div class="xor-row text-orange">
+                <span class="xor-row-label">Key:</span>
+                <span class="xor-row-char"></span>
+                <span id="xor-key-dec" class="xor-row-dec"></span>
+                <span id="xor-key-bin"></span>
+              </div>
+              <hr style="border: 0; border-top: 1px solid var(--border-color); width: 100%; margin: 4px 0;">
+              <div class="xor-row text-green">
+                <span class="xor-row-label">Result:</span>
+                <span class="xor-row-char"></span>
+                <span id="xor-out-dec" class="xor-row-dec"></span>
+                <span id="xor-out-bin"></span>
+              </div>
+              <div class="text-muted text-sm" style="margin-top: var(--space-sm);">XOR Truth Table: 0⊕1=1  1⊕0=1  0⊕0=0  1⊕1=0</div>
+            </div>
+
+            <div id="xor-controls" style="margin-top: var(--space-md);"></div>
+
+            <div>
+              <h3>Encryption Progress</h3>
+              <div id="xor-progress" class="xor-progress-container"></div>
+            </div>
+
+            <details style="margin-top: var(--space-md);">
+              <summary class="text-cyan cursor-pointer">▸ How it works</summary>
+              <ol class="text-muted" style="margin-top: var(--space-sm);">
+                <li>Text character is converted to its ASCII number</li>
+                <li>The ASCII number is expressed as 8 binary bits</li>
+                <li>A random keystream byte is generated from the entropy source</li>
+                <li>Each bit of the input is XORed with the matching keystream bit</li>
+                <li>The resulting bits form the encrypted byte</li>
+              </ol>
+            </details>
+          </div>
+        </div>
+
+        <div id="learn-entropy" class="sub-tab-panel hidden">
+          <div class="flex-row">
+            <input type="text" id="entropy-input" placeholder="Enter text to analyze..." style="flex-grow: 1;">
+            <button id="entropy-calc-btn" class="primary-btn">Calculate</button>
+          </div>
+
+          <div id="entropy-viz-section" class="hidden" style="margin-top: var(--space-md);">
+            <h3 id="entropy-step-header"></h3>
+
+            <div id="entropy-content-area" class="learn-viz-box"></div>
+
+            <div id="entropy-controls" style="margin-top: var(--space-md);"></div>
+          </div>
+        </div>
+
+        <div id="learn-nist" class="sub-tab-panel hidden">
+          <div class="flex-row">
+            <input type="text" id="nist-input" placeholder="Enter text to analyze..." style="flex-grow: 1;">
+            <button id="nist-analyze-btn" class="primary-btn">Analyze</button>
+            <button id="nist-random-btn">Generate Random (16 bytes)</button>
+          </div>
+
+          <div id="nist-viz-section" class="hidden" style="margin-top: var(--space-md);">
+            <h3 id="nist-step-header"></h3>
+
+            <div id="nist-content-area" class="learn-viz-box"></div>
+
+            <div id="nist-controls" style="margin-top: var(--space-md);"></div>
+          </div>
+        </div>
+
+      </section>
+    </main>
+  </div>
+  <script type="module" src="main.js"></script>
+</body>
+</html>

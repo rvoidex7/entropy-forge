@@ -1,7 +1,7 @@
 //! Comprehensive quality check example
 
-use entropy_weaver::entropy::{EntropySource, SystemEntropy};
-use entropy_weaver::quality::{QualityMetrics, NistTests};
+use entropy_forge::entropy::{EntropySource, SystemEntropy};
+use entropy_forge::quality::{QualityMetrics, NistTests};
 
 fn main() {
     println!("=== Entropy Quality Check ===\n");

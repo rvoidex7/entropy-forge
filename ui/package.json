@@ -1,0 +1,16 @@
+{
+  "name": "entropy-forge-ui",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "esbuild ts/main.ts --bundle --outdir=dist",
+    "dev": "esbuild ts/main.ts --bundle --outdir=dist --watch"
+  },
+  "devDependencies": {
+    "@tauri-apps/api": "^2.10.1",
+    "@tauri-apps/cli": "^2",
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "esbuild": "^0.20.2"
+  }
+}

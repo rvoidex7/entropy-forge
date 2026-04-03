@@ -10,7 +10,7 @@ use super::EntropySource;
 /// # Examples
 ///
 /// ```
-/// use entropy_weaver::entropy::{EntropySource, MockEntropy};
+/// use entropy_forge::entropy::{EntropySource, MockEntropy};
 ///
 /// let mut entropy = MockEntropy::new(42);
 /// let mut buffer = [0u8; 4];

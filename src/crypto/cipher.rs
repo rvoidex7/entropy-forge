@@ -16,8 +16,8 @@ use crate::entropy::EntropySource;
 /// # Examples
 ///
 /// ```
-/// use entropy_weaver::entropy::SystemEntropy;
-/// use entropy_weaver::crypto::StreamCipher;
+/// use entropy_forge::entropy::SystemEntropy;
+/// use entropy_forge::crypto::StreamCipher;
 ///
 /// let entropy = SystemEntropy::new();
 /// let mut cipher = StreamCipher::new(entropy);

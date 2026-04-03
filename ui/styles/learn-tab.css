@@ -1,0 +1,167 @@
+.sub-tab-bar {
+  display: flex;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: var(--space-md);
+  overflow-x: auto;
+}
+
+.sub-tab-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  padding: var(--space-sm) var(--space-md);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  white-space: nowrap;
+}
+
+.sub-tab-btn.active {
+  color: var(--accent-cyan);
+  border-bottom-color: var(--accent-cyan);
+}
+
+.learn-viz-box {
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+  padding: var(--space-md);
+  border-radius: 4px;
+}
+
+.control-btn {
+  background-color: var(--bg-tertiary);
+  padding: 8px 16px;
+  min-width: 80px;
+}
+
+.control-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* XOR Specific */
+.xor-row {
+  margin-bottom: var(--space-sm);
+  font-family: var(--font-mono);
+}
+
+.xor-row-label {
+  display: inline-block;
+  width: 80px;
+  font-weight: bold;
+}
+
+.xor-row-char {
+  display: inline-block;
+  width: 60px;
+}
+
+.xor-row-dec {
+  display: inline-block;
+  width: 60px;
+}
+
+.xor-progress-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: var(--space-md);
+}
+
+.xor-badge {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+}
+
+.xor-badge.past {
+  color: #888;
+  background-color: #222;
+}
+
+.xor-badge.current {
+  color: #000;
+  background-color: var(--accent-green);
+  font-weight: bold;
+}
+
+.xor-badge.future {
+  color: #444;
+  background-color: #111;
+}
+
+/* Entropy Specific */
+.entropy-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.entropy-table th, .entropy-table td {
+  padding: var(--space-xs);
+  text-align: left;
+}
+
+.entropy-bar {
+  height: 16px;
+  background-color: var(--accent-cyan);
+  border-radius: 2px;
+}
+
+.entropy-summary {
+  text-align: center;
+  padding: var(--space-lg) 0;
+}
+
+.entropy-val-large {
+  font-size: 28px;
+  color: var(--accent-cyan);
+  margin-bottom: var(--space-sm);
+}
+
+.entropy-interpret {
+  text-align: center;
+  font-size: var(--text-lg);
+  margin-top: var(--space-md);
+}
+
+/* NIST Specific */
+.nist-bits {
+  word-break: break-all;
+  line-height: 1.5;
+  margin-bottom: var(--space-md);
+}
+
+.nist-ratio-container {
+  margin: var(--space-md) 0;
+}
+
+.nist-ratio-bar {
+  height: 32px;
+  background-color: var(--bg-tertiary);
+  position: relative;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: var(--space-xs) 0;
+}
+
+.nist-ratio-ones {
+  height: 100%;
+  background-color: var(--accent-green);
+}
+
+.nist-ratio-center {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  background-color: #fff;
+  transform: translateX(-50%);
+}
+
+.nist-stats {
+  background-color: var(--bg-tertiary);
+  padding: var(--space-md);
+  border-radius: 4px;
+  font-family: var(--font-mono);
+}
