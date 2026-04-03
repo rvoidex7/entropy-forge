@@ -161,8 +161,8 @@ impl QualityMetrics {
     /// # Examples
     ///
     /// ```
-    /// use entropy_weaver::entropy::SystemEntropy;
-    /// use entropy_weaver::quality::QualityMetrics;
+    /// use entropy_forge::entropy::SystemEntropy;
+    /// use entropy_forge::quality::QualityMetrics;
     ///
     /// let mut source = SystemEntropy::new();
     /// let metrics = QualityMetrics::analyze(&mut source, 100_000);
