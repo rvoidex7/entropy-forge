@@ -5,7 +5,8 @@
   "identifier": "com.entropyforge.desktop",
   "build": {
     "frontendDist": "../ui/dist",
-    "devUrl": "http://localhost:1420"
+    "devUrl": "../ui/dist",
+    "beforeDevCommand": "npm run dev --prefix ../ui"
   },
   "app": {
     "windows": [
