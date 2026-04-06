@@ -133,13 +133,22 @@
 
         <!-- MAIN CONTENT AREA -->
         <main class="flex-1 flex flex-col relative data-flow-bg overflow-hidden bg-surface-dim h-screen w-full">
-            <!-- TOP APP BAR -->
-            <header class="h-16 border-b border-[#00FF88]/20 bg-[#131314] flex justify-end items-center px-6 z-40">
-                <div class="flex items-center space-x-6">
-                    <div class="flex items-center space-x-1">
-                        <div class="w-2 h-2 bg-primary-container animate-pulse"></div>
-                        <span class="text-[10px] text-primary tracking-widest font-bold uppercase">SYSTEM ONLINE</span>
-                    </div>
+            <!-- TOP APP BAR WITH WINDOW CONTROLS -->
+            <header data-tauri-drag-region class="h-16 border-b border-[#00FF88]/20 bg-[#131314] flex justify-between items-center px-6 z-40">
+                <div class="flex-1"></div>
+                <div class="flex items-center space-x-3">
+                    <!-- Minimize Button -->
+                    <button id="titlebar-minimize" class="group flex items-center justify-center w-8 h-8 rounded-none hover:bg-[#00FF88]/10 transition-colors duration-200">
+                        <span class="material-symbols-outlined text-sm text-slate-400 group-hover:text-[#00FF88]">minimize</span>
+                    </button>
+                    <!-- Maximize Button -->
+                    <button id="titlebar-maximize" class="group flex items-center justify-center w-8 h-8 rounded-none hover:bg-[#00FF88]/10 transition-colors duration-200">
+                        <span class="material-symbols-outlined text-sm text-slate-400 group-hover:text-[#00FF88]">check_box_outline_blank</span>
+                    </button>
+                    <!-- Close Button -->
+                    <button id="titlebar-close" class="group flex items-center justify-center w-8 h-8 rounded-none hover:bg-error/20 transition-colors duration-200">
+                        <span class="material-symbols-outlined text-sm text-slate-400 group-hover:text-error">close</span>
+                    </button>
                 </div>
             </header>
 

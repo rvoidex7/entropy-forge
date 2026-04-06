@@ -1,6 +1,33 @@
 import { invoke } from "@tauri-apps/api/core";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 
 document.addEventListener("DOMContentLoaded", () => {
+    // ==========================================
+    // 0. Window Control Buttons
+    // ==========================================
+    const appWindow = getCurrentWindow();
+    const minimizeBtn = document.getElementById('titlebar-minimize');
+    const maximizeBtn = document.getElementById('titlebar-maximize');
+    const closeBtn = document.getElementById('titlebar-close');
+
+    if (minimizeBtn) {
+        minimizeBtn.addEventListener('click', () => {
+            appWindow.minimize();
+        });
+    }
+
+    if (maximizeBtn) {
+        maximizeBtn.addEventListener('click', () => {
+            appWindow.toggleMaximize();
+        });
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            appWindow.close();
+        });
+    }
+
     // ==========================================
     // 1. Tab Switching (Sidebar & Bottom Nav)
     // ==========================================
