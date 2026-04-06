@@ -180,6 +180,17 @@
         }
       });
     }
+    const useHelpLink = document.getElementById("use-help-link");
+    if (useHelpLink) {
+      useHelpLink.addEventListener("click", () => {
+        switchTab("tab-learn");
+        const learnInput2 = document.getElementById("learn-input");
+        if (learnInput2 && useInput && useInput.value) {
+          learnInput2.value = useInput.value;
+          learnInput2.dispatchEvent(new Event("input"));
+        }
+      });
+    }
     const testSlider = document.getElementById("test-size-slider");
     const testLabel = document.getElementById("test-size-label");
     const testRunBtn = document.getElementById("test-run-btn");
@@ -209,6 +220,7 @@
           document.getElementById("test-min-bar").style.width = `${result.min_entropy / 8 * 100}%`;
           document.getElementById("test-mean-val").textContent = result.mean.toFixed(3);
           document.getElementById("test-chi-val").textContent = result.chi_square.toFixed(2);
+          document.getElementById("test-longest-run-val").textContent = result.longest_run.toString();
           if (tbody) {
             tbody.innerHTML = "";
             result.nist_results.forEach((t) => {
@@ -242,11 +254,12 @@
       benchRunBtn.addEventListener("click", async () => {
         const mbs = parseInt(benchSlider.value, 10);
         const bytes = mbs * 1024 * 1024;
-        const logDiv = document.getElementById("bench-log");
-        if (logDiv) {
-          logDiv.innerHTML += `<div class="text-primary-container mb-1">[00:00:00] RUNNING BENCHMARK FOR ${mbs}MB...</div>`;
-          logDiv.scrollTop = logDiv.scrollHeight;
-        }
+        const durationVal = document.getElementById("bench-duration-val");
+        const bytesVal = document.getElementById("bench-bytes-val");
+        if (durationVal)
+          durationVal.textContent = "...";
+        if (bytesVal)
+          bytesVal.textContent = "...";
         try {
           const result = await invoke("run_benchmark", {
             bytes
@@ -255,15 +268,16 @@
           document.getElementById("bench-latency").textContent = result.latency_us.toFixed(3);
           const peak = Math.min(result.throughput_mbps / 2e3 * 100, 100);
           document.getElementById("bench-throughput-bar").style.width = `${peak}%`;
-          if (logDiv) {
-            logDiv.innerHTML += `<div class="text-secondary mb-1">[00:00:01] COMPLETED. Generated ${result.bytes_generated.toLocaleString()} bytes in ${result.duration_secs.toFixed(4)}s.</div>`;
-            logDiv.innerHTML += `<div class="text-outline-variant italic mt-4">&gt; Waiting for operator command... _</div>`;
-            logDiv.scrollTop = logDiv.scrollHeight;
-          }
+          if (durationVal)
+            durationVal.textContent = `${result.duration_secs.toFixed(4)}s`;
+          if (bytesVal)
+            bytesVal.textContent = result.bytes_generated.toLocaleString();
         } catch (error) {
           console.error(error);
-          if (logDiv)
-            logDiv.innerHTML += `<div class="text-error mb-1">ERROR: ${error}</div>`;
+          if (durationVal)
+            durationVal.textContent = `Error`;
+          if (bytesVal)
+            bytesVal.textContent = `Error`;
         }
       });
     }
@@ -291,9 +305,13 @@
     });
     let currentXorSteps = [];
     let currentXorStepIdx = 0;
+    let playInterval = null;
     const learnInput = document.getElementById("learn-input");
     const btnXorPrev = document.getElementById("learn-prev");
     const btnXorNext = document.getElementById("learn-next");
+    const btnXorPlayPause = document.getElementById("learn-play-pause");
+    const learnSpeedSlider = document.getElementById("learn-speed-slider");
+    const learnSpeedText = document.getElementById("learn-speed-text");
     const xorStepInfo = document.getElementById("learn-xor-step-info");
     const xorContent = document.getElementById("learn-xor-content");
     const xorProgText = document.getElementById("learn-progress-text");
@@ -305,6 +323,8 @@
         const result = await invoke("get_xor_steps", { text: learnInput.value });
         currentXorSteps = result.steps;
         currentXorStepIdx = 0;
+        if (playInterval)
+          togglePlayPause();
         renderXorStep();
       } catch (e) {
         console.error(e);
@@ -386,6 +406,43 @@
         if (currentXorStepIdx < currentXorSteps.length - 1) {
           currentXorStepIdx++;
           renderXorStep();
+        } else if (playInterval) {
+          togglePlayPause();
+        }
+      });
+    }
+    function togglePlayPause() {
+      if (!btnXorPlayPause)
+        return;
+      const icon = btnXorPlayPause.querySelector(".material-symbols-outlined");
+      if (playInterval) {
+        clearInterval(playInterval);
+        playInterval = null;
+        if (icon)
+          icon.textContent = "play_arrow";
+      } else {
+        if (currentXorStepIdx >= currentXorSteps.length - 1) {
+          currentXorStepIdx = 0;
+        }
+        const speedMs = parseInt(learnSpeedSlider.value, 10);
+        playInterval = setInterval(() => {
+          if (btnXorNext)
+            btnXorNext.click();
+        }, speedMs);
+        if (icon)
+          icon.textContent = "pause";
+      }
+    }
+    if (btnXorPlayPause) {
+      btnXorPlayPause.addEventListener("click", togglePlayPause);
+    }
+    if (learnSpeedSlider && learnSpeedText) {
+      learnSpeedSlider.addEventListener("input", () => {
+        const speedSec = (parseInt(learnSpeedSlider.value, 10) / 1e3).toFixed(1);
+        learnSpeedText.textContent = `${speedSec}s / step`;
+        if (playInterval) {
+          togglePlayPause();
+          togglePlayPause();
         }
       });
     }

@@ -103,8 +103,8 @@
 </head>
 <body class="overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
     <div class="flex h-screen w-screen">
-        <!-- SIDE NAVIGATION SHELL -->
-        <aside class="docked left-0 h-full w-64 border-r border-[#00FF88]/20 flex flex-col py-8 px-0 bg-[#131314] font-['JetBrains_Mono'] uppercase tracking-tight text-sm z-50">
+        <!-- SIDE NAVIGATION SHELL (Desktop only) -->
+        <aside class="hidden lg:flex docked left-0 h-full w-64 border-r border-[#00FF88]/20 flex-col py-8 px-0 bg-[#131314] font-['JetBrains_Mono'] uppercase tracking-tight text-sm z-50">
             <div class="px-6 mb-12">
                 <h1 class="text-xl font-bold tracking-tighter text-[#00FF88]">ENTROPY FORGE</h1>
                 <p class="text-[10px] text-slate-500 tracking-widest font-medium mt-1">V.2.04.88-ALPHA</p>
@@ -133,18 +133,13 @@
 
         <!-- MAIN CONTENT AREA -->
         <main class="flex-1 flex flex-col relative data-flow-bg overflow-hidden bg-surface-dim h-screen w-full">
-            <!-- TOP APP BAR -->
-            <header class="h-16 border-b border-[#00FF88]/20 bg-[#131314] flex justify-end items-center px-6 z-40">
-                <div class="flex items-center space-x-6">
-                    <div class="flex items-center space-x-1">
-                        <div class="w-2 h-2 bg-primary-container animate-pulse"></div>
-                        <span class="text-[10px] text-primary tracking-widest font-bold uppercase">SYSTEM ONLINE</span>
-                    </div>
-                </div>
+            <!-- TOP APP BAR (Mobile only) -->
+            <header class="lg:hidden h-16 border-b border-[#00FF88]/20 bg-[#131314] flex justify-between items-center px-6 z-40">
+                <h1 class="text-lg font-bold tracking-tighter text-[#00FF88]">ENTROPY FORGE</h1>
             </header>
 
             <!-- TAB CONTENT CONTAINER -->
-            <div id="tab-content-container" class="flex-1 overflow-y-auto no-scrollbar relative w-full h-full">
+            <div id="tab-content-container" class="flex-1 overflow-y-auto no-scrollbar relative w-full h-full mb-16 lg:mb-0">
                 <!-- USE TAB -->
                 <section id="tab-use" class="tab-panel active h-full">
                     <div class="p-8 max-w-2xl mx-auto space-y-8 pb-32">
@@ -217,6 +212,13 @@
                                 <textarea id="use-output" class="w-full bg-transparent border-0 focus:ring-0 font-mono text-xs text-primary-fixed leading-relaxed break-all resize-none min-h-[120px] p-2" readonly placeholder="Awaiting sequence initiation"></textarea>
                             </div>
                         </section>
+
+                        <div class="text-center pt-4">
+                            <button id="use-help-link" class="text-xs text-primary-container hover:text-primary underline underline-offset-4 tracking-wider transition-colors inline-flex items-center">
+                                Nasıl çalışır? (XOR Visualizer'ı Gör)
+                                <span class="material-symbols-outlined ml-1 text-[14px]">arrow_forward</span>
+                            </button>
+                        </div>
                     </div>
                 </section>
 
@@ -296,6 +298,13 @@
                                             <p id="test-chi-val" class="text-lg font-bold text-[#00FF88]">0.00</p>
                                         </div>
                                         <span class="text-[8px] text-slate-600 px-2 py-1 border border-outline-variant italic">STAT</span>
+                                    </div>
+                                    <div class="bg-surface-container-highest p-4 flex justify-between items-center">
+                                        <div class="space-y-1">
+                                            <p class="text-[10px] text-slate-500 uppercase">Longest Run</p>
+                                            <p id="test-longest-run-val" class="text-lg font-bold text-[#00FF88]">0</p>
+                                        </div>
+                                        <span class="text-[8px] text-slate-600 px-2 py-1 border border-outline-variant italic">BITS</span>
                                     </div>
                                 </div>
                             </div>
@@ -396,28 +405,15 @@
                                 </button>
                             </div>
 
-                            <!-- Session Stats Log -->
-                            <div class="col-span-12 md:col-span-7 bg-surface-container-highest p-0 flex flex-col relative">
-                                <div class="p-4 bg-surface-container border-b border-outline-variant flex justify-between items-center">
-                                    <h3 class="text-[10px] font-bold text-outline uppercase tracking-widest">Session Stats Log</h3>
-                                    <div class="flex space-x-2">
-                                        <div class="w-2 h-2 bg-primary-container"></div>
-                                        <div class="w-2 h-2 bg-surface-variant"></div>
-                                    </div>
+                            <!-- Session Stats -->
+                            <div class="col-span-12 md:col-span-7 flex flex-col space-y-6 justify-center pl-0 lg:pl-12">
+                                <div class="bg-surface-container-highest p-6 border-l-4 border-[#A855F7]">
+                                    <p class="text-[10px] font-black text-[#A855F7] uppercase tracking-widest mb-1">Total Bytes Generated</p>
+                                    <p id="bench-bytes-val" class="text-3xl font-bold text-primary">0</p>
                                 </div>
-                                <div id="bench-log" class="p-6 font-['JetBrains_Mono'] text-[11px] leading-relaxed overflow-y-auto max-h-[300px] no-scrollbar">
-                                    <div class="text-outline-variant italic mt-4">&gt; Waiting for operator command... _</div>
-                                </div>
-                                <!-- Mini Visualization Area -->
-                                <div class="absolute bottom-4 right-4 w-32 h-12 flex items-end space-x-1 opacity-50">
-                                    <div class="w-1 bg-primary-container h-[20%]"></div>
-                                    <div class="w-1 bg-primary-container h-[40%]"></div>
-                                    <div class="w-1 bg-primary-container h-[35%]"></div>
-                                    <div class="w-1 bg-primary-container h-[80%]"></div>
-                                    <div class="w-1 bg-primary-container h-[60%]"></div>
-                                    <div class="w-1 bg-primary-container h-[95%]"></div>
-                                    <div class="w-1 bg-primary-container h-[70%]"></div>
-                                    <div class="w-1 bg-primary-container h-[85%]"></div>
+                                <div class="bg-surface-container-highest p-6 border-l-4 border-secondary">
+                                    <p class="text-[10px] font-black text-secondary uppercase tracking-widest mb-1">Execution Duration</p>
+                                    <p id="bench-duration-val" class="text-3xl font-bold text-primary">0.000s</p>
                                 </div>
                             </div>
                         </div>
@@ -470,12 +466,20 @@
                                             <button id="learn-prev" class="w-12 h-12 flex items-center justify-center bg-surface-container border border-outline-variant/30 text-slate-400 hover:text-primary transition-colors">
                                                 <span class="material-symbols-outlined">skip_previous</span>
                                             </button>
-                                            <button id="learn-next" class="w-12 h-12 flex items-center justify-center bg-primary-container text-on-primary-container hover:bg-primary transition-colors">
-                                                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">skip_next</span>
+                                            <button id="learn-play-pause" class="w-12 h-12 flex items-center justify-center bg-primary-container text-on-primary-container hover:bg-primary transition-colors">
+                                                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">play_arrow</span>
+                                            </button>
+                                            <button id="learn-next" class="w-12 h-12 flex items-center justify-center bg-surface-container border border-outline-variant/30 text-slate-400 hover:text-primary transition-colors">
+                                                <span class="material-symbols-outlined">skip_next</span>
                                             </button>
                                         </div>
                                         <div class="flex-1 w-full space-y-2">
                                             <div class="flex justify-between text-[10px] uppercase font-bold text-slate-500 tracking-wider">
+                                                <span>Animation Speed</span>
+                                                <span id="learn-speed-text">1.0s / step</span>
+                                            </div>
+                                            <input id="learn-speed-slider" class="w-full h-px bg-outline-variant/30 appearance-none cursor-pointer accent-[#00FF88]" type="range" min="100" max="2000" step="100" value="1000"/>
+                                            <div class="flex justify-between text-[10px] uppercase font-bold text-slate-500 tracking-wider mt-4">
                                                 <span>Animation Progress</span>
                                                 <span id="learn-progress-text">0%</span>
                                             </div>
