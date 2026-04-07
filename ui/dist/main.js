@@ -86,6 +86,18 @@
   _Resource_rid = /* @__PURE__ */ new WeakMap();
 
   // ts/main.ts
+  var safeInvoke = async (command, args = {}) => {
+    try {
+      if (window.__TAURI_INTERNALS__) {
+        return await invoke(command, args);
+      } else {
+        console.warn(`[Tauri Mock] Called invoke('${command}') with args:`, args);
+        throw new Error("Tauri API is not available in the browser.");
+      }
+    } catch (e) {
+      throw e;
+    }
+  };
   document.addEventListener("DOMContentLoaded", () => {
     const tabLinks = document.querySelectorAll(".tab-link, .mobile-tab-link");
     const tabPanels = document.querySelectorAll(".tab-panel");
@@ -155,7 +167,7 @@
         if (!text)
           return;
         try {
-          const result = await invoke("encrypt_decrypt", {
+          const result = await safeInvoke("encrypt_decrypt", {
             plaintext: text,
             hexOutput: useHexCheck.checked
           });
@@ -211,7 +223,7 @@
         if (tbody)
           tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4">Running tests...</td></tr>';
         try {
-          const result = await invoke("run_quality_tests", {
+          const result = await safeInvoke("run_quality_tests", {
             sampleSize: bytes
           });
           document.getElementById("test-shannon-val").textContent = result.shannon_entropy.toFixed(4);
@@ -261,7 +273,7 @@
         if (bytesVal)
           bytesVal.textContent = "...";
         try {
-          const result = await invoke("run_benchmark", {
+          const result = await safeInvoke("run_benchmark", {
             bytes
           });
           document.getElementById("bench-throughput").textContent = result.throughput_mbps.toFixed(1);
@@ -320,7 +332,7 @@
       if (!learnInput.value)
         return;
       try {
-        const result = await invoke("get_xor_steps", { text: learnInput.value });
+        const result = await safeInvoke("get_xor_steps", { text: learnInput.value });
         currentXorSteps = result.steps;
         currentXorStepIdx = 0;
         if (playInterval)
@@ -457,7 +469,7 @@
       if (!learnEntInput.value)
         return;
       try {
-        const result = await invoke("get_entropy_steps", { text: learnEntInput.value });
+        const result = await safeInvoke("get_entropy_steps", { text: learnEntInput.value });
         currentEntSteps = result.steps;
         currentEntStepIdx = 0;
         renderEntStep();
@@ -530,7 +542,7 @@
     const nistContent = document.getElementById("learn-nist-content");
     async function loadNistSteps() {
       try {
-        const result = await invoke("get_nist_steps_random", { count: 64 });
+        const result = await safeInvoke("get_nist_steps_random", { count: 64 });
         currentNistSteps = result.steps;
         currentNistStepIdx = 0;
         renderNistStep();

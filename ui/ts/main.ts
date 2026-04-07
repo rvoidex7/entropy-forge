@@ -1,5 +1,18 @@
 import { invoke } from "@tauri-apps/api/core";
 
+const safeInvoke = async (command: string, args: any = {}) => {
+    try {
+        if ((window as any).__TAURI_INTERNALS__) {
+            return await invoke(command, args);
+        } else {
+            console.warn(`[Tauri Mock] Called invoke('${command}') with args:`, args);
+            throw new Error("Tauri API is not available in the browser.");
+        }
+    } catch (e) {
+        throw e;
+    }
+};
+
 document.addEventListener("DOMContentLoaded", () => {
     // ==========================================
     // 1. Tab Switching (Sidebar & Bottom Nav)
@@ -78,7 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!text) return;
 
             try {
-                const result: any = await invoke('encrypt_decrypt', {
+                const result: any = await safeInvoke('encrypt_decrypt', {
                     plaintext: text,
                     hexOutput: useHexCheck.checked
                 });
@@ -151,7 +164,7 @@ if (useHelpLink) {
             if (tbody) tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4">Running tests...</td></tr>';
 
             try {
-                const result: any = await invoke('run_quality_tests', {
+                const result: any = await safeInvoke('run_quality_tests', {
                     sampleSize: bytes
                 });
 
@@ -216,7 +229,7 @@ if (useHelpLink) {
             if (bytesVal) bytesVal.textContent = '...';
 
             try {
-                const result: any = await invoke('run_benchmark', {
+                const result: any = await safeInvoke('run_benchmark', {
                     bytes: bytes
                 });
 
@@ -287,7 +300,7 @@ if (useHelpLink) {
     async function loadXorSteps() {
         if (!learnInput.value) return;
         try {
-            const result: any = await invoke('get_xor_steps', { text: learnInput.value });
+            const result: any = await safeInvoke('get_xor_steps', { text: learnInput.value });
             currentXorSteps = result.steps;
             currentXorStepIdx = 0;
             if (playInterval) togglePlayPause(); // Pause if loading new
@@ -434,7 +447,7 @@ if (useHelpLink) {
     async function loadEntSteps() {
         if (!learnEntInput.value) return;
         try {
-            const result: any = await invoke('get_entropy_steps', { text: learnEntInput.value });
+            const result: any = await safeInvoke('get_entropy_steps', { text: learnEntInput.value });
             currentEntSteps = result.steps;
             currentEntStepIdx = 0;
             renderEntStep();
@@ -502,7 +515,7 @@ if (useHelpLink) {
 
     async function loadNistSteps() {
         try {
-            const result: any = await invoke('get_nist_steps_random', { count: 64 });
+            const result: any = await safeInvoke('get_nist_steps_random', { count: 64 });
             currentNistSteps = result.steps;
             currentNistStepIdx = 0;
             renderNistStep();
