@@ -8,6 +8,9 @@
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;300;400;500;700;800&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    <!-- Custom CSS (before Tailwind for priority) -->
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/responsive.css">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script id="tailwind-config">
         tailwind.config = {
@@ -109,7 +112,6 @@
         <aside class="hidden lg:flex docked left-0 h-full w-64 border-r border-[#00FF88]/20 flex-col py-8 px-0 bg-[#131314] font-['JetBrains_Mono'] uppercase tracking-tight text-sm z-50">
             <div class="px-6 mb-12">
                 <h1 class="text-xl font-bold tracking-tighter text-[#00FF88]">ENTROPY FORGE</h1>
-                <p class="text-[10px] text-slate-500 tracking-widest font-medium mt-1">V.2.04.88-ALPHA</p>
             </div>
 
             <nav id="sidebar-nav" class="flex-grow flex flex-col space-y-1">
@@ -148,16 +150,16 @@
                         <!-- Module Title -->
                         <div class="flex justify-between items-end border-l-4 border-primary-container pl-4">
                             <div>
-                                <h2 class="text-2xl font-black uppercase tracking-tighter">CRYPTO_FORGE_MODULE</h2>
-                                <p class="text-xs text-primary-container/60 mt-1 font-medium tracking-widest">READY FOR INPUT STREAM :: TYPE: STREAM_CIPHER</p>
+                                <h2 class="text-2xl font-black uppercase tracking-tighter">Stream Cipher</h2>
+                                <p class="text-xs text-primary-container/60 mt-1 font-medium tracking-widest">Encrypt messages using the keystream generator</p>
                             </div>
                         </div>
 
                         <!-- Plaintext Input Area -->
                         <section class="space-y-4">
                             <div class="flex items-center justify-between">
-                                <span class="text-[10px] text-outline uppercase tracking-[0.2em] font-bold">01. Plaintext Input</span>
-                                <span class="text-[10px] text-secondary font-mono">STATUS: READY_</span>
+                                <span class="text-[10px] text-outline uppercase tracking-[0.2em] font-bold">Plaintext Input</span>
+                                <span class="text-[10px] text-secondary font-mono">UTF-8</span>
                             </div>
                             <div class="bg-surface-container-low p-6 ghost-border relative group overflow-hidden">
                                 <div class="absolute top-0 left-0 w-1 h-full bg-primary-container/20 group-hover:bg-primary-container transition-colors"></div>
@@ -173,7 +175,7 @@
                         <!-- Forge Controls -->
                         <div class="grid grid-cols-2 gap-6">
                             <!-- Hex Toggle -->
-                            <div class="bg-surface-container-low p-6 ghost-border flex items-center justify-between">
+                            <div class="bg-surface-container-low p-6 ghost-border flex items-center justify-between" title="Toggle between hexadecimal and UTF-8 output format. Hex shows bytes as 2-digit hex values, UTF-8 shows text characters.">
                                 <div>
                                     <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Hex Output Mode</p>
                                     <p class="text-xs text-primary mt-1">ENABLED</p>
@@ -193,8 +195,8 @@
                         <!-- Lattice Visualizer -->
                         <section class="space-y-4 keystream-section">
                             <div class="flex items-center justify-between">
-                                <span class="text-[10px] text-outline uppercase tracking-[0.2em] font-bold">02. Keystream Lattice</span>
-                                <span class="text-[10px] text-primary font-mono">8x8_KERNEL_MAPPED</span>
+                                <span class="text-[10px] text-outline uppercase tracking-[0.2em] font-bold">02. Keystream State</span>
+                                <span class="text-[10px] text-primary font-mono">8×8 Grid</span>
                             </div>
                             <div class="p-1 bg-surface-container-low border border-outline-variant/20">
                                 <div id="use-keystream-grid" class="grid grid-cols-8 gap-1 aspect-square bg-background p-2 w-48 h-48 mx-auto">
@@ -206,8 +208,8 @@
                         <!-- Output Section -->
                         <section class="space-y-4">
                             <div class="flex items-center justify-between">
-                                <span class="text-[10px] text-outline uppercase tracking-[0.2em] font-bold">03. Ciphertext Yield</span>
-                                <span class="text-[10px] text-secondary font-mono">ENCRYPTION: IDLE</span>
+                                <span class="text-[10px] text-outline uppercase tracking-[0.2em] font-bold">Ciphertext Output</span>
+                                <span class="text-[10px] text-secondary font-mono">Hex</span>
                             </div>
                             <div class="bg-surface-container-low p-4 relative border border-outline-variant/10 min-h-[120px]">
                                 <div class="absolute top-0 left-0 w-1 h-full bg-primary-container animate-pulse"></div>
@@ -258,11 +260,11 @@
                             <!-- Bento Grid - Metrics -->
                             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                                 <!-- Shannon Entropy Card -->
-                                <div class="bg-surface-container-low border-l-4 border-[#00FF88] p-6 flex flex-col justify-between h-48">
-                                    <div class="flex justify-between items-start">
-                                        <span class="text-xs font-bold uppercase tracking-widest text-[#00FF88]">Shannon Entropy</span>
-                                        <span class="material-symbols-outlined text-slate-600">query_stats</span>
-                                    </div>
+                                 <div class="bg-surface-container-low border-l-4 border-[#00FF88] p-6 flex flex-col justify-between h-48" title="Shannon Entropy measures the average information content. 8.0 bits/byte = perfect randomness. Lower values indicate patterns.">
+                                     <div class="flex justify-between items-start">
+                                         <span class="text-xs font-bold uppercase tracking-widest text-[#00FF88]">Shannon Entropy</span>
+                                         <span class="material-symbols-outlined text-slate-600">query_stats</span>
+                                     </div>
                                     <div>
                                         <div class="text-4xl font-black text-on-surface"><span id="test-shannon-val">0.0000</span> <span class="text-xs text-slate-500 font-normal">bits/byte</span></div>
                                         <div class="mt-4 w-full h-1 bg-surface-container-highest">
@@ -271,12 +273,12 @@
                                     </div>
                                 </div>
 
-                                <!-- Min-Entropy Card -->
-                                <div class="bg-surface-container-low border-l-4 border-secondary p-6 flex flex-col justify-between h-48">
-                                    <div class="flex justify-between items-start">
-                                        <span class="text-xs font-bold uppercase tracking-widest text-secondary">Min-Entropy</span>
-                                        <span class="material-symbols-outlined text-slate-600">data_thresholding</span>
-                                    </div>
+                                 <!-- Min-Entropy Card -->
+                                 <div class="bg-surface-container-low border-l-4 border-secondary p-6 flex flex-col justify-between h-48" title="Min-Entropy is the worst-case entropy, critical for cryptographic security. The minimum entropy must be high to ensure unpredictability.">
+                                     <div class="flex justify-between items-start">
+                                         <span class="text-xs font-bold uppercase tracking-widest text-secondary">Min-Entropy</span>
+                                         <span class="material-symbols-outlined text-slate-600">data_thresholding</span>
+                                     </div>
                                     <div>
                                         <div class="text-4xl font-black text-on-surface"><span id="test-min-val">0.0000</span> <span class="text-xs text-slate-500 font-normal">bits/byte</span></div>
                                         <div class="mt-4 w-full h-1 bg-surface-container-highest">
@@ -287,27 +289,27 @@
 
                                 <!-- Data Labels Cluster -->
                                 <div class="grid grid-cols-1 gap-4">
-                                    <div class="bg-surface-container-highest p-4 flex justify-between items-center">
-                                        <div class="space-y-1">
-                                            <p class="text-[10px] text-slate-500 uppercase">Mean Byte Value</p>
-                                            <p id="test-mean-val" class="text-lg font-bold text-[#00FF88]">0.000</p>
-                                        </div>
-                                        <span class="text-[8px] text-slate-600 px-2 py-1 border border-outline-variant italic">IDEAL: 127.5</span>
-                                    </div>
-                                    <div class="bg-surface-container-highest p-4 flex justify-between items-center">
-                                        <div class="space-y-1">
-                                            <p class="text-[10px] text-slate-500 uppercase">Chi-Square Distribution</p>
-                                            <p id="test-chi-val" class="text-lg font-bold text-[#00FF88]">0.00</p>
-                                        </div>
-                                        <span class="text-[8px] text-slate-600 px-2 py-1 border border-outline-variant italic">STAT</span>
-                                    </div>
-                                    <div class="bg-surface-container-highest p-4 flex justify-between items-center">
-                                        <div class="space-y-1">
-                                            <p class="text-[10px] text-slate-500 uppercase">Longest Run</p>
-                                            <p id="test-longest-run-val" class="text-lg font-bold text-[#00FF88]">0</p>
-                                        </div>
-                                        <span class="text-[8px] text-slate-600 px-2 py-1 border border-outline-variant italic">BITS</span>
-                                    </div>
+                                     <div class="bg-surface-container-highest p-4 flex justify-between items-center" title="Mean byte value should be close to 127.5 for uniform distribution. Values significantly different indicate byte bias.">
+                                         <div class="space-y-1">
+                                             <p class="text-[10px] text-slate-500 uppercase">Mean Byte Value</p>
+                                             <p id="test-mean-val" class="text-lg font-bold text-[#00FF88]">0.000</p>
+                                         </div>
+                                         <span class="text-[8px] text-slate-600 px-2 py-1 border border-outline-variant italic">IDEAL: 127.5</span>
+                                     </div>
+                                     <div class="bg-surface-container-highest p-4 flex justify-between items-center" title="Chi-square test measures deviation from uniform distribution of byte values. Lower values indicate better randomness.">
+                                         <div class="space-y-1">
+                                             <p class="text-[10px] text-slate-500 uppercase">Chi-Square Distribution</p>
+                                             <p id="test-chi-val" class="text-lg font-bold text-[#00FF88]">0.00</p>
+                                         </div>
+                                         <span class="text-[8px] text-slate-600 px-2 py-1 border border-outline-variant italic">STAT</span>
+                                     </div>
+                                     <div class="bg-surface-container-highest p-4 flex justify-between items-center" title="Longest run is the maximum consecutive sequence of the same bit. Longer runs indicate patterns; shorter runs suggest better randomness.">
+                                         <div class="space-y-1">
+                                             <p class="text-[10px] text-slate-500 uppercase">Longest Run</p>
+                                             <p id="test-longest-run-val" class="text-lg font-bold text-[#00FF88]">0</p>
+                                         </div>
+                                         <span class="text-[8px] text-slate-600 px-2 py-1 border border-outline-variant italic">BITS</span>
+                                     </div>
                                 </div>
                             </div>
 

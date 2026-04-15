@@ -175,13 +175,11 @@
           for (let i = 0; i < 64; i++) {
             const div = document.createElement("div");
             const val = bytes[i] || 0;
-            if (val < 85) {
-              div.className = "bg-primary-container/20 border border-primary-container/30 w-full h-full";
-            } else if (val < 170) {
-              div.className = "bg-surface-variant border border-outline-variant w-full h-full";
-            } else {
-              div.className = "bg-secondary-container/40 border border-secondary-container/50 w-full h-full";
-            }
+            const gray = Math.round(val / 255 * 255);
+            const rgbColor = `rgb(${gray}, ${gray}, ${gray})`;
+            div.style.backgroundColor = rgbColor;
+            div.style.border = "1px solid rgba(132, 149, 133, 0.3)";
+            div.className = "w-full h-full";
             useKeystreamGrid.appendChild(div);
           }
         } catch (error) {
