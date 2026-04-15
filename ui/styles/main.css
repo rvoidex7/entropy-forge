@@ -643,3 +643,23 @@ button {
     padding: var(--gap-sm);
   }
 }
+
+/* ============================================================
+   DESKTOP (lg: breakpoint = 1024px and above)
+   ============================================================ */
+@media (min-width: 1024px) {
+  /* Sidebar should be visible */
+  aside.hidden.lg\\:flex {
+    display: flex !important;
+  }
+
+  /* Mobile nav should be hidden */
+  nav#mobile-nav.lg\\:hidden {
+    display: none !important;
+  }
+
+  /* Main content adjustments */
+  main {
+    margin-left: 0;
+  }
+}
