@@ -23,13 +23,11 @@ document.addEventListener("DOMContentLoaded", () => {
     function switchTab(targetId: string) {
         tabPanels.forEach(panel => {
             panel.classList.remove('active');
-            panel.classList.add('hidden');
         });
 
         const targetPanel = document.getElementById(targetId);
         if (targetPanel) {
             targetPanel.classList.add('active');
-            targetPanel.classList.remove('hidden');
         }
 
         document.querySelectorAll('.tab-link').forEach(link => {
@@ -267,15 +265,13 @@ if (useHelpLink) {
             (e.currentTarget as HTMLElement).classList.remove('bg-surface-container', 'text-slate-400');
             (e.currentTarget as HTMLElement).classList.add('active', 'bg-primary-container', 'text-on-primary-container');
 
-            learnSections.forEach(section => {
-                if (section.id === `learn-${targetLearn}`) {
-                    section.classList.add('active');
-                    section.classList.remove('hidden');
-                } else {
-                    section.classList.remove('active');
-                    section.classList.add('hidden');
-                }
-            });
+             learnSections.forEach(section => {
+                 if (section.id === `learn-${targetLearn}`) {
+                     section.classList.add('active');
+                 } else {
+                     section.classList.remove('active');
+                 }
+             });
         });
     });
 

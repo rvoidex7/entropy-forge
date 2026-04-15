@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "build": "esbuild ts/main.ts --bundle --outdir=dist && npm run copy-assets",
-    "copy-assets": "mkdir -p dist/styles && cp index.html dist/ && cp styles/*.css dist/styles/",
+    "copy-assets": "node scripts/copy-assets.js",
     "dev": "esbuild ts/main.ts --bundle --outdir=dist --watch"
   },
   "devDependencies": {
