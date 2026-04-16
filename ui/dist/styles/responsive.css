@@ -1,5 +1,31 @@
 /* Responsive adjustments for mobile devices */
 
+/* ============================================================
+   ACCESSIBILITY - Focus Styles for Keyboard Navigation
+   ============================================================ */
+
+/* Global focus styles for all interactive elements */
+button:focus,
+input:focus,
+textarea:focus,
+a:focus,
+[role="button"]:focus {
+  outline: 2px solid #00FF88;
+  outline-offset: 2px;
+}
+
+/* Remove default outline on buttons that have hover styles */
+button:focus-visible {
+  outline: 2px solid #00FF88;
+  outline-offset: 2px;
+}
+
+/* Tab links focus */
+a[data-target]:focus {
+  outline: 2px solid #00FF88;
+  outline-offset: 0px;
+}
+
 /* Tablet portrait / small laptop (500px – 767px) */
 @media (min-width: 500px) and (max-width: 767px) {
   #app {
