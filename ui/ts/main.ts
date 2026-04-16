@@ -96,13 +96,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 useOutput.value = result.ciphertext;
 
-                // Update Keystream Grid (dynamic based on input length)
+                // Update Keystream Grid (fixed 16 columns, wraps to new rows)
                 useKeystreamGrid.innerHTML = '';
                 const bytes = result.keystream_bytes || [];
                 const inputLength = text.length;
+                const cols = 16; // Fixed 16 columns
                 
-                // Calculate grid dimensions (aim for square or close to it)
-                const cols = Math.ceil(Math.sqrt(inputLength));
                 useKeystreamGrid.style.gridTemplateColumns = `repeat(${cols}, minmax(0, 1fr))`;
                 
                 for (let i = 0; i < inputLength; i++) {
