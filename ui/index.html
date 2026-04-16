@@ -443,12 +443,73 @@
                                         </div>
 
                                         <!-- Step-by-Step Breakdown -->
-                                        <div id="learn-xor-content" class="space-y-8 relative min-h-[300px]">
-                                            <!-- Dynamic content injected here -->
-                                        </div>
-                                    </div>
+                                         <div id="learn-xor-content" class="space-y-8 relative min-h-[300px]">
+                                             <!-- Dynamic content injected here -->
+                                         </div>
 
-                                    <!-- Playback Controls -->
+                                         <!-- XOR Truth Table & Explanation -->
+                                         <div class="space-y-4 pt-8 border-t border-outline-variant/20">
+                                             <div class="bg-surface-container-low p-4 rounded">
+                                                 <h4 class="text-sm font-bold text-[#00FF88] mb-3">XOR Truth Table</h4>
+                                                 <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                                                     <div class="bg-surface-container-highest p-3 text-center rounded border border-outline-variant/20">
+                                                         <span class="text-xs text-slate-400">0 ⊕ 0</span>
+                                                         <div class="text-lg font-bold text-slate-300">=&nbsp;0</div>
+                                                     </div>
+                                                     <div class="bg-surface-container-highest p-3 text-center rounded border border-outline-variant/20">
+                                                         <span class="text-xs text-slate-400">0 ⊕ 1</span>
+                                                         <div class="text-lg font-bold text-[#00FF88]">=&nbsp;1</div>
+                                                     </div>
+                                                     <div class="bg-surface-container-highest p-3 text-center rounded border border-outline-variant/20">
+                                                         <span class="text-xs text-slate-400">1 ⊕ 0</span>
+                                                         <div class="text-lg font-bold text-[#00FF88]">=&nbsp;1</div>
+                                                     </div>
+                                                     <div class="bg-surface-container-highest p-3 text-center rounded border border-outline-variant/20">
+                                                         <span class="text-xs text-slate-400">1 ⊕ 1</span>
+                                                         <div class="text-lg font-bold text-slate-300">=&nbsp;0</div>
+                                                     </div>
+                                                 </div>
+                                             </div>
+
+                                             <div class="bg-surface-container-low p-4 rounded border-l-2 border-[#00FF88]">
+                                                 <p class="text-sm text-slate-300 leading-relaxed">
+                                                     <span class="font-bold text-[#00FF88]">Rule:</span> If the input bits are <strong>different</strong>, the result is <strong>1</strong>. If they are <strong>the same</strong>, the result is <strong>0</strong>.
+                                                 </p>
+                                             </div>
+                                         </div>
+
+                                         <!-- How it Works (Collapsible) -->
+                                         <div class="pt-8 border-t border-outline-variant/20">
+                                             <button id="learn-xor-collapsible" class="w-full flex items-center justify-between bg-surface-container-low p-4 rounded hover:bg-surface-container-highest transition-colors">
+                                                 <span class="text-sm font-bold text-primary">▶ How XOR Encryption Works</span>
+                                                 <span class="material-symbols-outlined text-primary">expand_more</span>
+                                             </button>
+                                             <div id="learn-xor-details" class="hidden bg-surface-container-highest border border-outline-variant/20 border-t-0 p-4 rounded-b space-y-3">
+                                                 <ol class="space-y-2 text-sm text-slate-300">
+                                                     <li><span class="font-bold text-[#00FF88]">1.</span> Convert your character to ASCII (e.g., 'H' = 72)</li>
+                                                     <li><span class="font-bold text-[#00FF88]">2.</span> Convert ASCII to binary (72 = 01001000)</li>
+                                                     <li><span class="font-bold text-[#00FF88]">3.</span> Generate a random keystream byte from entropy source</li>
+                                                     <li><span class="font-bold text-[#00FF88]">4.</span> XOR each bit pair (plaintext ⊕ key)</li>
+                                                     <li><span class="font-bold text-[#00FF88]">5.</span> Result is the encrypted byte sent as ciphertext</li>
+                                                 </ol>
+                                                 <div class="mt-4 pt-4 border-t border-outline-variant/20">
+                                                     <p class="text-xs text-slate-400 leading-relaxed">
+                                                         <strong>Why XOR?</strong> It's reversible: if you have ciphertext ⊕ key, you get plaintext back. This makes it perfect for symmetric encryption when combined with truly random keys (stream cipher).
+                                                     </p>
+                                                 </div>
+                                             </div>
+                                         </div>
+
+                                         <!-- Encryption Progress -->
+                                         <div id="learn-xor-progress" class="pt-8 border-t border-outline-variant/20 hidden">
+                                             <h4 class="text-sm font-bold text-[#A855F7] mb-3">Encryption Progress</h4>
+                                             <div class="bg-surface-container-highest p-4 rounded border border-outline-variant/20 flex flex-wrap gap-2">
+                                                 <!-- Dynamic content injected here -->
+                                             </div>
+                                         </div>
+                                     </div>
+
+                                     <!-- Playback Controls -->
                                     <div class="flex flex-col md:flex-row items-center gap-6 bg-surface-container-low p-6 border border-outline-variant/10">
                                         <div class="flex gap-2">
                                             <button id="learn-prev" class="w-12 h-12 flex items-center justify-center bg-surface-container border border-outline-variant/30 text-slate-400 hover:text-primary transition-colors">
@@ -493,39 +554,86 @@
                             </div>
                         </div>
 
-                        <!-- Entropy Lesson Placeholder -->
-                        <div id="learn-entropy" class="learn-section space-y-6">
-                            <div class="bg-surface-container-lowest border border-outline-variant/10 p-8">
-                                <h3 class="text-xl font-bold text-primary mb-4">Shannon Entropy Visualization</h3>
-                                <p class="text-sm text-slate-400 mb-6">Learn how probability distributions affect information density.</p>
+                        <!-- Entropy Lesson -->
+                         <div id="learn-entropy" class="learn-section space-y-6">
+                             <div class="bg-surface-container-lowest border border-outline-variant/10 p-8">
+                                 <h3 class="text-xl font-bold text-primary mb-2">Shannon Entropy Visualization</h3>
+                                 <p class="text-sm text-slate-400 mb-6">Learn how probability distributions affect information density and randomness.</p>
 
-                                <div class="mb-8">
-                                    <label class="block text-[10px] text-on-surface-variant uppercase tracking-widest mb-2">&gt; Input text</label>
-                                    <input type="text" id="learn-entropy-input" class="w-full bg-surface-container-highest border-b-2 border-primary-container focus:ring-0 text-primary p-2 font-mono text-lg" value="Hello World">
-                                </div>
-                                <div class="flex gap-4 mb-6">
-                                    <button id="learn-entropy-prev" class="bg-surface-container px-4 py-2 text-sm text-slate-300">Previous</button>
-                                    <div class="flex-1 text-center py-2 text-xs font-mono text-[#00FF88]" id="learn-entropy-step-info">Step 0 / 0</div>
-                                    <button id="learn-entropy-next" class="bg-primary-container text-on-primary-container px-4 py-2 text-sm font-bold">Next</button>
-                                </div>
-                                <div id="learn-entropy-content" class="min-h-[200px] border border-outline-variant/20 p-4"></div>
-                            </div>
-                        </div>
+                                 <div class="mb-8">
+                                     <label class="block text-[10px] text-on-surface-variant uppercase tracking-widest mb-2">&gt; Input text</label>
+                                     <input type="text" id="learn-entropy-input" class="w-full bg-surface-container-highest border-b-2 border-primary-container focus:ring-0 text-primary p-2 font-mono text-lg" value="Hello World">
+                                 </div>
 
-                        <!-- NIST Lesson Placeholder -->
-                        <div id="learn-nist" class="learn-section space-y-6">
-                            <div class="bg-surface-container-lowest border border-outline-variant/10 p-8">
-                                <h3 class="text-xl font-bold text-[#A855F7] mb-4">NIST Frequency Test</h3>
-                                <p class="text-sm text-slate-400 mb-6">Understand how we statistically verify randomness.</p>
+                                 <div class="flex flex-col md:flex-row gap-4 mb-6">
+                                     <button id="learn-entropy-calculate" class="bg-primary-container text-on-primary-container px-6 py-2 text-sm font-bold rounded hover:bg-primary transition-colors">Calculate</button>
+                                     <div class="flex-1 text-center py-2 text-xs font-mono text-primary" id="learn-entropy-step-info">Step 0 / 0</div>
+                                 </div>
 
-                                <div class="flex gap-4 mb-6">
-                                    <button id="learn-nist-prev" class="bg-surface-container px-4 py-2 text-sm text-slate-300">Previous</button>
-                                    <div class="flex-1 text-center py-2 text-xs font-mono text-[#A855F7]" id="learn-nist-step-info">Step 0 / 0</div>
-                                    <button id="learn-nist-next" class="bg-[#A855F7] text-white px-4 py-2 text-sm font-bold">Next</button>
-                                </div>
-                                <div id="learn-nist-content" class="min-h-[200px] border border-outline-variant/20 p-4"></div>
-                            </div>
-                        </div>
+                                 <div class="flex gap-4 mb-6">
+                                     <button id="learn-entropy-prev" class="flex-1 bg-surface-container px-4 py-2 text-sm text-slate-300 rounded hover:bg-surface-container-highest transition-colors">Previous</button>
+                                     <button id="learn-entropy-play-pause" class="flex-1 bg-primary-container text-on-primary-container px-4 py-2 text-sm font-bold rounded hover:bg-primary transition-colors flex items-center justify-center gap-2">
+                                         <span class="material-symbols-outlined" style="font-size: 18px; font-variation-settings: 'FILL' 1;">play_arrow</span>
+                                         <span>Play</span>
+                                     </button>
+                                     <button id="learn-entropy-next" class="flex-1 bg-surface-container px-4 py-2 text-sm text-slate-300 rounded hover:bg-surface-container-highest transition-colors">Next</button>
+                                 </div>
+
+                                 <div id="learn-entropy-content" class="min-h-[300px] border border-outline-variant/20 p-6 rounded bg-surface-container-highest"></div>
+
+                                 <!-- Entropy Speed Slider -->
+                                 <div class="mt-6 pt-6 border-t border-outline-variant/20">
+                                     <div class="flex justify-between text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-2">
+                                         <span>Animation Speed</span>
+                                         <span id="learn-entropy-speed-text">1.0s / step</span>
+                                     </div>
+                                     <input id="learn-entropy-speed-slider" class="w-full h-px bg-outline-variant/30 appearance-none cursor-pointer accent-[#00FF88]" type="range" min="100" max="2000" step="100" value="1000"/>
+                                 </div>
+                             </div>
+                         </div>
+
+                        <!-- NIST Lesson -->
+                         <div id="learn-nist" class="learn-section space-y-6">
+                             <div class="bg-surface-container-lowest border border-outline-variant/10 p-8">
+                                 <h3 class="text-xl font-bold text-[#A855F7] mb-2">NIST Frequency Test</h3>
+                                 <p class="text-sm text-slate-400 mb-6">Understand how we statistically verify that data is truly random, not biased toward 1s or 0s.</p>
+
+                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                                     <div>
+                                         <label class="block text-[10px] text-on-surface-variant uppercase tracking-widest mb-2">&gt; Analyze text</label>
+                                         <div class="flex gap-2">
+                                             <input type="text" id="learn-nist-input" class="flex-1 bg-surface-container-highest border-b-2 border-[#A855F7] focus:ring-0 text-primary p-2 font-mono text-sm" placeholder="Enter text...">
+                                             <button id="learn-nist-analyze" class="bg-[#A855F7] text-white px-4 py-2 text-sm font-bold rounded hover:bg-[#9945dd] transition-colors">Analyze</button>
+                                         </div>
+                                     </div>
+                                     <div class="flex items-end">
+                                         <button id="learn-nist-random" class="w-full bg-surface-container text-slate-300 px-4 py-2 text-sm font-bold rounded hover:bg-surface-container-highest transition-colors">Generate Random (64 bytes)</button>
+                                     </div>
+                                 </div>
+
+                                 <div class="flex flex-col md:flex-row gap-4 mb-6">
+                                     <button id="learn-nist-prev" class="flex-1 bg-surface-container px-4 py-2 text-sm text-slate-300 rounded hover:bg-surface-container-highest transition-colors">Previous</button>
+                                     <button id="learn-nist-play-pause" class="flex-1 bg-[#A855F7] text-white px-4 py-2 text-sm font-bold rounded hover:bg-[#9945dd] transition-colors flex items-center justify-center gap-2">
+                                         <span class="material-symbols-outlined" style="font-size: 18px; font-variation-settings: 'FILL' 1;">play_arrow</span>
+                                         <span>Play</span>
+                                     </button>
+                                     <button id="learn-nist-next" class="flex-1 bg-surface-container px-4 py-2 text-sm text-slate-300 rounded hover:bg-surface-container-highest transition-colors">Next</button>
+                                 </div>
+
+                                 <div class="flex-1 text-center py-3 text-xs font-mono text-[#A855F7]" id="learn-nist-step-info">Step 0 / 0</div>
+
+                                 <div id="learn-nist-content" class="min-h-[400px] border border-outline-variant/20 p-6 rounded bg-surface-container-highest"></div>
+
+                                 <!-- NIST Speed Slider -->
+                                 <div class="mt-6 pt-6 border-t border-outline-variant/20">
+                                     <div class="flex justify-between text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-2">
+                                         <span>Animation Speed</span>
+                                         <span id="learn-nist-speed-text">1.0s / step</span>
+                                     </div>
+                                     <input id="learn-nist-speed-slider" class="w-full h-px bg-outline-variant/30 appearance-none cursor-pointer accent-[#A855F7]" type="range" min="100" max="2000" step="100" value="1000"/>
+                                 </div>
+                             </div>
+                         </div>
 
                     </div>
                 </section>
