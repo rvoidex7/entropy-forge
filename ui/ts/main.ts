@@ -59,13 +59,34 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    tabLinks.forEach(link => {
-        link.addEventListener('click', (e) => {
-            e.preventDefault();
-            const target = (e.currentTarget as HTMLElement).getAttribute('data-target');
-            if (target) switchTab(target);
-        });
-    });
+     tabLinks.forEach(link => {
+         link.addEventListener('click', (e) => {
+             e.preventDefault();
+             const target = (e.currentTarget as HTMLElement).getAttribute('data-target');
+             if (target) switchTab(target);
+         });
+     });
+
+     // Learn sub-categories navigation (desktop sidebar only)
+     const subTabLinks = document.querySelectorAll('.sub-tab-link');
+     subTabLinks.forEach(link => {
+         link.addEventListener('click', (e) => {
+             e.preventDefault();
+             // First switch to tab-learn
+             switchTab('tab-learn');
+             
+             // Then scroll to specific sub-section
+             const target = (e.currentTarget as HTMLElement).getAttribute('data-target');
+             if (target) {
+                 const section = document.getElementById(target);
+                 if (section) {
+                     setTimeout(() => {
+                         section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                     }, 100);
+                 }
+             }
+         });
+     });
 
     // ==========================================
     // 2. Use Tab Logic

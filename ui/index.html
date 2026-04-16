@@ -109,28 +109,40 @@
 <body class="overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
     <div class="flex h-screen w-screen">
         <!-- SIDE NAVIGATION SHELL (Desktop only) -->
-        <aside class="hidden lg:flex docked left-0 h-full w-64 border-r border-[#00FF88]/20 flex-col py-8 px-0 bg-[#131314] font-['JetBrains_Mono'] uppercase tracking-tight text-sm z-50">
-            <div class="px-6 mb-12">
-                <h1 class="text-xl font-bold tracking-tighter text-[#00FF88]">ENTROPY FORGE</h1>
-            </div>
-
+        <aside class="hidden lg:flex docked left-0 h-full w-40 border-r border-[#00FF88]/20 flex-col py-8 px-0 bg-[#131314] font-['JetBrains_Mono'] uppercase tracking-tight text-sm z-50">
             <nav id="sidebar-nav" class="flex-grow flex flex-col space-y-1">
-                <a href="#" class="tab-link group flex items-center px-6 py-4 text-[#00FF88] bg-[#00FF88]/10 border-l-2 border-[#00FF88] uppercase tracking-tight text-sm font-bold" data-target="tab-use">
-                    <span class="material-symbols-outlined mr-4" style="font-variation-settings: 'FILL' 1;">lock</span>
+                <a href="#" class="tab-link group flex items-center px-4 py-3 text-[#00FF88] bg-[#00FF88]/10 border-l-2 border-[#00FF88] uppercase tracking-tight text-xs font-bold" data-target="tab-use">
+                    <span class="material-symbols-outlined mr-2" style="font-size: 18px; font-variation-settings: 'FILL' 1;">lock</span>
                     Use
                 </a>
-                <a href="#" class="tab-link group flex items-center px-6 py-4 text-slate-500 hover:text-[#A855F7] hover:bg-[#A855F7]/5 transition-colors duration-100 uppercase tracking-tight text-sm" data-target="tab-test">
-                    <span class="material-symbols-outlined mr-4">analytics</span>
+                <a href="#" class="tab-link group flex items-center px-4 py-3 text-slate-500 hover:text-[#A855F7] hover:bg-[#A855F7]/5 transition-colors duration-100 uppercase tracking-tight text-xs" data-target="tab-test">
+                    <span class="material-symbols-outlined mr-2" style="font-size: 18px;">analytics</span>
                     Test
                 </a>
-                <a href="#" class="tab-link group flex items-center px-6 py-4 text-slate-500 hover:text-[#A855F7] hover:bg-[#A855F7]/5 transition-colors duration-100 uppercase tracking-tight text-sm" data-target="tab-benchmark">
-                    <span class="material-symbols-outlined mr-4">speed</span>
+                <a href="#" class="tab-link group flex items-center px-4 py-3 text-slate-500 hover:text-[#A855F7] hover:bg-[#A855F7]/5 transition-colors duration-100 uppercase tracking-tight text-xs" data-target="tab-benchmark">
+                    <span class="material-symbols-outlined mr-2" style="font-size: 18px;">speed</span>
                     Bench
                 </a>
-                <a href="#" class="tab-link group flex items-center px-6 py-4 text-slate-500 hover:text-[#A855F7] hover:bg-[#A855F7]/5 transition-colors duration-100 uppercase tracking-tight text-sm" data-target="tab-learn">
-                    <span class="material-symbols-outlined mr-4">terminal</span>
+                <a href="#" class="tab-link group flex items-center px-4 py-3 text-slate-500 hover:text-[#A855F7] hover:bg-[#A855F7]/5 transition-colors duration-100 uppercase tracking-tight text-xs" data-target="tab-learn">
+                    <span class="material-symbols-outlined mr-2" style="font-size: 18px;">terminal</span>
                     Learn
                 </a>
+                
+                <!-- Learn Sub-categories (Desktop only) -->
+                <div id="learn-subcats" class="flex flex-col space-y-0 mt-2 ml-2">
+                    <a href="#" class="sub-tab-link flex items-center px-4 py-2 text-slate-400 hover:text-[#00FF88] transition-colors duration-100 uppercase tracking-tight text-xs" data-target="learn-xor">
+                        <span class="material-symbols-outlined mr-2" style="font-size: 14px;">arrow_right</span>
+                        XOR
+                    </a>
+                    <a href="#" class="sub-tab-link flex items-center px-4 py-2 text-slate-400 hover:text-[#00FF88] transition-colors duration-100 uppercase tracking-tight text-xs" data-target="learn-entropy">
+                        <span class="material-symbols-outlined mr-2" style="font-size: 14px;">arrow_right</span>
+                        Shannon
+                    </a>
+                    <a href="#" class="sub-tab-link flex items-center px-4 py-2 text-slate-400 hover:text-[#00FF88] transition-colors duration-100 uppercase tracking-tight text-xs" data-target="learn-nist">
+                        <span class="material-symbols-outlined mr-2" style="font-size: 14px;">arrow_right</span>
+                        NIST
+                    </a>
+                </div>
             </nav>
 
         </aside>
@@ -139,83 +151,84 @@
         <main class="flex-1 flex flex-col relative data-flow-bg overflow-hidden bg-surface-dim h-screen w-full">
             <!-- TOP APP BAR (Mobile only) -->
             <header class="lg:hidden h-16 border-b border-[#00FF88]/20 bg-[#131314] flex justify-between items-center px-6 z-40">
-                <h1 class="text-lg font-bold tracking-tighter text-[#00FF88]">ENTROPY FORGE</h1>
             </header>
 
             <!-- TAB CONTENT CONTAINER -->
             <div id="tab-content-container" class="flex-1 overflow-y-auto no-scrollbar relative w-full h-full mb-16 lg:mb-0">
                 <!-- USE TAB -->
                 <section id="tab-use" class="tab-panel active h-full">
-                    <div class="p-8 max-w-2xl mx-auto space-y-8 pb-32">
-                        <!-- Module Title -->
-                        <div class="flex justify-between items-end border-l-4 border-primary-container pl-4">
-                            <div>
-                                <h2 class="text-2xl font-black uppercase tracking-tighter">Stream Cipher</h2>
-                                <p class="text-xs text-primary-container/60 mt-1 font-medium tracking-widest">Encrypt messages using the keystream generator</p>
-                            </div>
-                        </div>
+                    <div class="p-8 space-y-8 pb-32">
+                         <!-- Module Title -->
+                         <div class="flex justify-between items-end border-l-4 border-primary-container pl-4">
+                             <div>
+                                 <h2 class="text-2xl font-black uppercase tracking-tighter">Stream Cipher</h2>
+                                 <p class="text-xs text-primary-container/60 mt-1 font-medium tracking-widest">Encrypt messages using the keystream generator</p>
+                             </div>
+                         </div>
 
-                        <!-- Plaintext Input Area -->
-                        <section class="space-y-4">
-                            <div class="flex items-center justify-between">
-                                <span class="text-[10px] text-outline uppercase tracking-[0.2em] font-bold">Plaintext Input</span>
-                                <span class="text-[10px] text-secondary font-mono">UTF-8</span>
-                            </div>
-                            <div class="bg-surface-container-low p-6 ghost-border relative group overflow-hidden">
-                                <div class="absolute top-0 left-0 w-1 h-full bg-primary-container/20 group-hover:bg-primary-container transition-colors"></div>
-                                <div class="absolute -left-4 top-4 text-primary text-sm font-bold">&gt;</div>
-                                <textarea id="use-input" class="w-full bg-transparent border-0 border-b-2 border-outline-variant focus:border-primary-container focus:ring-0 text-on-surface p-4 min-h-[120px] placeholder:text-outline/40 text-sm font-mono transition-all duration-300 resize-none" placeholder="Enter sequence for encryption..."></textarea>
-                                <div class="mt-4 flex justify-between items-center text-[10px] font-bold text-slate-600">
-                                    <span id="use-input-length">LENGTH: 0 BYTES</span>
-                                    <span>ENCODING: UTF-8</span>
-                                </div>
-                            </div>
-                        </section>
+                         <!-- Main Grid Container (side-by-side on desktop) -->
+                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                             <!-- Input Column -->
+                             <div class="space-y-8">
+                                 <!-- Plaintext Input Area -->
+                                  <section class="space-y-4">
+                                      <div class="flex items-center justify-between">
+                                          <span class="text-[10px] text-outline uppercase tracking-[0.2em] font-bold">Plaintext Input</span>
+                                          <span class="text-[10px] text-secondary font-mono">UTF-8</span>
+                                      </div>
+                                      <div class="bg-surface-container-low p-3 ghost-border relative group overflow-hidden">
+                                          <div class="absolute top-0 left-0 w-1 h-full bg-primary-container/20 group-hover:bg-primary-container transition-colors"></div>
+                                          <div class="absolute -left-4 top-2 text-primary text-sm font-bold">&gt;</div>
+                                          <textarea id="use-input" class="w-full bg-transparent border-0 border-b-2 border-outline-variant focus:border-primary-container focus:ring-0 text-on-surface p-2 h-10 placeholder:text-outline/40 text-sm font-mono transition-all duration-300 resize-none" placeholder="Enter sequence for encryption..."></textarea>
+                                          <div class="mt-2 flex justify-between items-center text-[10px] font-bold text-slate-600">
+                                              <span id="use-input-length">LENGTH: 0 BYTES</span>
+                                              <span>ENCODING: UTF-8</span>
+                                          </div>
+                                      </div>
+                                  </section>
+                             </div>
 
-                        <!-- Forge Controls -->
-                        <div class="grid grid-cols-2 gap-6">
-                            <!-- Hex Toggle -->
-                            <div class="bg-surface-container-low p-6 ghost-border flex items-center justify-between" title="Toggle between hexadecimal and UTF-8 output format. Hex shows bytes as 2-digit hex values, UTF-8 shows text characters.">
-                                <div>
-                                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-widest">Hex Output Mode</p>
-                                    <p class="text-xs text-primary mt-1">ENABLED</p>
-                                </div>
-                                <label class="relative inline-flex items-center cursor-pointer">
-                                  <input type="checkbox" id="use-hex-check" value="" class="sr-only peer" checked>
-                                  <div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
-                                </label>
-                            </div>
-                            <!-- Encrypt / Decrypt Button -->
-                            <button id="use-encrypt-btn" class="bg-gradient-to-br from-primary-container to-[#6f00be] text-on-surface flex items-center justify-center font-black uppercase tracking-tighter text-lg group hover:scale-[0.98] transition-transform active:scale-95 shadow-[0_0_20px_rgba(0,255,136,0.2)]">
-                                <span class="material-symbols-outlined mr-3 group-hover:rotate-90 transition-transform" style="font-variation-settings: 'FILL' 1;">lock</span>
-                                Generate
-                            </button>
-                        </div>
+                             <!-- Output Column -->
+                             <div class="space-y-8">
+                                 <!-- Output Section -->
+                                 <section class="space-y-4">
+                                     <div class="flex items-center justify-between">
+                                         <span class="text-[10px] text-outline uppercase tracking-[0.2em] font-bold">Ciphertext Output</span>
+                                         <span class="text-[10px] text-secondary font-mono">Hex</span>
+                                     </div>
+                                     <div class="bg-surface-container-low p-3 relative border border-outline-variant/10 h-10 overflow-y-auto">
+                                         <div class="absolute top-0 left-0 w-1 h-full bg-primary-container animate-pulse"></div>
+                                         <textarea id="use-output" class="w-full bg-transparent border-0 focus:ring-0 font-mono text-xs text-primary-fixed resize-none h-10 p-2" readonly placeholder="Awaiting sequence initiation"></textarea>
+                                     </div>
+                                 </section>
+                             </div>
+                         </div>
 
-                        <!-- Lattice Visualizer -->
-                        <section class="space-y-4 keystream-section">
-                            <div class="flex items-center justify-between">
-                                <span class="text-[10px] text-outline uppercase tracking-[0.2em] font-bold">02. Keystream State</span>
-                                <span class="text-[10px] text-secondary font-mono">Dynamic Grid</span>
-                            </div>
-                            <div class="w-full bg-surface-container-low border border-outline-variant/20 overflow-x-auto">
-                                <div id="use-keystream-grid">
-                                    <!-- Grid cells populated dynamically -->
-                                </div>
-                            </div>
-                        </section>
+                         <!-- Forge Controls - Full Width -->
+                         <div class="bg-surface-container-low p-4 ghost-border flex items-center justify-between">
+                             <label class="flex items-center gap-3">
+                                 <input type="checkbox" id="use-hex-check" class="sr-only peer" checked>
+                                 <div class="w-10 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container relative"></div>
+                                 <span class="text-xs font-bold text-slate-400 uppercase tracking-wide">Hex Output</span>
+                             </label>
+                             <button id="use-encrypt-btn" class="bg-gradient-to-br from-primary-container to-[#6f00be] text-on-surface px-6 py-2 font-black uppercase tracking-tighter text-xs group hover:scale-[0.98] transition-transform active:scale-95">
+                                 <span class="material-symbols-outlined mr-2 group-hover:rotate-90 transition-transform inline-block" style="font-size: 16px; font-variation-settings: 'FILL' 1; vertical-align: middle;">lock</span>
+                                 Generate
+                             </button>
+                         </div>
 
-                        <!-- Output Section -->
-                        <section class="space-y-4">
-                            <div class="flex items-center justify-between">
-                                <span class="text-[10px] text-outline uppercase tracking-[0.2em] font-bold">Ciphertext Output</span>
-                                <span class="text-[10px] text-secondary font-mono">Hex</span>
-                            </div>
-                            <div class="bg-surface-container-low p-4 relative border border-outline-variant/10 min-h-[120px]">
-                                <div class="absolute top-0 left-0 w-1 h-full bg-primary-container animate-pulse"></div>
-                                <textarea id="use-output" class="w-full bg-transparent border-0 focus:ring-0 font-mono text-xs text-primary-fixed leading-relaxed break-all resize-none min-h-[120px] p-2" readonly placeholder="Awaiting sequence initiation"></textarea>
-                            </div>
-                        </section>
+                         <!-- Lattice Visualizer (Full Width) -->
+                         <section class="space-y-4 keystream-section">
+                             <div class="flex items-center justify-between">
+                                 <span class="text-[10px] text-outline uppercase tracking-[0.2em] font-bold">02. Keystream State</span>
+                                 <span class="text-[10px] text-secondary font-mono">Dynamic Grid</span>
+                             </div>
+                             <div class="w-full bg-surface-container-low border border-outline-variant/20 overflow-x-auto">
+                                 <div id="use-keystream-grid">
+                                     <!-- Grid cells populated dynamically -->
+                                 </div>
+                             </div>
+                         </section>
 
                         <div class="text-center pt-4">
                             <button id="use-help-link" class="text-xs text-primary-container hover:text-primary underline underline-offset-4 tracking-wider transition-colors inline-flex items-center">

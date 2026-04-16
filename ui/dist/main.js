@@ -148,6 +148,22 @@
           switchTab(target);
       });
     });
+    const subTabLinks = document.querySelectorAll(".sub-tab-link");
+    subTabLinks.forEach((link) => {
+      link.addEventListener("click", (e) => {
+        e.preventDefault();
+        switchTab("tab-learn");
+        const target = e.currentTarget.getAttribute("data-target");
+        if (target) {
+          const section = document.getElementById(target);
+          if (section) {
+            setTimeout(() => {
+              section.scrollIntoView({ behavior: "smooth", block: "start" });
+            }, 100);
+          }
+        }
+      });
+    });
     const useInput = document.getElementById("use-input");
     const useLength = document.getElementById("use-input-length");
     const useHexCheck = document.getElementById("use-hex-check");
