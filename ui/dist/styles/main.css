@@ -653,13 +653,44 @@ button {
     display: flex !important;
   }
 
-  /* Mobile nav should be hidden */
-  nav#mobile-nav.lg\\:hidden {
-    display: none !important;
-  }
+   /* Mobile nav should be hidden */
+   nav#mobile-nav.lg\\:hidden {
+     display: none !important;
+   }
 
-  /* Main content adjustments */
-  main {
-    margin-left: 0;
-  }
+   /* Main content adjustments */
+   main {
+     margin-left: 0;
+   }
+}
+
+/* ============================================================
+   KEYSTREAM GRID - Responsive square cells
+   ============================================================ */
+
+#use-keystream-grid {
+  display: grid;
+  gap: 4px;
+  padding: 16px;
+  background: var(--bg-input);
+  grid-template-columns: repeat(16, 1fr) !important;
+  width: 100%;
+  min-height: 300px;
+}
+
+#use-keystream-grid > div {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+  border: 1px solid rgba(132, 149, 133, 0.3);
+}
+
+#use-keystream-grid > div:hover {
+  opacity: 0.8;
+  transform: scale(1.05);
+  cursor: pointer;
 }

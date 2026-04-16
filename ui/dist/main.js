@@ -172,14 +172,14 @@
           useOutput.value = result.ciphertext;
           useKeystreamGrid.innerHTML = "";
           const bytes = result.keystream_bytes || [];
-          for (let i = 0; i < 64; i++) {
+          const inputLength = text.length;
+          for (let i = 0; i < inputLength; i++) {
             const div = document.createElement("div");
             const val = bytes[i] || 0;
             const gray = Math.round(val / 255 * 255);
             const rgbColor = `rgb(${gray}, ${gray}, ${gray})`;
             div.style.backgroundColor = rgbColor;
-            div.style.border = "1px solid rgba(132, 149, 133, 0.3)";
-            div.className = "w-full h-full";
+            div.title = `Byte ${i}: 0x${val.toString(16).toUpperCase().padStart(2, "0")} (${val})`;
             useKeystreamGrid.appendChild(div);
           }
         } catch (error) {
