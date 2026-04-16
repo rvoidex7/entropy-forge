@@ -522,6 +522,28 @@
         }
       });
     }
+    const entCollapsibleBtn = document.getElementById("learn-entropy-collapsible");
+    const entDetailsDiv = document.getElementById("learn-entropy-details");
+    if (entCollapsibleBtn && entDetailsDiv) {
+      entCollapsibleBtn.addEventListener("click", () => {
+        entDetailsDiv.classList.toggle("hidden");
+        const icon = entCollapsibleBtn.querySelector(".material-symbols-outlined");
+        if (icon) {
+          icon.textContent = entDetailsDiv.classList.contains("hidden") ? "expand_more" : "expand_less";
+        }
+      });
+    }
+    const nistCollapsibleBtn = document.getElementById("learn-nist-collapsible");
+    const nistDetailsDiv = document.getElementById("learn-nist-details");
+    if (nistCollapsibleBtn && nistDetailsDiv) {
+      nistCollapsibleBtn.addEventListener("click", () => {
+        nistDetailsDiv.classList.toggle("hidden");
+        const icon = nistCollapsibleBtn.querySelector(".material-symbols-outlined");
+        if (icon) {
+          icon.textContent = nistDetailsDiv.classList.contains("hidden") ? "expand_more" : "expand_less";
+        }
+      });
+    }
     let currentEntSteps = [];
     let currentEntStepIdx = 0;
     let entPlayInterval = null;

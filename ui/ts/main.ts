@@ -523,17 +523,43 @@ if (useHelpLink) {
      }
 
      // XOR Collapsible "How it works" button
-     const xorCollapsibleBtn = document.getElementById('learn-xor-collapsible');
-     const xorDetailsDiv = document.getElementById('learn-xor-details');
-     if (xorCollapsibleBtn && xorDetailsDiv) {
-         xorCollapsibleBtn.addEventListener('click', () => {
-             xorDetailsDiv.classList.toggle('hidden');
-             const icon = xorCollapsibleBtn.querySelector('.material-symbols-outlined') as HTMLElement;
-             if (icon) {
-                 icon.textContent = xorDetailsDiv.classList.contains('hidden') ? 'expand_more' : 'expand_less';
-             }
-         });
-     }
+      const xorCollapsibleBtn = document.getElementById('learn-xor-collapsible');
+      const xorDetailsDiv = document.getElementById('learn-xor-details');
+      if (xorCollapsibleBtn && xorDetailsDiv) {
+          xorCollapsibleBtn.addEventListener('click', () => {
+              xorDetailsDiv.classList.toggle('hidden');
+              const icon = xorCollapsibleBtn.querySelector('.material-symbols-outlined') as HTMLElement;
+              if (icon) {
+                  icon.textContent = xorDetailsDiv.classList.contains('hidden') ? 'expand_more' : 'expand_less';
+              }
+          });
+      }
+
+      // Shannon Entropy collapsible handler
+      const entCollapsibleBtn = document.getElementById('learn-entropy-collapsible');
+      const entDetailsDiv = document.getElementById('learn-entropy-details');
+      if (entCollapsibleBtn && entDetailsDiv) {
+          entCollapsibleBtn.addEventListener('click', () => {
+              entDetailsDiv.classList.toggle('hidden');
+              const icon = entCollapsibleBtn.querySelector('.material-symbols-outlined') as HTMLElement;
+              if (icon) {
+                  icon.textContent = entDetailsDiv.classList.contains('hidden') ? 'expand_more' : 'expand_less';
+              }
+          });
+      }
+
+      // NIST Frequency Test collapsible handler
+      const nistCollapsibleBtn = document.getElementById('learn-nist-collapsible');
+      const nistDetailsDiv = document.getElementById('learn-nist-details');
+      if (nistCollapsibleBtn && nistDetailsDiv) {
+          nistCollapsibleBtn.addEventListener('click', () => {
+              nistDetailsDiv.classList.toggle('hidden');
+              const icon = nistCollapsibleBtn.querySelector('.material-symbols-outlined') as HTMLElement;
+              if (icon) {
+                  icon.textContent = nistDetailsDiv.classList.contains('hidden') ? 'expand_more' : 'expand_less';
+              }
+          });
+      }
 
      // ==========================================
      // 7. Learn Entropy Logic

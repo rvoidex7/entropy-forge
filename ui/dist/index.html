@@ -594,16 +594,39 @@
 
                                  <div id="learn-entropy-content" class="min-h-[300px] border border-outline-variant/20 p-6 rounded bg-surface-container-highest"></div>
 
-                                 <!-- Entropy Speed Slider -->
-                                 <div class="mt-6 pt-6 border-t border-outline-variant/20">
-                                     <div class="flex justify-between text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-2">
-                                         <span>Animation Speed</span>
-                                         <span id="learn-entropy-speed-text">1.0s / step</span>
-                                     </div>
-                                     <input id="learn-entropy-speed-slider" class="w-full h-px bg-outline-variant/30 appearance-none cursor-pointer accent-[#00FF88]" type="range" min="100" max="2000" step="100" value="1000"/>
-                                 </div>
-                             </div>
-                         </div>
+                                  <!-- Entropy Speed Slider -->
+                                  <div class="mt-6 pt-6 border-t border-outline-variant/20">
+                                      <div class="flex justify-between text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-2">
+                                          <span>Animation Speed</span>
+                                          <span id="learn-entropy-speed-text">1.0s / step</span>
+                                      </div>
+                                      <input id="learn-entropy-speed-slider" class="w-full h-px bg-outline-variant/30 appearance-none cursor-pointer accent-[#00FF88]" type="range" min="100" max="2000" step="100" value="1000"/>
+                                  </div>
+
+                                  <!-- Learn More: Shannon Formula -->
+                                  <div class="mt-6 pt-6 border-t border-outline-variant/20">
+                                      <button id="learn-entropy-collapsible" class="w-full flex items-center justify-between bg-surface-container-low p-4 rounded hover:bg-surface-container-highest transition-colors">
+                                          <span class="text-sm font-bold text-[#00FF88]">▶ Shannon Entropy Formula</span>
+                                          <span class="material-symbols-outlined text-[#00FF88]">expand_more</span>
+                                      </button>
+                                      <div id="learn-entropy-details" class="hidden bg-surface-container-highest border border-outline-variant/20 border-t-0 p-4 rounded-b space-y-3">
+                                          <p class="text-sm text-slate-300 font-mono">H(X) = -Σ P(x) × log₂(P(x))</p>
+                                          <p class="text-sm text-slate-400 leading-relaxed">
+                                              <strong>Where:</strong>
+                                              <br/>• H(X) = Shannon entropy (bits/byte)
+                                              <br/>• P(x) = Probability of byte value x
+                                              <br/>• Σ = Sum over all possible byte values
+                                              <br/>• log₂ = Logarithm base 2
+                                          </p>
+                                          <div class="mt-4 pt-4 border-t border-outline-variant/20">
+                                              <p class="text-xs text-slate-400 leading-relaxed">
+                                                  <strong>Interpretation:</strong> Maximum entropy (8.0 bits/byte) means each byte value is equally likely. Lower entropy indicates patterns or bias in the data.
+                                              </p>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
 
                         <!-- NIST Lesson -->
                          <div id="learn-nist" class="learn-section space-y-6">
@@ -637,16 +660,40 @@
 
                                  <div id="learn-nist-content" class="min-h-[400px] border border-outline-variant/20 p-6 rounded bg-surface-container-highest"></div>
 
-                                 <!-- NIST Speed Slider -->
-                                 <div class="mt-6 pt-6 border-t border-outline-variant/20">
-                                     <div class="flex justify-between text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-2">
-                                         <span>Animation Speed</span>
-                                         <span id="learn-nist-speed-text">1.0s / step</span>
-                                     </div>
-                                     <input id="learn-nist-speed-slider" class="w-full h-px bg-outline-variant/30 appearance-none cursor-pointer accent-[#A855F7]" type="range" min="100" max="2000" step="100" value="1000"/>
-                                 </div>
-                             </div>
-                         </div>
+                                  <!-- NIST Speed Slider -->
+                                  <div class="mt-6 pt-6 border-t border-outline-variant/20">
+                                      <div class="flex justify-between text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-2">
+                                          <span>Animation Speed</span>
+                                          <span id="learn-nist-speed-text">1.0s / step</span>
+                                      </div>
+                                      <input id="learn-nist-speed-slider" class="w-full h-px bg-outline-variant/30 appearance-none cursor-pointer accent-[#A855F7]" type="range" min="100" max="2000" step="100" value="1000"/>
+                                  </div>
+
+                                  <!-- Learn More: NIST Formula -->
+                                  <div class="mt-6 pt-6 border-t border-outline-variant/20">
+                                      <button id="learn-nist-collapsible" class="w-full flex items-center justify-between bg-surface-container-low p-4 rounded hover:bg-surface-container-highest transition-colors">
+                                          <span class="text-sm font-bold text-[#A855F7]">▶ NIST Frequency Test Formula</span>
+                                          <span class="material-symbols-outlined text-[#A855F7]">expand_more</span>
+                                      </button>
+                                      <div id="learn-nist-details" class="hidden bg-surface-container-highest border border-outline-variant/20 border-t-0 p-4 rounded-b space-y-3">
+                                          <p class="text-sm text-slate-300 font-mono">Z = (# ones - # zeros) / √n</p>
+                                          <p class="text-sm text-slate-300 font-mono">P-value = erfc(|Z| / √2)</p>
+                                          <p class="text-sm text-slate-400 leading-relaxed">
+                                              <strong>Where:</strong>
+                                              <br/>• n = Total number of bits
+                                              <br/>• Z = Test statistic (normalized difference)
+                                              <br/>• erfc = Complementary error function
+                                              <br/>• P-value ≥ 0.01 = Test PASSES (random)
+                                          </p>
+                                          <div class="mt-4 pt-4 border-t border-outline-variant/20">
+                                              <p class="text-xs text-slate-400 leading-relaxed">
+                                                  <strong>Purpose:</strong> Detects bias in bit sequences. If ones and zeros are equally likely, the sequence passes the randomness test.
+                                              </p>
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
 
                     </div>
                 </section>
