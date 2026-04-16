@@ -2,9 +2,9 @@
   "name": "entropy-forge-ui",
   "version": "1.0.0",
   "scripts": {
-    "build": "esbuild ts/main.ts --bundle --outdir=dist && npm run copy-assets",
+    "build": "esbuild ts/main.ts --bundle --outdir=dist --target=ES2016 --minify && npm run copy-assets",
     "copy-assets": "node scripts/copy-assets.js",
-    "dev": "esbuild ts/main.ts --bundle --outdir=dist --watch"
+    "dev": "esbuild ts/main.ts --bundle --outdir=dist --watch --target=ES2016"
   },
   "devDependencies": {
     "@tauri-apps/api": "^2.10.1",

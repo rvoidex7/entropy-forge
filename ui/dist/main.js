@@ -1,406 +1,27 @@
-"use strict";
-(() => {
-  // node_modules/@tauri-apps/api/external/tslib/tslib.es6.js
-  function __classPrivateFieldGet(receiver, state, kind, f) {
-    if (kind === "a" && !f)
-      throw new TypeError("Private accessor was defined without a getter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver))
-      throw new TypeError("Cannot read private member from an object whose class did not declare it");
-    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
-  }
-  function __classPrivateFieldSet(receiver, state, value, kind, f) {
-    if (kind === "m")
-      throw new TypeError("Private method is not writable");
-    if (kind === "a" && !f)
-      throw new TypeError("Private accessor was defined without a setter");
-    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver))
-      throw new TypeError("Cannot write private member to an object whose class did not declare it");
-    return kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value), value;
-  }
-
-  // node_modules/@tauri-apps/api/core.js
-  var _Channel_onmessage;
-  var _Channel_nextMessageIndex;
-  var _Channel_pendingMessages;
-  var _Channel_messageEndIndex;
-  var _Resource_rid;
-  var SERIALIZE_TO_IPC_FN = "__TAURI_TO_IPC_KEY__";
-  function transformCallback(callback, once = false) {
-    return window.__TAURI_INTERNALS__.transformCallback(callback, once);
-  }
-  var Channel = class {
-    constructor(onmessage) {
-      _Channel_onmessage.set(this, void 0);
-      _Channel_nextMessageIndex.set(this, 0);
-      _Channel_pendingMessages.set(this, []);
-      _Channel_messageEndIndex.set(this, void 0);
-      __classPrivateFieldSet(this, _Channel_onmessage, onmessage || (() => {
-      }), "f");
-      this.id = transformCallback((rawMessage) => {
-        const index = rawMessage.index;
-        if ("end" in rawMessage) {
-          if (index == __classPrivateFieldGet(this, _Channel_nextMessageIndex, "f")) {
-            this.cleanupCallback();
-          } else {
-            __classPrivateFieldSet(this, _Channel_messageEndIndex, index, "f");
-          }
-          return;
-        }
-        const message = rawMessage.message;
-        if (index == __classPrivateFieldGet(this, _Channel_nextMessageIndex, "f")) {
-          __classPrivateFieldGet(this, _Channel_onmessage, "f").call(this, message);
-          __classPrivateFieldSet(this, _Channel_nextMessageIndex, __classPrivateFieldGet(this, _Channel_nextMessageIndex, "f") + 1, "f");
-          while (__classPrivateFieldGet(this, _Channel_nextMessageIndex, "f") in __classPrivateFieldGet(this, _Channel_pendingMessages, "f")) {
-            const message2 = __classPrivateFieldGet(this, _Channel_pendingMessages, "f")[__classPrivateFieldGet(this, _Channel_nextMessageIndex, "f")];
-            __classPrivateFieldGet(this, _Channel_onmessage, "f").call(this, message2);
-            delete __classPrivateFieldGet(this, _Channel_pendingMessages, "f")[__classPrivateFieldGet(this, _Channel_nextMessageIndex, "f")];
-            __classPrivateFieldSet(this, _Channel_nextMessageIndex, __classPrivateFieldGet(this, _Channel_nextMessageIndex, "f") + 1, "f");
-          }
-          if (__classPrivateFieldGet(this, _Channel_nextMessageIndex, "f") === __classPrivateFieldGet(this, _Channel_messageEndIndex, "f")) {
-            this.cleanupCallback();
-          }
-        } else {
-          __classPrivateFieldGet(this, _Channel_pendingMessages, "f")[index] = message;
-        }
-      });
-    }
-    cleanupCallback() {
-      window.__TAURI_INTERNALS__.unregisterCallback(this.id);
-    }
-    set onmessage(handler) {
-      __classPrivateFieldSet(this, _Channel_onmessage, handler, "f");
-    }
-    get onmessage() {
-      return __classPrivateFieldGet(this, _Channel_onmessage, "f");
-    }
-    [(_Channel_onmessage = /* @__PURE__ */ new WeakMap(), _Channel_nextMessageIndex = /* @__PURE__ */ new WeakMap(), _Channel_pendingMessages = /* @__PURE__ */ new WeakMap(), _Channel_messageEndIndex = /* @__PURE__ */ new WeakMap(), SERIALIZE_TO_IPC_FN)]() {
-      return `__CHANNEL__:${this.id}`;
-    }
-    toJSON() {
-      return this[SERIALIZE_TO_IPC_FN]();
-    }
-  };
-  async function invoke(cmd, args = {}, options) {
-    return window.__TAURI_INTERNALS__.invoke(cmd, args, options);
-  }
-  _Resource_rid = /* @__PURE__ */ new WeakMap();
-
-  // ts/main.ts
-  var safeInvoke = async (command, args = {}) => {
-    try {
-      if (window.__TAURI_INTERNALS__) {
-        return await invoke(command, args);
-      } else {
-        console.warn(`[Tauri Mock] Called invoke('${command}') with args:`, args);
-        throw new Error("Tauri API is not available in the browser.");
-      }
-    } catch (e) {
-      throw e;
-    }
-  };
-  document.addEventListener("DOMContentLoaded", () => {
-    const tabLinks = document.querySelectorAll(".tab-link, .mobile-tab-link");
-    const tabPanels = document.querySelectorAll(".tab-panel");
-    function switchTab(targetId) {
-      tabPanels.forEach((panel) => {
-        panel.classList.remove("active");
-      });
-      const targetPanel = document.getElementById(targetId);
-      if (targetPanel) {
-        targetPanel.classList.add("active");
-      }
-      document.querySelectorAll(".tab-link").forEach((link) => {
-        if (link.getAttribute("data-target") === targetId) {
-          link.classList.remove("text-slate-500");
-          link.classList.add("text-[#00FF88]", "bg-[#00FF88]/10", "border-l-2", "border-[#00FF88]");
-          const icon = link.querySelector(".material-symbols-outlined");
-          if (icon)
-            icon.style.fontVariationSettings = "'FILL' 1";
-        } else {
-          link.classList.add("text-slate-500");
-          link.classList.remove("text-[#00FF88]", "bg-[#00FF88]/10", "border-l-2", "border-[#00FF88]");
-          const icon = link.querySelector(".material-symbols-outlined");
-          if (icon)
-            icon.style.fontVariationSettings = "'FILL' 0";
-        }
-      });
-      document.querySelectorAll(".mobile-tab-link").forEach((link) => {
-        if (link.getAttribute("data-target") === targetId) {
-          link.classList.remove("text-gray-500");
-          link.classList.add("text-[#00FF88]", "border-t-2", "border-[#00FF88]");
-          const icon = link.querySelector(".material-symbols-outlined");
-          if (icon)
-            icon.style.fontVariationSettings = "'FILL' 1";
-        } else {
-          link.classList.add("text-gray-500");
-          link.classList.remove("text-[#00FF88]", "border-t-2", "border-[#00FF88]");
-          const icon = link.querySelector(".material-symbols-outlined");
-          if (icon)
-            icon.style.fontVariationSettings = "'FILL' 0";
-        }
-      });
-    }
-    tabLinks.forEach((link) => {
-      link.addEventListener("click", (e) => {
-        e.preventDefault();
-        const target = e.currentTarget.getAttribute("data-target");
-        if (target)
-          switchTab(target);
-      });
-    });
-    const subTabLinks = document.querySelectorAll(".sub-tab-link");
-    subTabLinks.forEach((link) => {
-      link.addEventListener("click", (e) => {
-        e.preventDefault();
-        switchTab("tab-learn");
-        const target = e.currentTarget.getAttribute("data-target");
-        if (target) {
-          const section = document.getElementById(target);
-          if (section) {
-            setTimeout(() => {
-              section.scrollIntoView({ behavior: "smooth", block: "start" });
-            }, 100);
-          }
-        }
-      });
-    });
-    const useInput = document.getElementById("use-input");
-    const useLength = document.getElementById("use-input-length");
-    const useHexCheck = document.getElementById("use-hex-check");
-    const useOutput = document.getElementById("use-output");
-    const useEncryptBtn = document.getElementById("use-encrypt-btn");
-    const useKeystreamGrid = document.getElementById("use-keystream-grid");
-    if (useInput && useLength) {
-      useInput.addEventListener("input", () => {
-        useLength.textContent = `LENGTH: ${useInput.value.length} BYTES`;
-      });
-    }
-    if (useEncryptBtn && useInput && useOutput && useHexCheck && useKeystreamGrid) {
-      useEncryptBtn.addEventListener("click", async () => {
-        const text = useInput.value;
-        if (!text)
-          return;
-        try {
-          const result = await safeInvoke("encrypt_decrypt", {
-            plaintext: text,
-            hexOutput: useHexCheck.checked
-          });
-          useOutput.value = result.ciphertext;
-          useKeystreamGrid.innerHTML = "";
-          const bytes = result.keystream_bytes || [];
-          const inputLength = text.length;
-          const parentContainer = useKeystreamGrid.parentElement;
-          if (parentContainer) {
-            const containerWidth = parentContainer.clientWidth;
-            const cellSize = 20;
-            const gap = 4;
-            const padding = 16;
-            const availableWidth = containerWidth - padding;
-            const cellWithGap = cellSize + gap;
-            const maxColumns = Math.floor(availableWidth / cellWithGap);
-            const columns = Math.max(1, maxColumns);
-            useKeystreamGrid.style.gridTemplateColumns = `repeat(${columns}, 20px)`;
-          }
-          for (let i = 0; i < inputLength; i++) {
-            const div = document.createElement("div");
-            const val = bytes[i] || 0;
-            const gray = Math.round(val / 255 * 255);
-            const rgbColor = `rgb(${gray}, ${gray}, ${gray})`;
-            div.style.backgroundColor = rgbColor;
-            div.title = `Byte ${i}: 0x${val.toString(16).toUpperCase().padStart(2, "0")} (${val})`;
-            useKeystreamGrid.appendChild(div);
-          }
-        } catch (error) {
-          console.error(error);
-          useOutput.value = `Error: ${error}`;
-        }
-      });
-    }
-    const useHelpLink = document.getElementById("use-help-link");
-    if (useHelpLink) {
-      useHelpLink.addEventListener("click", () => {
-        switchTab("tab-learn");
-        const learnInput2 = document.getElementById("learn-input");
-        if (learnInput2 && useInput && useInput.value) {
-          learnInput2.value = useInput.value;
-          learnInput2.dispatchEvent(new Event("input"));
-        }
-      });
-    }
-    const testSlider = document.getElementById("test-size-slider");
-    const testLabel = document.getElementById("test-size-label");
-    const testRunBtn = document.getElementById("test-run-btn");
-    const testResultsSec = document.getElementById("test-results-section");
-    if (testSlider && testLabel) {
-      testSlider.addEventListener("input", () => {
-        const val = parseFloat(testSlider.value);
-        const bytes = Math.round(Math.pow(10, val));
-        testLabel.textContent = `${bytes.toLocaleString()} BYTES`;
-      });
-    }
-    if (testRunBtn && testSlider && testResultsSec) {
-      testRunBtn.addEventListener("click", async () => {
-        const val = parseFloat(testSlider.value);
-        const bytes = Math.round(Math.pow(10, val));
-        testResultsSec.classList.remove("hidden");
-        const tbody = document.getElementById("test-nist-tbody");
-        if (tbody)
-          tbody.innerHTML = '<tr><td colspan="3" class="text-center py-4">Running tests...</td></tr>';
-        try {
-          const result = await safeInvoke("run_quality_tests", {
-            sampleSize: bytes
-          });
-          document.getElementById("test-shannon-val").textContent = result.shannon_entropy.toFixed(4);
-          document.getElementById("test-shannon-bar").style.width = `${result.shannon_entropy / 8 * 100}%`;
-          document.getElementById("test-min-val").textContent = result.min_entropy.toFixed(4);
-          document.getElementById("test-min-bar").style.width = `${result.min_entropy / 8 * 100}%`;
-          document.getElementById("test-mean-val").textContent = result.mean.toFixed(3);
-          document.getElementById("test-chi-val").textContent = result.chi_square.toFixed(2);
-          document.getElementById("test-longest-run-val").textContent = result.longest_run.toString();
-          document.getElementById("test-score-val").textContent = result.overall_score.toFixed(1);
-          if (tbody) {
-            tbody.innerHTML = "";
-            result.nist_results.forEach((t) => {
-              const row = document.createElement("tr");
-              row.className = "border-b border-outline-variant/10 hover:bg-surface-container-low transition-colors group";
-              const statusHtml = t.passed ? `<span class="bg-[#00FF88]/10 text-[#00FF88] border border-[#00FF88]/30 px-3 py-1 font-bold">\u2713 PASS</span>` : `<span class="bg-error-container/20 text-error border border-error/30 px-3 py-1 font-bold">\u2717 FAIL</span>`;
-              row.innerHTML = `
-                            <td class="px-6 py-4 font-bold uppercase tracking-tight">${t.name}</td>
-                            <td class="px-6 py-4 font-mono">${t.p_value.toFixed(6)}</td>
-                            <td class="px-6 py-4 text-right">${statusHtml}</td>
-                        `;
-              tbody.appendChild(row);
-            });
-          }
-        } catch (error) {
-          console.error(error);
-          if (tbody)
-            tbody.innerHTML = `<tr><td colspan="3" class="text-center text-error py-4">Error: ${error}</td></tr>`;
-        }
-      });
-    }
-    const benchSlider = document.getElementById("bench-size-slider");
-    const benchLabel = document.getElementById("bench-size-label");
-    const benchRunBtn = document.getElementById("bench-run-btn");
-    const benchResultsSec = document.getElementById("bench-results-section");
-    if (benchSlider && benchLabel) {
-      benchSlider.addEventListener("input", () => {
-        const val = parseFloat(benchSlider.value);
-        const bytes = Math.round(Math.pow(10, val));
-        if (bytes >= 1e6) {
-          benchLabel.textContent = `${(bytes / 1e6).toFixed(1)}M bytes`;
-        } else if (bytes >= 1e3) {
-          benchLabel.textContent = `${(bytes / 1e3).toFixed(0)}K bytes`;
-        } else {
-          benchLabel.textContent = `${bytes} bytes`;
-        }
-      });
-      benchSlider.dispatchEvent(new Event("input"));
-    }
-    if (benchRunBtn && benchSlider && benchResultsSec) {
-      benchRunBtn.addEventListener("click", async () => {
-        const val = parseFloat(benchSlider.value);
-        const bytes = Math.round(Math.pow(10, val));
-        benchResultsSec.classList.remove("hidden");
-        try {
-          const result = await safeInvoke("run_benchmark", {
-            bytes
-          });
-          document.getElementById("bench-throughput").textContent = result.throughput_mbps.toFixed(2);
-          document.getElementById("bench-latency").textContent = result.latency_us.toFixed(2);
-          const bytesFormatted = result.bytes_generated.toLocaleString();
-          document.getElementById("bench-details").textContent = `Generated ${bytesFormatted} bytes in ${result.duration_secs.toFixed(3)} seconds`;
-        } catch (error) {
-          console.error(error);
-          document.getElementById("bench-details").textContent = `Error: ${error}`;
-        }
-      });
-    }
-    const learnBtns = document.querySelectorAll(".learn-btn");
-    const learnSections = document.querySelectorAll(".learn-section");
-    learnBtns.forEach((btn) => {
-      btn.addEventListener("click", (e) => {
-        const targetLearn = e.currentTarget.getAttribute("data-learn");
-        learnBtns.forEach((b) => {
-          b.classList.remove("active", "bg-primary-container", "text-on-primary-container");
-          b.classList.add("bg-surface-container", "text-slate-400");
-        });
-        e.currentTarget.classList.remove("bg-surface-container", "text-slate-400");
-        e.currentTarget.classList.add("active", "bg-primary-container", "text-on-primary-container");
-        learnSections.forEach((section) => {
-          if (section.id === `learn-${targetLearn}`) {
-            section.classList.add("active");
-          } else {
-            section.classList.remove("active");
-          }
-        });
-      });
-    });
-    let currentXorSteps = [];
-    let currentXorStepIdx = 0;
-    let playInterval = null;
-    const learnInput = document.getElementById("learn-input");
-    const btnXorPrev = document.getElementById("learn-prev");
-    const btnXorNext = document.getElementById("learn-next");
-    const btnXorPlayPause = document.getElementById("learn-play-pause");
-    const learnSpeedSlider = document.getElementById("learn-speed-slider");
-    const learnSpeedText = document.getElementById("learn-speed-text");
-    const xorStepInfo = document.getElementById("learn-xor-step-info");
-    const xorContent = document.getElementById("learn-xor-content");
-    const xorProgText = document.getElementById("learn-progress-text");
-    const xorProgSlider = document.getElementById("learn-progress-slider");
-    async function loadXorSteps() {
-      if (!learnInput.value)
-        return;
-      try {
-        const result = await safeInvoke("get_xor_steps", { text: learnInput.value });
-        currentXorSteps = result.steps;
-        currentXorStepIdx = 0;
-        if (playInterval)
-          togglePlayPause();
-        renderXorStep();
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    function renderXorStep() {
-      if (currentXorSteps.length === 0) {
-        if (xorContent)
-          xorContent.innerHTML = "No steps.";
-        return;
-      }
-      const step = currentXorSteps[currentXorStepIdx];
-      if (xorStepInfo)
-        xorStepInfo.textContent = `STEP_IDX: ${(currentXorStepIdx + 1).toString().padStart(3, "0")} / ${currentXorSteps.length.toString().padStart(3, "0")}`;
-      let prog = Math.round((currentXorStepIdx + 1) / currentXorSteps.length * 100);
-      if (xorProgText)
-        xorProgText.textContent = `${prog}%`;
-      if (xorProgSlider)
-        xorProgSlider.value = prog.toString();
-      if (xorContent) {
-        let ptBitsHtml = step.input_binary.split("").map((b) => `<span class="w-6 h-8 bg-surface-container-highest flex items-center justify-center font-bold text-cyan-400">${b}</span>`).join("");
-        let keyBitsHtml = step.keystream_binary.split("").map((b) => `<span class="w-6 h-8 bg-surface-container-highest flex items-center justify-center font-bold text-orange-400">${b}</span>`).join("");
-        let resBitsHtml = step.result_binary.split("").map((b) => `<span class="w-6 h-8 bg-primary-container/10 border border-green-400/30 flex items-center justify-center font-black text-green-400">${b}</span>`).join("");
-        xorContent.innerHTML = `
+"use strict";(()=>{var Wt=(a,r)=>()=>(a&&(r=a(a=0)),r);var Jt=(a,r)=>()=>(r||a((r={exports:{}}).exports,r),r.exports);var I=(a,r,l)=>new Promise((p,c)=>{var k=v=>{try{w(l.next(v))}catch(_){c(_)}},z=v=>{try{w(l.throw(v))}catch(_){c(_)}},w=v=>v.done?p(v.value):Promise.resolve(v.value).then(k,z);w((l=l.apply(a,r)).next())});function b(a,r,l,p){if(l==="a"&&!p)throw new TypeError("Private accessor was defined without a getter");if(typeof r=="function"?a!==r||!p:!r.has(a))throw new TypeError("Cannot read private member from an object whose class did not declare it");return l==="m"?p:l==="a"?p.call(a):p?p.value:r.get(a)}function P(a,r,l,p,c){if(p==="m")throw new TypeError("Private method is not writable");if(p==="a"&&!c)throw new TypeError("Private accessor was defined without a setter");if(typeof r=="function"?a!==r||!c:!r.has(a))throw new TypeError("Cannot write private member to an object whose class did not declare it");return p==="a"?c.call(a,l):c?c.value=l:r.set(a,l),l}var jt=Wt(()=>{});function te(a,r=!1){return window.__TAURI_INTERNALS__.transformCallback(a,r)}function zt(p){return I(this,arguments,function*(a,r={},l){return window.__TAURI_INTERNALS__.invoke(a,r,l)})}var $,g,A,et,Qt,Ot,Dt,Xt=Wt(()=>{jt();Ot="__TAURI_TO_IPC_KEY__";Dt=class{constructor(r){$.set(this,void 0),g.set(this,0),A.set(this,[]),et.set(this,void 0),P(this,$,r||(()=>{}),"f"),this.id=te(l=>{let p=l.index;if("end"in l){p==b(this,g,"f")?this.cleanupCallback():P(this,et,p,"f");return}let c=l.message;if(p==b(this,g,"f")){for(b(this,$,"f").call(this,c),P(this,g,b(this,g,"f")+1,"f");b(this,g,"f")in b(this,A,"f");){let k=b(this,A,"f")[b(this,g,"f")];b(this,$,"f").call(this,k),delete b(this,A,"f")[b(this,g,"f")],P(this,g,b(this,g,"f")+1,"f")}b(this,g,"f")===b(this,et,"f")&&this.cleanupCallback()}else b(this,A,"f")[p]=c})}cleanupCallback(){window.__TAURI_INTERNALS__.unregisterCallback(this.id)}set onmessage(r){P(this,$,r,"f")}get onmessage(){return b(this,$,"f")}[($=new WeakMap,g=new WeakMap,A=new WeakMap,et=new WeakMap,Ot)](){return`__CHANNEL__:${this.id}`}toJSON(){return this[Ot]()}};Qt=new WeakMap});var ee=Jt(D=>{Xt();var B=(l,...p)=>I(D,[l,...p],function*(a,r={}){try{if(window.__TAURI_INTERNALS__)return yield zt(a,r);throw console.warn(`[Tauri Mock] Called invoke('${a}') with args:`,r),new Error("Tauri API is not available in the browser.")}catch(c){throw c}});document.addEventListener("DOMContentLoaded",()=>{let a=document.querySelectorAll(".tab-link, .mobile-tab-link"),r=document.querySelectorAll(".tab-panel");function l(t){r.forEach(e=>{e.classList.remove("active")});let n=document.getElementById(t);n&&n.classList.add("active"),document.querySelectorAll(".tab-link").forEach(e=>{if(e.getAttribute("data-target")===t){e.classList.remove("text-slate-500"),e.classList.add("text-[#00FF88]","bg-[#00FF88]/10","border-l-2","border-[#00FF88]");let s=e.querySelector(".material-symbols-outlined");s&&(s.style.fontVariationSettings="'FILL' 1")}else{e.classList.add("text-slate-500"),e.classList.remove("text-[#00FF88]","bg-[#00FF88]/10","border-l-2","border-[#00FF88]");let s=e.querySelector(".material-symbols-outlined");s&&(s.style.fontVariationSettings="'FILL' 0")}}),document.querySelectorAll(".mobile-tab-link").forEach(e=>{if(e.getAttribute("data-target")===t){e.classList.remove("text-gray-500"),e.classList.add("text-[#00FF88]","border-t-2","border-[#00FF88]");let s=e.querySelector(".material-symbols-outlined");s&&(s.style.fontVariationSettings="'FILL' 1")}else{e.classList.add("text-gray-500"),e.classList.remove("text-[#00FF88]","border-t-2","border-[#00FF88]");let s=e.querySelector(".material-symbols-outlined");s&&(s.style.fontVariationSettings="'FILL' 0")}})}a.forEach(t=>{t.addEventListener("click",n=>{n.preventDefault();let e=n.currentTarget.getAttribute("data-target");e&&l(e)})}),document.querySelectorAll(".sub-tab-link").forEach(t=>{t.addEventListener("click",n=>{n.preventDefault(),l("tab-learn");let e=n.currentTarget.getAttribute("data-target");if(e){let s=document.getElementById(e);s&&setTimeout(()=>{s.scrollIntoView({behavior:"smooth",block:"start"})},100)}})});let c=document.getElementById("use-input"),k=document.getElementById("use-input-length"),z=document.getElementById("use-hex-check"),w=document.getElementById("use-output"),v=document.getElementById("use-encrypt-btn"),_=document.getElementById("use-keystream-grid");c&&k&&c.addEventListener("input",()=>{k.textContent=`LENGTH: ${c.value.length} BYTES`}),v&&c&&w&&z&&_&&v.addEventListener("click",()=>I(D,null,function*(){let t=c.value;if(t)try{let n=yield B("encrypt_decrypt",{plaintext:t,hexOutput:z.checked});w.value=n.ciphertext,_.innerHTML="";let e=n.keystream_bytes||[],s=t.length,o=_.parentElement;if(o){let i=o.clientWidth,d=20,u=4,y=i-16,f=d+u,mt=Math.floor(y/f),bt=Math.max(1,mt);_.style.gridTemplateColumns=`repeat(${bt}, 20px)`}for(let i=0;i<s;i++){let d=document.createElement("div"),u=e[i]||0,m=Math.round(u/255*255),y=`rgb(${m}, ${m}, ${m})`;d.style.backgroundColor=y,d.title=`Byte ${i}: 0x${u.toString(16).toUpperCase().padStart(2,"0")} (${u})`,_.appendChild(d)}}catch(n){console.error(n),w.value=`Error: ${n}`}}));let yt=document.getElementById("use-help-link");yt&&yt.addEventListener("click",()=>{l("tab-learn");let t=document.getElementById("learn-input");t&&c&&c.value&&(t.value=c.value,t.dispatchEvent(new Event("input")))});let q=document.getElementById("test-size-slider"),xt=document.getElementById("test-size-label"),ft=document.getElementById("test-run-btn"),gt=document.getElementById("test-results-section");q&&xt&&q.addEventListener("input",()=>{let t=parseFloat(q.value),n=Math.round(Math.pow(10,t));xt.textContent=`${n.toLocaleString()} BYTES`}),ft&&q&&gt&&ft.addEventListener("click",()=>I(D,null,function*(){let t=parseFloat(q.value),n=Math.round(Math.pow(10,t));gt.classList.remove("hidden");let e=document.getElementById("test-nist-tbody");e&&(e.innerHTML='<tr><td colspan="3" class="text-center py-4">Running tests...</td></tr>');try{let s=yield B("run_quality_tests",{sampleSize:n});document.getElementById("test-shannon-val").textContent=s.shannon_entropy.toFixed(4),document.getElementById("test-shannon-bar").style.width=`${s.shannon_entropy/8*100}%`,document.getElementById("test-min-val").textContent=s.min_entropy.toFixed(4),document.getElementById("test-min-bar").style.width=`${s.min_entropy/8*100}%`,document.getElementById("test-mean-val").textContent=s.mean.toFixed(3),document.getElementById("test-chi-val").textContent=s.chi_square.toFixed(2),document.getElementById("test-longest-run-val").textContent=s.longest_run.toString(),document.getElementById("test-score-val").textContent=s.overall_score.toFixed(1),e&&(e.innerHTML="",s.nist_results.forEach(o=>{let i=document.createElement("tr");i.className="border-b border-outline-variant/10 hover:bg-surface-container-low transition-colors group";let d=o.passed?'<span class="bg-[#00FF88]/10 text-[#00FF88] border border-[#00FF88]/30 px-3 py-1 font-bold">\u2713 PASS</span>':'<span class="bg-error-container/20 text-error border border-error/30 px-3 py-1 font-bold">\u2717 FAIL</span>';i.innerHTML=`
+                            <td class="px-6 py-4 font-bold uppercase tracking-tight">${o.name}</td>
+                            <td class="px-6 py-4 font-mono">${o.p_value.toFixed(6)}</td>
+                            <td class="px-6 py-4 text-right">${d}</td>
+                        `,e.appendChild(i)}))}catch(s){console.error(s),e&&(e.innerHTML=`<tr><td colspan="3" class="text-center text-error py-4">Error: ${s}</td></tr>`)}}));let M=document.getElementById("bench-size-slider"),X=document.getElementById("bench-size-label"),vt=document.getElementById("bench-run-btn"),ht=document.getElementById("bench-results-section");M&&X&&(M.addEventListener("input",()=>{let t=parseFloat(M.value),n=Math.round(Math.pow(10,t));n>=1e6?X.textContent=`${(n/1e6).toFixed(1)}M bytes`:n>=1e3?X.textContent=`${(n/1e3).toFixed(0)}K bytes`:X.textContent=`${n} bytes`}),M.dispatchEvent(new Event("input"))),vt&&M&&ht&&vt.addEventListener("click",()=>I(D,null,function*(){let t=parseFloat(M.value),n=Math.round(Math.pow(10,t));ht.classList.remove("hidden");try{let e=yield B("run_benchmark",{bytes:n});document.getElementById("bench-throughput").textContent=e.throughput_mbps.toFixed(2),document.getElementById("bench-latency").textContent=e.latency_us.toFixed(2);let s=e.bytes_generated.toLocaleString();document.getElementById("bench-details").textContent=`Generated ${s} bytes in ${e.duration_secs.toFixed(3)} seconds`}catch(e){console.error(e),document.getElementById("bench-details").textContent=`Error: ${e}`}}));let Et=document.querySelectorAll(".learn-btn"),Ut=document.querySelectorAll(".learn-section");Et.forEach(t=>{t.addEventListener("click",n=>{let e=n.currentTarget.getAttribute("data-learn");Et.forEach(s=>{s.classList.remove("active","bg-primary-container","text-on-primary-container"),s.classList.add("bg-surface-container","text-slate-400")}),n.currentTarget.classList.remove("bg-surface-container","text-slate-400"),n.currentTarget.classList.add("active","bg-primary-container","text-on-primary-container"),Ut.forEach(s=>{s.id===`learn-${e}`?s.classList.add("active"):s.classList.remove("active")})})});let h=[],x=0,S=null,U=document.getElementById("learn-input"),It=document.getElementById("learn-prev"),V=document.getElementById("learn-next"),G=document.getElementById("learn-play-pause"),K=document.getElementById("learn-speed-slider"),_t=document.getElementById("learn-speed-text"),Lt=document.getElementById("learn-xor-step-info"),Z=document.getElementById("learn-xor-content"),wt=document.getElementById("learn-progress-text"),St=document.getElementById("learn-progress-slider");function Ct(){return I(this,null,function*(){if(U.value)try{h=(yield B("get_xor_steps",{text:U.value})).steps,x=0,S&&N(),nt()}catch(t){console.error(t)}})}function nt(){if(h.length===0){Z&&(Z.innerHTML="No steps.");return}let t=h[x];Lt&&(Lt.textContent=`STEP_IDX: ${(x+1).toString().padStart(3,"0")} / ${h.length.toString().padStart(3,"0")}`);let n=Math.round((x+1)/h.length*100);if(wt&&(wt.textContent=`${n}%`),St&&(St.value=n.toString()),Z){let e=t.input_binary.split("").map(i=>`<span class="w-6 h-8 bg-surface-container-highest flex items-center justify-center font-bold text-cyan-400">${i}</span>`).join(""),s=t.keystream_binary.split("").map(i=>`<span class="w-6 h-8 bg-surface-container-highest flex items-center justify-center font-bold text-orange-400">${i}</span>`).join(""),o=t.result_binary.split("").map(i=>`<span class="w-6 h-8 bg-primary-container/10 border border-green-400/30 flex items-center justify-center font-black text-green-400">${i}</span>`).join("");Z.innerHTML=`
              <div class="space-y-6">
-                 <h3 class="text-lg font-bold text-primary">Step ${currentXorStepIdx + 1} of ${currentXorSteps.length}: Encrypting '${step.character}'</h3>
+                 <h3 class="text-lg font-bold text-primary">Step ${x+1} of ${h.length}: Encrypting '${t.character}'</h3>
                  
                  <div class="bg-surface-container-low p-4 relative overflow-hidden border-l-2 border-[#00FF88] rounded">
                      <div class="flex justify-between items-start mb-4">
                          <div>
                              <span class="text-[10px] text-secondary uppercase font-bold">Input Character</span>
-                             <div class="text-4xl font-black text-primary">'${step.character}'</div>
+                             <div class="text-4xl font-black text-primary">'${t.character}'</div>
                          </div>
                          <div class="text-right">
                              <span class="text-[10px] text-outline-variant uppercase">ASCII Decimal</span>
-                             <div class="text-xl font-bold">${step.input_byte}</div>
+                             <div class="text-xl font-bold">${t.input_byte}</div>
                          </div>
                      </div>
 
                      <div class="space-y-4 pt-4 border-t border-outline-variant/30">
                          <div class="flex items-center justify-between">
                              <span class="text-[10px] text-cyan-400 text-left uppercase w-20 font-bold">Plaintext</span>
-                             <div class="flex gap-1">${ptBitsHtml}</div>
+                             <div class="flex gap-1">${e}</div>
                          </div>
 
                          <div class="flex items-center gap-4">
@@ -411,222 +32,31 @@
 
                          <div class="flex items-center justify-between">
                              <span class="text-[10px] text-orange-400 text-left uppercase w-20 font-bold">Keystream</span>
-                             <div class="flex gap-1">${keyBitsHtml}</div>
+                             <div class="flex gap-1">${s}</div>
                          </div>
 
                          <div class="flex items-center justify-between pt-4 border-t-2 border-green-400/30">
                              <span class="text-[10px] text-green-400 text-left uppercase w-20 font-bold">Result</span>
-                             <div class="flex gap-1">${resBitsHtml}</div>
+                             <div class="flex gap-1">${o}</div>
                          </div>
                      </div>
                  </div>
              </div>
-             `;
-      }
-      updateXorProgressSummary();
-    }
-    function updateXorProgressSummary() {
-      const progressContainer = document.getElementById("learn-xor-progress");
-      if (!progressContainer)
-        return;
-      if (currentXorSteps.length === 0) {
-        progressContainer.classList.add("hidden");
-        return;
-      }
-      progressContainer.classList.remove("hidden");
-      const progressContent = progressContainer.querySelector(".flex.flex-wrap.gap-2");
-      if (!progressContent)
-        return;
-      let html = "";
-      currentXorSteps.forEach((step, idx) => {
-        const resultByte = step.result_byte.toString(16).toUpperCase().padStart(2, "0");
-        let classes = "px-3 py-2 rounded font-mono text-sm font-bold transition-colors ";
-        if (idx === currentXorStepIdx) {
-          classes += "bg-green-500/30 border border-green-400 text-green-300";
-        } else if (idx < currentXorStepIdx) {
-          classes += "bg-surface-container-highest text-slate-400 border border-outline-variant/20";
-        } else {
-          classes += "bg-surface-container text-slate-500 border border-outline-variant/20";
-        }
-        html += `<span class="${classes}">${resultByte}</span>`;
-      });
-      progressContent.innerHTML = html;
-    }
-    if (learnInput) {
-      learnInput.addEventListener("input", () => {
-        loadXorSteps();
-      });
-      setTimeout(loadXorSteps, 500);
-    }
-    if (btnXorPrev) {
-      btnXorPrev.addEventListener("click", () => {
-        if (currentXorStepIdx > 0) {
-          currentXorStepIdx--;
-          renderXorStep();
-        }
-      });
-    }
-    if (btnXorNext) {
-      btnXorNext.addEventListener("click", () => {
-        if (currentXorStepIdx < currentXorSteps.length - 1) {
-          currentXorStepIdx++;
-          renderXorStep();
-        } else if (playInterval) {
-          togglePlayPause();
-        }
-      });
-    }
-    function togglePlayPause() {
-      if (!btnXorPlayPause)
-        return;
-      const icon = btnXorPlayPause.querySelector(".material-symbols-outlined");
-      if (playInterval) {
-        clearInterval(playInterval);
-        playInterval = null;
-        if (icon)
-          icon.textContent = "play_arrow";
-      } else {
-        if (currentXorStepIdx >= currentXorSteps.length - 1) {
-          currentXorStepIdx = 0;
-        }
-        const speedMs = parseInt(learnSpeedSlider.value, 10);
-        playInterval = setInterval(() => {
-          if (btnXorNext)
-            btnXorNext.click();
-        }, speedMs);
-        if (icon)
-          icon.textContent = "pause";
-      }
-    }
-    if (btnXorPlayPause) {
-      btnXorPlayPause.addEventListener("click", togglePlayPause);
-    }
-    if (learnSpeedSlider && learnSpeedText) {
-      learnSpeedSlider.addEventListener("input", () => {
-        const speedSec = (parseInt(learnSpeedSlider.value, 10) / 1e3).toFixed(1);
-        learnSpeedText.textContent = `${speedSec}s / step`;
-        if (playInterval) {
-          togglePlayPause();
-          togglePlayPause();
-        }
-      });
-    }
-    const xorCollapsibleBtn = document.getElementById("learn-xor-collapsible");
-    const xorDetailsDiv = document.getElementById("learn-xor-details");
-    if (xorCollapsibleBtn && xorDetailsDiv) {
-      xorCollapsibleBtn.addEventListener("click", () => {
-        xorDetailsDiv.classList.toggle("hidden");
-        const icon = xorCollapsibleBtn.querySelector(".material-symbols-outlined");
-        if (icon) {
-          icon.textContent = xorDetailsDiv.classList.contains("hidden") ? "expand_more" : "expand_less";
-        }
-      });
-    }
-    const entCollapsibleBtn = document.getElementById("learn-entropy-collapsible");
-    const entDetailsDiv = document.getElementById("learn-entropy-details");
-    if (entCollapsibleBtn && entDetailsDiv) {
-      entCollapsibleBtn.addEventListener("click", () => {
-        entDetailsDiv.classList.toggle("hidden");
-        const icon = entCollapsibleBtn.querySelector(".material-symbols-outlined");
-        if (icon) {
-          icon.textContent = entDetailsDiv.classList.contains("hidden") ? "expand_more" : "expand_less";
-        }
-      });
-    }
-    const nistCollapsibleBtn = document.getElementById("learn-nist-collapsible");
-    const nistDetailsDiv = document.getElementById("learn-nist-details");
-    if (nistCollapsibleBtn && nistDetailsDiv) {
-      nistCollapsibleBtn.addEventListener("click", () => {
-        nistDetailsDiv.classList.toggle("hidden");
-        const icon = nistCollapsibleBtn.querySelector(".material-symbols-outlined");
-        if (icon) {
-          icon.textContent = nistDetailsDiv.classList.contains("hidden") ? "expand_more" : "expand_less";
-        }
-      });
-    }
-    let currentEntSteps = [];
-    let currentEntStepIdx = 0;
-    let entPlayInterval = null;
-    const learnEntInput = document.getElementById("learn-entropy-input");
-    const btnEntPrev = document.getElementById("learn-entropy-prev");
-    const btnEntNext = document.getElementById("learn-entropy-next");
-    const btnEntPlayPause = document.getElementById("learn-entropy-play-pause");
-    const entStepInfo = document.getElementById("learn-entropy-step-info");
-    const entContent = document.getElementById("learn-entropy-content");
-    const btnEntCalculate = document.getElementById("learn-entropy-calculate");
-    const entSpeedSlider = document.getElementById("learn-entropy-speed-slider");
-    const entSpeedText = document.getElementById("learn-entropy-speed-text");
-    async function loadEntSteps() {
-      if (!learnEntInput.value)
-        return;
-      try {
-        const result = await safeInvoke("get_entropy_steps", { text: learnEntInput.value });
-        currentEntSteps = result.steps;
-        currentEntStepIdx = 0;
-        if (entPlayInterval)
-          toggleEntPlayPause();
-        renderEntStep();
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    function renderEntStep() {
-      if (currentEntSteps.length === 0)
-        return;
-      const step = currentEntSteps[currentEntStepIdx];
-      const stepType = step.step_type;
-      if (entStepInfo)
-        entStepInfo.textContent = `Step ${currentEntStepIdx + 1} / ${currentEntSteps.length}`;
-      if (entContent) {
-        let tableHtml = `<table class="w-full text-sm">
+             `}Vt()}function Vt(){let t=document.getElementById("learn-xor-progress");if(!t)return;if(h.length===0){t.classList.add("hidden");return}t.classList.remove("hidden");let n=t.querySelector(".flex.flex-wrap.gap-2");if(!n)return;let e="";h.forEach((s,o)=>{let i=s.result_byte.toString(16).toUpperCase().padStart(2,"0"),d="px-3 py-2 rounded font-mono text-sm font-bold transition-colors ";o===x?d+="bg-green-500/30 border border-green-400 text-green-300":o<x?d+="bg-surface-container-highest text-slate-400 border border-outline-variant/20":d+="bg-surface-container text-slate-500 border border-outline-variant/20",e+=`<span class="${d}">${i}</span>`}),n.innerHTML=e}U&&(U.addEventListener("input",()=>{Ct()}),setTimeout(Ct,500)),It&&It.addEventListener("click",()=>{x>0&&(x--,nt())}),V&&V.addEventListener("click",()=>{x<h.length-1?(x++,nt()):S&&N()});function N(){if(!G)return;let t=G.querySelector(".material-symbols-outlined");if(S)clearInterval(S),S=null,t&&(t.textContent="play_arrow");else{x>=h.length-1&&(x=0);let n=parseInt(K.value,10);S=setInterval(()=>{V&&V.click()},n),t&&(t.textContent="pause")}}G&&G.addEventListener("click",N),K&&_t&&K.addEventListener("input",()=>{let t=(parseInt(K.value,10)/1e3).toFixed(1);_t.textContent=`${t}s / step`,S&&(N(),N())});let st=document.getElementById("learn-xor-collapsible"),rt=document.getElementById("learn-xor-details");st&&rt&&st.addEventListener("click",()=>{rt.classList.toggle("hidden");let t=st.querySelector(".material-symbols-outlined");t&&(t.textContent=rt.classList.contains("hidden")?"expand_more":"expand_less")});let at=document.getElementById("learn-entropy-collapsible"),ot=document.getElementById("learn-entropy-details");at&&ot&&at.addEventListener("click",()=>{ot.classList.toggle("hidden");let t=at.querySelector(".material-symbols-outlined");t&&(t.textContent=ot.classList.contains("hidden")?"expand_more":"expand_less")});let it=document.getElementById("learn-nist-collapsible"),lt=document.getElementById("learn-nist-details");it&&lt&&it.addEventListener("click",()=>{lt.classList.toggle("hidden");let t=it.querySelector(".material-symbols-outlined");t&&(t.textContent=lt.classList.contains("hidden")?"expand_more":"expand_less")});let H=[],L=0,C=null,Tt=document.getElementById("learn-entropy-input"),Ft=document.getElementById("learn-entropy-prev"),Y=document.getElementById("learn-entropy-next"),R=document.getElementById("learn-entropy-play-pause"),$t=document.getElementById("learn-entropy-step-info"),Bt=document.getElementById("learn-entropy-content"),kt=document.getElementById("learn-entropy-calculate"),J=document.getElementById("learn-entropy-speed-slider"),Mt=document.getElementById("learn-entropy-speed-text");function Gt(){return I(this,null,function*(){if(Tt.value)try{H=(yield B("get_entropy_steps",{text:Tt.value})).steps,L=0,C&&W(),ct()}catch(t){console.error(t)}})}function ct(){var e,s;if(H.length===0)return;let t=H[L],n=t.step_type;if($t&&($t.textContent=`Step ${L+1} / ${H.length}`),Bt){let o=`<table class="w-full text-sm">
                  <thead>
                      <tr class="border-b border-outline-variant/30 text-left">
                          <th class="p-2 font-bold text-primary">Byte</th>
-                         <th class="p-2 font-bold text-primary">Count</th>`;
-        if (stepType !== "CountBytes") {
-          tableHtml += `<th class="p-2 font-bold text-primary">Probability</th>`;
-        }
-        if (stepType === "CalculateContributions" || stepType === "SumEntropy" || stepType === "Interpret") {
-          tableHtml += `<th class="p-2 font-bold text-primary">Contribution</th>`;
-        }
-        tableHtml += `<th class="p-2 font-bold text-primary">Visual</th>
+                         <th class="p-2 font-bold text-primary">Count</th>`;n!=="CountBytes"&&(o+='<th class="p-2 font-bold text-primary">Probability</th>'),(n==="CalculateContributions"||n==="SumEntropy"||n==="Interpret")&&(o+='<th class="p-2 font-bold text-primary">Contribution</th>'),o+=`<th class="p-2 font-bold text-primary">Visual</th>
                      </tr>
                  </thead>
-                 <tbody>`;
-        const sortedBytes = Object.keys(step.byte_counts).sort();
-        const maxCount = Math.max(...Object.values(step.byte_counts), 1);
-        for (const byteStr of sortedBytes) {
-          const byteNum = parseInt(byteStr);
-          const count = step.byte_counts[byteStr];
-          const prob = step.probabilities?.[byteStr] || 0;
-          const contrib = step.entropy_contributions?.[byteStr] || 0;
-          const charRepr = byteNum >= 32 && byteNum <= 126 ? String.fromCharCode(byteNum) : `0x${byteNum.toString(16).toUpperCase().padStart(2, "0")}`;
-          const barWidth = count / maxCount * 100;
-          const barColor = count === 1 ? "#00FF88" : `rgb(255, ${100 + (155 - Math.min(count * 20, 155))}, 100)`;
-          tableHtml += `<tr class="border-b border-outline-variant/20 hover:bg-surface-container-low transition-colors">
-                     <td class="p-2 font-mono text-slate-300">'${charRepr}'</td>
-                     <td class="p-2 font-mono text-slate-300">${count}</td>`;
-          if (stepType !== "CountBytes") {
-            tableHtml += `<td class="p-2 font-mono text-slate-300">${prob.toFixed(3)}</td>`;
-          }
-          if (stepType === "CalculateContributions" || stepType === "SumEntropy" || stepType === "Interpret") {
-            tableHtml += `<td class="p-2 font-mono text-slate-300">${contrib.toFixed(3)} bits</td>`;
-          }
-          tableHtml += `<td class="p-2"><div class="h-6 bg-surface-container rounded" style="width: ${barWidth}%; background-color: ${barColor};"></div></td>
-                     </tr>`;
-        }
-        tableHtml += `</tbody></table>`;
-        let explanationHtml = "";
-        switch (stepType) {
-          case "CountBytes":
-            explanationHtml = `<div class="mt-6 p-4 bg-surface-container-low rounded border-l-2 border-primary">
+                 <tbody>`;let i=Object.keys(t.byte_counts).sort(),d=Math.max(...Object.values(t.byte_counts),1);for(let m of i){let y=parseInt(m),f=t.byte_counts[m],mt=((e=t.probabilities)==null?void 0:e[m])||0,bt=((s=t.entropy_contributions)==null?void 0:s[m])||0,Kt=y>=32&&y<=126?String.fromCharCode(y):`0x${y.toString(16).toUpperCase().padStart(2,"0")}`,Zt=f/d*100,Yt=f===1?"#00FF88":`rgb(255, ${100+(155-Math.min(f*20,155))}, 100)`;o+=`<tr class="border-b border-outline-variant/20 hover:bg-surface-container-low transition-colors">
+                     <td class="p-2 font-mono text-slate-300">'${Kt}'</td>
+                     <td class="p-2 font-mono text-slate-300">${f}</td>`,n!=="CountBytes"&&(o+=`<td class="p-2 font-mono text-slate-300">${mt.toFixed(3)}</td>`),(n==="CalculateContributions"||n==="SumEntropy"||n==="Interpret")&&(o+=`<td class="p-2 font-mono text-slate-300">${bt.toFixed(3)} bits</td>`),o+=`<td class="p-2"><div class="h-6 bg-surface-container rounded" style="width: ${Zt}%; background-color: ${Yt};"></div></td>
+                     </tr>`}o+="</tbody></table>";let u="";switch(n){case"CountBytes":u=`<div class="mt-6 p-4 bg-surface-container-low rounded border-l-2 border-primary">
                          <p class="text-sm text-slate-300">
                              <strong>\u{1F4A1} What's happening:</strong> We count how many times each unique byte appears in the input. This frequency distribution is the foundation for entropy calculation.
                          </p>
-                     </div>`;
-            break;
-          case "CalculateProbabilities":
-            explanationHtml = `<div class="mt-6 space-y-3">
+                     </div>`;break;case"CalculateProbabilities":u=`<div class="mt-6 space-y-3">
                          <div class="p-4 bg-surface-container-low rounded border-l-2 border-primary">
                              <p class="text-sm text-slate-300 mb-2">
                                  <strong>\u{1F4A1} Formula:</strong> P(x) = Count(x) \xF7 Total Bytes
@@ -638,10 +68,7 @@
                          <button class="w-full p-2 bg-surface-container rounded text-xs text-slate-400 hover:bg-surface-container-highest transition-colors text-left">
                              \u25B6 Learn More: Why does this matter?
                          </button>
-                     </div>`;
-            break;
-          case "CalculateContributions":
-            explanationHtml = `<div class="mt-6 space-y-3">
+                     </div>`;break;case"CalculateContributions":u=`<div class="mt-6 space-y-3">
                          <div class="p-4 bg-surface-container-low rounded border-l-2 border-primary">
                              <p class="text-sm text-slate-300 mb-2">
                                  <strong>\u{1F4A1} Formula:</strong> Contribution = -P(x) \xD7 log\u2082(P(x))
@@ -653,182 +80,50 @@
                          <button class="w-full p-2 bg-surface-container rounded text-xs text-slate-400 hover:bg-surface-container-highest transition-colors text-left">
                              \u25B6 Learn More: Information Theory Background
                          </button>
-                     </div>`;
-            break;
-          case "SumEntropy":
-          case "Interpret":
-            const efficiency = step.max_entropy > 0 ? step.total_entropy / step.max_entropy * 100 : 0;
-            let interpretation = "Moderate entropy.";
-            let interpretIcon = "\u26A0\uFE0F";
-            if (step.current_entropy_sum < 2) {
-              interpretation = "Low entropy. The input is very predictable.";
-              interpretIcon = "\u{1F4C9}";
-            } else if (efficiency > 80) {
-              interpretation = "High entropy! The input looks quite random or uses many different characters.";
-              interpretIcon = "\u{1F525}";
-            }
-            explanationHtml = `<div class="mt-6 space-y-4">
+                     </div>`;break;case"SumEntropy":case"Interpret":let m=t.max_entropy>0?t.total_entropy/t.max_entropy*100:0,y="Moderate entropy.",f="\u26A0\uFE0F";t.current_entropy_sum<2?(y="Low entropy. The input is very predictable.",f="\u{1F4C9}"):m>80&&(y="High entropy! The input looks quite random or uses many different characters.",f="\u{1F525}"),u=`<div class="mt-6 space-y-4">
                          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                              <div class="bg-surface-container-low p-4 rounded border border-primary/30">
                                  <div class="text-xs text-slate-400 uppercase mb-1">Total Entropy</div>
-                                 <div class="text-2xl font-bold text-primary">${step.current_entropy_sum.toFixed(4)}</div>
+                                 <div class="text-2xl font-bold text-primary">${t.current_entropy_sum.toFixed(4)}</div>
                                  <div class="text-xs text-slate-500 mt-1">bits/byte</div>
                              </div>
                              <div class="bg-surface-container-low p-4 rounded border border-primary/30">
                                  <div class="text-xs text-slate-400 uppercase mb-1">Maximum Possible</div>
-                                 <div class="text-2xl font-bold text-primary">${step.max_entropy.toFixed(4)}</div>
-                                 <div class="text-xs text-slate-500 mt-1">bits/byte (${sortedBytes.length} unique)</div>
+                                 <div class="text-2xl font-bold text-primary">${t.max_entropy.toFixed(4)}</div>
+                                 <div class="text-xs text-slate-500 mt-1">bits/byte (${i.length} unique)</div>
                              </div>
                              <div class="bg-surface-container-low p-4 rounded border border-[#A855F7]/30">
                                  <div class="text-xs text-slate-400 uppercase mb-1">Efficiency</div>
-                                 <div class="text-2xl font-bold text-[#A855F7]">${efficiency.toFixed(1)}%</div>
+                                 <div class="text-2xl font-bold text-[#A855F7]">${m.toFixed(1)}%</div>
                                  <div class="text-xs text-slate-500 mt-1">how close to max</div>
                              </div>
                          </div>
 
                          <div class="p-4 bg-surface-container-low rounded border-l-2 border-[#A855F7]">
                              <p class="text-sm text-slate-300 mb-2">
-                                 <strong>${interpretIcon} Interpretation:</strong>
+                                 <strong>${f} Interpretation:</strong>
                              </p>
                              <p class="text-sm text-slate-300">
-                                 ${interpretation}
+                                 ${y}
                              </p>
-                             ${step.current_entropy_sum < 2 ? `<p class="text-sm text-slate-400 mt-2 italic">For cryptography, you generally want entropy > 7 bits/byte for strong randomness.</p>` : ""}
+                             ${t.current_entropy_sum<2?'<p class="text-sm text-slate-400 mt-2 italic">For cryptography, you generally want entropy > 7 bits/byte for strong randomness.</p>':""}
                          </div>
-                     </div>`;
-            break;
-        }
-        entContent.innerHTML = tableHtml + explanationHtml;
-      }
-    }
-    function toggleEntPlayPause() {
-      if (!btnEntPlayPause)
-        return;
-      const icon = btnEntPlayPause.querySelector(".material-symbols-outlined");
-      const label = btnEntPlayPause.querySelector("span:last-child");
-      if (entPlayInterval) {
-        clearInterval(entPlayInterval);
-        entPlayInterval = null;
-        if (icon)
-          icon.textContent = "play_arrow";
-        if (label)
-          label.textContent = "Play";
-      } else {
-        if (currentEntStepIdx >= currentEntSteps.length - 1) {
-          currentEntStepIdx = 0;
-        }
-        const speedMs = parseInt(entSpeedSlider.value, 10);
-        entPlayInterval = setInterval(() => {
-          if (btnEntNext)
-            btnEntNext.click();
-        }, speedMs);
-        if (icon)
-          icon.textContent = "pause";
-        if (label)
-          label.textContent = "Pause";
-      }
-    }
-    if (btnEntCalculate) {
-      btnEntCalculate.addEventListener("click", loadEntSteps);
-    }
-    if (btnEntPrev) {
-      btnEntPrev.addEventListener("click", () => {
-        if (currentEntStepIdx > 0) {
-          currentEntStepIdx--;
-          renderEntStep();
-        }
-      });
-    }
-    if (btnEntNext) {
-      btnEntNext.addEventListener("click", () => {
-        if (currentEntStepIdx < currentEntSteps.length - 1) {
-          currentEntStepIdx++;
-          renderEntStep();
-        } else if (entPlayInterval) {
-          toggleEntPlayPause();
-        }
-      });
-    }
-    if (btnEntPlayPause) {
-      btnEntPlayPause.addEventListener("click", toggleEntPlayPause);
-    }
-    if (entSpeedSlider && entSpeedText) {
-      entSpeedSlider.addEventListener("input", () => {
-        const speedSec = (parseInt(entSpeedSlider.value, 10) / 1e3).toFixed(1);
-        entSpeedText.textContent = `${speedSec}s / step`;
-        if (entPlayInterval) {
-          toggleEntPlayPause();
-          toggleEntPlayPause();
-        }
-      });
-    }
-    let currentNistSteps = [];
-    let currentNistStepIdx = 0;
-    let nistPlayInterval = null;
-    const nistInput = document.getElementById("learn-nist-input");
-    const btnNistAnalyze = document.getElementById("learn-nist-analyze");
-    const btnNistRandom = document.getElementById("learn-nist-random");
-    const btnNistPrev = document.getElementById("learn-nist-prev");
-    const btnNistNext = document.getElementById("learn-nist-next");
-    const btnNistPlayPause = document.getElementById("learn-nist-play-pause");
-    const nistStepInfo = document.getElementById("learn-nist-step-info");
-    const nistContent = document.getElementById("learn-nist-content");
-    const nistSpeedSlider = document.getElementById("learn-nist-speed-slider");
-    const nistSpeedText = document.getElementById("learn-nist-speed-text");
-    async function loadNistSteps(isRandom = true, text = "") {
-      try {
-        let result;
-        if (isRandom) {
-          result = await safeInvoke("get_nist_steps_random", { count: 64 });
-        } else {
-          result = await safeInvoke("get_nist_steps", { text });
-        }
-        currentNistSteps = result.steps;
-        currentNistStepIdx = 0;
-        if (nistPlayInterval)
-          toggleNistPlayPause();
-        renderNistStep();
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    function renderNistStep() {
-      if (currentNistSteps.length === 0)
-        return;
-      const step = currentNistSteps[currentNistStepIdx];
-      const stepType = step.step_type;
-      if (nistStepInfo)
-        nistStepInfo.textContent = `Step ${currentNistStepIdx + 1} / ${currentNistSteps.length}`;
-      if (nistContent) {
-        let bitsHtml = "";
-        for (let i = 0; i < step.bits.length; i++) {
-          if (i > 0 && i % 8 === 0) {
-            bitsHtml += '<span class="mx-2"></span>';
-          }
-          const bit = step.bits[i];
-          const color = bit === 1 ? "text-[#00FF88]" : "text-slate-400";
-          bitsHtml += `<span class="inline-block w-4 text-center font-bold ${color}">${bit}</span>`;
-        }
-        let content = `<div class="space-y-6">
-                 <h3 class="text-lg font-bold text-[#A855F7]">Step ${currentNistStepIdx + 1} of ${currentNistSteps.length}: ${stepType.replace(/([A-Z])/g, " $1").trim()}</h3>
+                     </div>`;break}Bt.innerHTML=o+u}}function W(){if(!R)return;let t=R.querySelector(".material-symbols-outlined"),n=R.querySelector("span:last-child");if(C)clearInterval(C),C=null,t&&(t.textContent="play_arrow"),n&&(n.textContent="Play");else{L>=H.length-1&&(L=0);let e=parseInt(J.value,10);C=setInterval(()=>{Y&&Y.click()},e),t&&(t.textContent="pause"),n&&(n.textContent="Pause")}}kt&&kt.addEventListener("click",Gt),Ft&&Ft.addEventListener("click",()=>{L>0&&(L--,ct())}),Y&&Y.addEventListener("click",()=>{L<H.length-1?(L++,ct()):C&&W()}),R&&R.addEventListener("click",W),J&&Mt&&J.addEventListener("input",()=>{let t=(parseInt(J.value,10)/1e3).toFixed(1);Mt.textContent=`${t}s / step`,C&&(W(),W())});let T=[],E=0,F=null,dt=document.getElementById("learn-nist-input"),Ht=document.getElementById("learn-nist-analyze"),Pt=document.getElementById("learn-nist-random"),At=document.getElementById("learn-nist-prev"),Q=document.getElementById("learn-nist-next"),j=document.getElementById("learn-nist-play-pause"),qt=document.getElementById("learn-nist-step-info"),Nt=document.getElementById("learn-nist-content"),tt=document.getElementById("learn-nist-speed-slider"),Rt=document.getElementById("learn-nist-speed-text");function ut(t=!0,n=""){return I(this,null,function*(){try{let e;t?e=yield B("get_nist_steps_random",{count:64}):e=yield B("get_nist_steps",{text:n}),T=e.steps,E=0,F&&O(),pt()}catch(e){console.error(e)}})}function pt(){if(T.length===0)return;let t=T[E],n=t.step_type;if(qt&&(qt.textContent=`Step ${E+1} / ${T.length}`),Nt){let e="";for(let u=0;u<t.bits.length;u++){u>0&&u%8===0&&(e+='<span class="mx-2"></span>');let m=t.bits[u];e+=`<span class="inline-block w-4 text-center font-bold ${m===1?"text-[#00FF88]":"text-slate-400"}">${m}</span>`}let s=`<div class="space-y-6">
+                 <h3 class="text-lg font-bold text-[#A855F7]">Step ${E+1} of ${T.length}: ${n.replace(/([A-Z])/g," $1").trim()}</h3>
 
                  <div>
-                     <h4 class="text-sm font-bold text-slate-300 mb-2">Bit Sequence (${step.bits.length} bits):</h4>
+                     <h4 class="text-sm font-bold text-slate-300 mb-2">Bit Sequence (${t.bits.length} bits):</h4>
                      <div class="bg-surface-container-lowest p-4 rounded border border-outline-variant/20 font-mono text-sm break-all">
-                         ${bitsHtml}
+                         ${e}
                      </div>
-                 </div>`;
-        const total = step.bits.length;
-        const onesPct = total > 0 ? step.ones_count / total * 100 : 0;
-        if (stepType !== "ConvertToBits") {
-          content += `<div class="grid grid-cols-2 gap-4">
+                 </div>`,o=t.bits.length,i=o>0?t.ones_count/o*100:0;n!=="ConvertToBits"&&(s+=`<div class="grid grid-cols-2 gap-4">
                      <div class="bg-surface-container-low p-4 rounded border border-outline-variant/20">
                          <div class="text-xs text-slate-400 uppercase font-bold mb-1">Ones Count</div>
-                         <div class="text-3xl font-bold text-[#00FF88]">${step.ones_count}</div>
+                         <div class="text-3xl font-bold text-[#00FF88]">${t.ones_count}</div>
                      </div>
                      <div class="bg-surface-container-low p-4 rounded border border-outline-variant/20">
                          <div class="text-xs text-slate-400 uppercase font-bold mb-1">Zeros Count</div>
-                         <div class="text-3xl font-bold text-slate-400">${step.zeros_count}</div>
+                         <div class="text-3xl font-bold text-slate-400">${t.zeros_count}</div>
                      </div>
                  </div>
 
@@ -836,81 +131,60 @@
                  <div>
                      <h4 class="text-sm font-bold text-slate-300 mb-2">Distribution Balance (Ideal: 50% Ones)</h4>
                      <div class="relative h-12 bg-slate-600 rounded overflow-hidden">
-                         <div class="absolute h-full bg-[#00FF88] transition-all" style="width: ${onesPct}%;"></div>
+                         <div class="absolute h-full bg-[#00FF88] transition-all" style="width: ${i}%;"></div>
                          <div class="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 w-0.5 h-full bg-black"></div>
                          <div class="absolute inset-0 flex items-center justify-center font-bold text-sm text-white mix-blend-multiply">
-                             ${onesPct.toFixed(1)}% Ones (${step.ones_count}/${total} bits)
+                             ${i.toFixed(1)}% Ones (${t.ones_count}/${o} bits)
                          </div>
                      </div>
-                 </div>`;
-        }
-        let explanationHtml = "";
-        switch (stepType) {
-          case "ConvertToBits":
-            explanationHtml = `<div class="p-4 bg-surface-container-low rounded border-l-2 border-[#A855F7]">
+                 </div>`);let d="";switch(n){case"ConvertToBits":d=`<div class="p-4 bg-surface-container-low rounded border-l-2 border-[#A855F7]">
                          <p class="text-sm text-slate-300">
                              <strong>\u{1F4A1} What's happening:</strong> Each byte becomes 8 binary digits. White = 0, Green = 1.
                          </p>
-                     </div>`;
-            break;
-          case "CountOnesZeros":
-            explanationHtml = `<div class="p-4 bg-surface-container-low rounded border-l-2 border-[#A855F7]">
+                     </div>`;break;case"CountOnesZeros":d=`<div class="p-4 bg-surface-container-low rounded border-l-2 border-[#A855F7]">
                          <p class="text-sm text-slate-300 mb-2">
                              <strong>\u{1F4A1} What's happening:</strong> If the data is truly random, we expect roughly 50% ones and 50% zeros, like fair coin flips.
                          </p>
                          <p class="text-sm text-slate-400 italic">
-                             Current ratio: ${onesPct.toFixed(1)}% ones vs ${(100 - onesPct).toFixed(1)}% zeros
+                             Current ratio: ${i.toFixed(1)}% ones vs ${(100-i).toFixed(1)}% zeros
                          </p>
-                     </div>`;
-            break;
-          case "CalculateStatistic":
-            explanationHtml = `<div class="space-y-3">
+                     </div>`;break;case"CalculateStatistic":d=`<div class="space-y-3">
                          <div class="bg-surface-container-low p-4 rounded border-l-2 border-[#A855F7]">
                              <p class="text-sm text-slate-300 mb-2">
                                  <strong>\u{1F4A1} Formula:</strong> S_obs = |Sum| \xF7 \u221A(n)
                              </p>
                              <p class="text-sm text-slate-400">Where Sum = (count_ones \xD7 +1) + (count_zeros \xD7 -1)</p>
-                             <p class="text-sm text-slate-400">Result: ${step.sum} \xF7 \u221A${total} = ${step.s_obs.toFixed(4)}</p>
+                             <p class="text-sm text-slate-400">Result: ${t.sum} \xF7 \u221A${o} = ${t.s_obs.toFixed(4)}</p>
                          </div>
                          <div class="p-3 bg-surface-container rounded text-xs text-slate-400">
                              <p>S_obs tells us how far from balanced (0) the sequence is. Closer to 0 = more balanced and random-looking.</p>
                          </div>
-                     </div>`;
-            break;
-          case "CalculatePValue":
-            explanationHtml = `<div class="space-y-3">
+                     </div>`;break;case"CalculatePValue":d=`<div class="space-y-3">
                          <div class="bg-surface-container-low p-4 rounded border-l-2 border-[#A855F7]">
                              <p class="text-sm text-slate-300 mb-2">
                                  <strong>\u{1F4A1} Formula:</strong> P-value = erfc(S_obs \xF7 \u221A2)
                              </p>
-                             <p class="text-sm text-slate-400">Result: erfc(${step.s_obs.toFixed(4)} \xF7 1.414) = ${step.p_value.toFixed(4)}</p>
+                             <p class="text-sm text-slate-400">Result: erfc(${t.s_obs.toFixed(4)} \xF7 1.414) = ${t.p_value.toFixed(4)}</p>
                          </div>
                          <div class="p-3 bg-surface-container rounded text-xs text-slate-400">
-                             <p><strong>Interpretation:</strong> P-value = ${(step.p_value * 100).toFixed(1)}% probability that a truly random sequence would show this much deviation.</p>
+                             <p><strong>Interpretation:</strong> P-value = ${(t.p_value*100).toFixed(1)}% probability that a truly random sequence would show this much deviation.</p>
                          </div>
-                     </div>`;
-            break;
-          case "Interpret":
-            const statusColor = step.passed ? "#00FF88" : "#ff6b6b";
-            const statusIcon = step.passed ? "\u2705" : "\u274C";
-            const statusText = step.passed ? "PASS" : "FAIL";
-            const statusMsg = step.passed ? "The sequence looks RANDOM!" : "The sequence is BIASED toward 1s or 0s.";
-            explanationHtml = `<div class="space-y-4">
-                         <div class="p-4 rounded border-l-4" style="border-color: ${statusColor}; background: rgba(0,0,0,0.2);">
+                     </div>`;break;case"Interpret":let u=t.passed?"#00FF88":"#ff6b6b",m=t.passed?"\u2705":"\u274C",y=t.passed?"PASS":"FAIL",f=t.passed?"The sequence looks RANDOM!":"The sequence is BIASED toward 1s or 0s.";d=`<div class="space-y-4">
+                         <div class="p-4 rounded border-l-4" style="border-color: ${u}; background: rgba(0,0,0,0.2);">
                              <div class="flex items-center gap-2 mb-2">
-                                 <span style="color: ${statusColor}" class="text-2xl font-bold">${statusIcon} ${statusText}</span>
+                                 <span style="color: ${u}" class="text-2xl font-bold">${m} ${y}</span>
                              </div>
-                             <p class="text-lg text-slate-300 font-bold mb-2">${statusMsg}</p>
+                             <p class="text-lg text-slate-300 font-bold mb-2">${f}</p>
                          </div>
 
                          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                              <div class="bg-surface-container-low p-4 rounded">
                                  <div class="text-xs text-slate-400 uppercase mb-1">Test Statistic (S_obs)</div>
-                                 <div class="text-2xl font-bold text-slate-300">${step.s_obs.toFixed(4)}</div>
+                                 <div class="text-2xl font-bold text-slate-300">${t.s_obs.toFixed(4)}</div>
                              </div>
                              <div class="bg-surface-container-low p-4 rounded">
                                  <div class="text-xs text-slate-400 uppercase mb-1">P-Value</div>
-                                 <div class="text-2xl font-bold" style="color: ${statusColor};">${step.p_value.toFixed(4)}</div>
+                                 <div class="text-2xl font-bold" style="color: ${u};">${t.p_value.toFixed(4)}</div>
                                  <div class="text-xs text-slate-500 mt-1">vs Threshold: 0.01</div>
                              </div>
                          </div>
@@ -919,84 +193,4 @@
                              <p><strong>Why this matters:</strong> P-value \u2265 0.01 indicates the data passes randomness test. Lower values suggest bias.</p>
                              <p class="mt-2 text-xs text-slate-400">For cryptography, randomness is critical. Biased sequences can be predicted and exploited.</p>
                          </div>
-                     </div>`;
-            break;
-        }
-        content += explanationHtml + "</div>";
-        nistContent.innerHTML = content;
-      }
-    }
-    function toggleNistPlayPause() {
-      if (!btnNistPlayPause)
-        return;
-      const icon = btnNistPlayPause.querySelector(".material-symbols-outlined");
-      const label = btnNistPlayPause.querySelector("span:last-child");
-      if (nistPlayInterval) {
-        clearInterval(nistPlayInterval);
-        nistPlayInterval = null;
-        if (icon)
-          icon.textContent = "play_arrow";
-        if (label)
-          label.textContent = "Play";
-      } else {
-        if (currentNistStepIdx >= currentNistSteps.length - 1) {
-          currentNistStepIdx = 0;
-        }
-        const speedMs = parseInt(nistSpeedSlider.value, 10);
-        nistPlayInterval = setInterval(() => {
-          if (btnNistNext)
-            btnNistNext.click();
-        }, speedMs);
-        if (icon)
-          icon.textContent = "pause";
-        if (label)
-          label.textContent = "Pause";
-      }
-    }
-    if (btnNistAnalyze) {
-      btnNistAnalyze.addEventListener("click", () => {
-        if (nistInput.value) {
-          loadNistSteps(false, nistInput.value);
-        }
-      });
-    }
-    if (btnNistRandom) {
-      btnNistRandom.addEventListener("click", () => {
-        nistInput.value = "";
-        loadNistSteps(true);
-      });
-    }
-    if (btnNistPrev) {
-      btnNistPrev.addEventListener("click", () => {
-        if (currentNistStepIdx > 0) {
-          currentNistStepIdx--;
-          renderNistStep();
-        }
-      });
-    }
-    if (btnNistNext) {
-      btnNistNext.addEventListener("click", () => {
-        if (currentNistStepIdx < currentNistSteps.length - 1) {
-          currentNistStepIdx++;
-          renderNistStep();
-        } else if (nistPlayInterval) {
-          toggleNistPlayPause();
-        }
-      });
-    }
-    if (btnNistPlayPause) {
-      btnNistPlayPause.addEventListener("click", toggleNistPlayPause);
-    }
-    if (nistSpeedSlider && nistSpeedText) {
-      nistSpeedSlider.addEventListener("input", () => {
-        const speedSec = (parseInt(nistSpeedSlider.value, 10) / 1e3).toFixed(1);
-        nistSpeedText.textContent = `${speedSec}s / step`;
-        if (nistPlayInterval) {
-          toggleNistPlayPause();
-          toggleNistPlayPause();
-        }
-      });
-    }
-    setTimeout(() => loadNistSteps(true), 500);
-  });
-})();
+                     </div>`;break}s+=d+"</div>",Nt.innerHTML=s}}function O(){if(!j)return;let t=j.querySelector(".material-symbols-outlined"),n=j.querySelector("span:last-child");if(F)clearInterval(F),F=null,t&&(t.textContent="play_arrow"),n&&(n.textContent="Play");else{E>=T.length-1&&(E=0);let e=parseInt(tt.value,10);F=setInterval(()=>{Q&&Q.click()},e),t&&(t.textContent="pause"),n&&(n.textContent="Pause")}}Ht&&Ht.addEventListener("click",()=>{dt.value&&ut(!1,dt.value)}),Pt&&Pt.addEventListener("click",()=>{dt.value="",ut(!0)}),At&&At.addEventListener("click",()=>{E>0&&(E--,pt())}),Q&&Q.addEventListener("click",()=>{E<T.length-1?(E++,pt()):F&&O()}),j&&j.addEventListener("click",O),tt&&Rt&&tt.addEventListener("input",()=>{let t=(parseInt(tt.value,10)/1e3).toFixed(1);Rt.textContent=`${t}s / step`,F&&(O(),O())}),setTimeout(()=>ut(!0),500)})});ee();})();
