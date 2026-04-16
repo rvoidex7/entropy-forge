@@ -665,32 +665,32 @@ button {
 }
 
 /* ============================================================
-   KEYSTREAM GRID - Responsive square cells
+   KEYSTREAM GRID - Fixed cell size, flexible container
    ============================================================ */
 
 #use-keystream-grid {
   display: grid;
   gap: 4px;
-  padding: 16px;
+  padding: 8px;
   background: var(--bg-input);
-  grid-template-columns: repeat(16, 1fr) !important;
+  grid-template-columns: repeat(16, 20px);
   width: 100%;
-  min-height: 300px;
+  justify-content: flex-start;
 }
 
 #use-keystream-grid > div {
-  aspect-ratio: 1 / 1;
+  width: 20px;
+  height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 10px;
+  font-size: 8px;
   font-weight: bold;
-  transition: opacity 0.2s ease, transform 0.15s ease;
+  transition: opacity 0.2s ease;
   border: 1px solid rgba(132, 149, 133, 0.3);
 }
 
 #use-keystream-grid > div:hover {
   opacity: 0.8;
-  transform: scale(1.05);
   cursor: pointer;
 }
