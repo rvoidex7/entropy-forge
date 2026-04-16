@@ -173,6 +173,18 @@
           useKeystreamGrid.innerHTML = "";
           const bytes = result.keystream_bytes || [];
           const inputLength = text.length;
+          const parentContainer = useKeystreamGrid.parentElement;
+          if (parentContainer) {
+            const containerWidth = parentContainer.clientWidth;
+            const cellSize = 20;
+            const gap = 4;
+            const padding = 16;
+            const availableWidth = containerWidth - padding;
+            const cellWithGap = cellSize + gap;
+            const maxColumns = Math.floor(availableWidth / cellWithGap);
+            const columns = Math.max(1, maxColumns);
+            useKeystreamGrid.style.gridTemplateColumns = `repeat(${columns}, 20px)`;
+          }
           for (let i = 0; i < inputLength; i++) {
             const div = document.createElement("div");
             const val = bytes[i] || 0;

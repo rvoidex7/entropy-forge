@@ -665,7 +665,7 @@ button {
 }
 
 /* ============================================================
-   KEYSTREAM GRID - Fixed cell size, flexible container
+   KEYSTREAM GRID - Dynamic columns based on container width
    ============================================================ */
 
 #use-keystream-grid {
@@ -673,9 +673,8 @@ button {
   gap: 4px;
   padding: 8px;
   background: var(--bg-input);
-  grid-template-columns: repeat(16, 20px);
-  width: 100%;
-  justify-content: flex-start;
+  grid-auto-flow: row;
+  width: fit-content;
 }
 
 #use-keystream-grid > div {

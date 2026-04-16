@@ -96,10 +96,30 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 useOutput.value = result.ciphertext;
 
-                // Update Keystream Grid (fixed 16 columns, wraps to new rows)
+                // Update Keystream Grid - calculate columns based on container width
                 useKeystreamGrid.innerHTML = '';
                 const bytes = result.keystream_bytes || [];
                 const inputLength = text.length;
+                
+                // Calculate available width and columns dynamically
+                const parentContainer = useKeystreamGrid.parentElement;
+                if (parentContainer) {
+                    const containerWidth = parentContainer.clientWidth;
+                    const cellSize = 20; // 20px cells
+                    const gap = 4; // 4px gap
+                    const padding = 16; // 8px * 2 sides
+                    
+                    // Available space for cells
+                    const availableWidth = containerWidth - padding;
+                    // Each cell + gap, except last gap
+                    const cellWithGap = cellSize + gap;
+                    const maxColumns = Math.floor(availableWidth / cellWithGap);
+                    
+                    // Use calculated columns or minimum 1
+                    const columns = Math.max(1, maxColumns);
+                    
+                    useKeystreamGrid.style.gridTemplateColumns = `repeat(${columns}, 20px)`;
+                }
                 
                 for (let i = 0; i < inputLength; i++) {
                     const div = document.createElement('div');
