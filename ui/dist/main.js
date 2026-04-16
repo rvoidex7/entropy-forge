@@ -263,42 +263,40 @@
         }
       });
     }
-    const benchSlider = document.getElementById("bench-volume-slider");
-    const benchLabel = document.getElementById("bench-volume-label");
+    const benchSlider = document.getElementById("bench-size-slider");
+    const benchLabel = document.getElementById("bench-size-label");
     const benchRunBtn = document.getElementById("bench-run-btn");
+    const benchResultsSec = document.getElementById("bench-results-section");
     if (benchSlider && benchLabel) {
       benchSlider.addEventListener("input", () => {
-        benchLabel.textContent = `${benchSlider.value} MB`;
+        const val = parseFloat(benchSlider.value);
+        const bytes = Math.round(Math.pow(10, val));
+        if (bytes >= 1e6) {
+          benchLabel.textContent = `${(bytes / 1e6).toFixed(1)}M bytes`;
+        } else if (bytes >= 1e3) {
+          benchLabel.textContent = `${(bytes / 1e3).toFixed(0)}K bytes`;
+        } else {
+          benchLabel.textContent = `${bytes} bytes`;
+        }
       });
+      benchSlider.dispatchEvent(new Event("input"));
     }
-    if (benchRunBtn && benchSlider) {
+    if (benchRunBtn && benchSlider && benchResultsSec) {
       benchRunBtn.addEventListener("click", async () => {
-        const mbs = parseInt(benchSlider.value, 10);
-        const bytes = mbs * 1024 * 1024;
-        const durationVal = document.getElementById("bench-duration-val");
-        const bytesVal = document.getElementById("bench-bytes-val");
-        if (durationVal)
-          durationVal.textContent = "...";
-        if (bytesVal)
-          bytesVal.textContent = "...";
+        const val = parseFloat(benchSlider.value);
+        const bytes = Math.round(Math.pow(10, val));
+        benchResultsSec.classList.remove("hidden");
         try {
           const result = await safeInvoke("run_benchmark", {
             bytes
           });
-          document.getElementById("bench-throughput").textContent = result.throughput_mbps.toFixed(1);
-          document.getElementById("bench-latency").textContent = result.latency_us.toFixed(3);
-          const peak = Math.min(result.throughput_mbps / 2e3 * 100, 100);
-          document.getElementById("bench-throughput-bar").style.width = `${peak}%`;
-          if (durationVal)
-            durationVal.textContent = `${result.duration_secs.toFixed(4)}s`;
-          if (bytesVal)
-            bytesVal.textContent = result.bytes_generated.toLocaleString();
+          document.getElementById("bench-throughput").textContent = result.throughput_mbps.toFixed(2);
+          document.getElementById("bench-latency").textContent = result.latency_us.toFixed(2);
+          const bytesFormatted = result.bytes_generated.toLocaleString();
+          document.getElementById("bench-details").textContent = `Generated ${bytesFormatted} bytes in ${result.duration_secs.toFixed(3)} seconds`;
         } catch (error) {
           console.error(error);
-          if (durationVal)
-            durationVal.textContent = `Error`;
-          if (bytesVal)
-            bytesVal.textContent = `Error`;
+          document.getElementById("bench-details").textContent = `Error: ${error}`;
         }
       });
     }

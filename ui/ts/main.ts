@@ -228,44 +228,54 @@ if (useHelpLink) {
     // ==========================================
     // 4. Bench Tab Logic
     // ==========================================
-    const benchSlider = document.getElementById('bench-volume-slider') as HTMLInputElement;
-    const benchLabel = document.getElementById('bench-volume-label');
+    const benchSlider = document.getElementById('bench-size-slider') as HTMLInputElement;
+    const benchLabel = document.getElementById('bench-size-label');
     const benchRunBtn = document.getElementById('bench-run-btn');
+    const benchResultsSec = document.getElementById('bench-results-section');
 
     if (benchSlider && benchLabel) {
         benchSlider.addEventListener('input', () => {
-            benchLabel.textContent = `${benchSlider.value} MB`;
+            // Slider: 4-10 = 10^4 to 10^10, but we cap at 10^7 (10M)
+            const val = parseFloat(benchSlider.value);
+            const bytes = Math.round(Math.pow(10, val));
+            
+            // Format as human readable
+            if (bytes >= 1_000_000) {
+                benchLabel.textContent = `${(bytes / 1_000_000).toFixed(1)}M bytes`;
+            } else if (bytes >= 1_000) {
+                benchLabel.textContent = `${(bytes / 1_000).toFixed(0)}K bytes`;
+            } else {
+                benchLabel.textContent = `${bytes} bytes`;
+            }
         });
+        // Initialize
+        benchSlider.dispatchEvent(new Event('input'));
     }
 
-    if (benchRunBtn && benchSlider) {
+    if (benchRunBtn && benchSlider && benchResultsSec) {
         benchRunBtn.addEventListener('click', async () => {
-            const mbs = parseInt(benchSlider.value, 10);
-            const bytes = mbs * 1024 * 1024;
+            const val = parseFloat(benchSlider.value);
+            const bytes = Math.round(Math.pow(10, val));
 
-            const durationVal = document.getElementById('bench-duration-val');
-            const bytesVal = document.getElementById('bench-bytes-val');
-            if (durationVal) durationVal.textContent = '...';
-            if (bytesVal) bytesVal.textContent = '...';
+            // Show results section
+            benchResultsSec.classList.remove('hidden');
 
             try {
                 const result: any = await safeInvoke('run_benchmark', {
                     bytes: bytes
                 });
 
-                document.getElementById('bench-throughput')!.textContent = result.throughput_mbps.toFixed(1);
-                document.getElementById('bench-latency')!.textContent = result.latency_us.toFixed(3);
-
-                // Animate bar (fake peak calculation)
-                const peak = Math.min((result.throughput_mbps / 2000.0) * 100, 100);
-                document.getElementById('bench-throughput-bar')!.style.width = `${peak}%`;
-
-                if (durationVal) durationVal.textContent = `${result.duration_secs.toFixed(4)}s`;
-                if (bytesVal) bytesVal.textContent = result.bytes_generated.toLocaleString();
+                // Display results
+                document.getElementById('bench-throughput')!.textContent = result.throughput_mbps.toFixed(2);
+                document.getElementById('bench-latency')!.textContent = result.latency_us.toFixed(2);
+                
+                // Format details text
+                const bytesFormatted = result.bytes_generated.toLocaleString();
+                document.getElementById('bench-details')!.textContent = 
+                    `Generated ${bytesFormatted} bytes in ${result.duration_secs.toFixed(3)} seconds`;
             } catch (error) {
                 console.error(error);
-                if (durationVal) durationVal.textContent = `Error`;
-                if (bytesVal) bytesVal.textContent = `Error`;
+                document.getElementById('bench-details')!.textContent = `Error: ${error}`;
             }
         });
     }
