@@ -653,13 +653,42 @@ button {
     display: flex !important;
   }
 
-  /* Mobile nav should be hidden */
-  nav#mobile-nav.lg\\:hidden {
-    display: none !important;
-  }
+   /* Mobile nav should be hidden */
+   nav#mobile-nav.lg\\:hidden {
+     display: none !important;
+   }
 
-  /* Main content adjustments */
-  main {
-    margin-left: 0;
-  }
+   /* Main content adjustments */
+   main {
+     margin-left: 0;
+   }
+}
+
+/* ============================================================
+   KEYSTREAM GRID - Dynamic sizing
+   ============================================================ */
+
+#use-keystream-grid {
+  display: inline-grid;
+  gap: 4px;
+  padding: 8px;
+  background: var(--bg-input);
+  border-radius: 4px;
+}
+
+#use-keystream-grid > div {
+  min-width: 24px;
+  min-height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  font-weight: bold;
+  transition: opacity 0.2s ease, transform 0.15s ease;
+}
+
+#use-keystream-grid > div:hover {
+  opacity: 0.8;
+  transform: scale(1.1);
+  cursor: pointer;
 }

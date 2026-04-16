@@ -185,10 +185,10 @@
                                   <div class="w-11 h-6 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
                                 </label>
                             </div>
-                            <!-- Initiate Forge Button -->
-                            <button id="use-encrypt-btn" class="bg-gradient-to-br from-primary-container to-[#6f00be] text-on-primary-container flex items-center justify-center font-black uppercase tracking-tighter text-lg group hover:scale-[0.98] transition-transform active:scale-95 shadow-[0_0_20px_rgba(0,255,136,0.2)]">
-                                <span class="material-symbols-outlined mr-3 group-hover:rotate-90 transition-transform" style="font-variation-settings: 'FILL' 1;">bolt</span>
-                                Initiate Forge
+                            <!-- Encrypt / Decrypt Button -->
+                            <button id="use-encrypt-btn" class="bg-gradient-to-br from-primary-container to-[#6f00be] text-black flex items-center justify-center font-black uppercase tracking-tighter text-lg group hover:scale-[0.98] transition-transform active:scale-95 shadow-[0_0_20px_rgba(0,255,136,0.2)]">
+                                <span class="material-symbols-outlined mr-3 group-hover:rotate-90 transition-transform" style="font-variation-settings: 'FILL' 1;">lock</span>
+                                Encrypt / Decrypt
                             </button>
                         </div>
 
@@ -196,10 +196,10 @@
                         <section class="space-y-4 keystream-section">
                             <div class="flex items-center justify-between">
                                 <span class="text-[10px] text-outline uppercase tracking-[0.2em] font-bold">02. Keystream State</span>
-                                <span class="text-[10px] text-primary font-mono">8×8 Grid</span>
+                                <span class="text-[10px] text-primary font-mono">Dynamic Grid</span>
                             </div>
-                            <div class="p-1 bg-surface-container-low border border-outline-variant/20">
-                                <div id="use-keystream-grid" class="grid grid-cols-8 gap-1 aspect-square bg-background p-2 w-48 h-48 mx-auto">
+                            <div class="p-1 bg-surface-container-low border border-outline-variant/20 overflow-auto max-h-80">
+                                <div id="use-keystream-grid" class="gap-1 bg-background p-2 inline-grid" style="grid-template-columns: repeat(8, minmax(0, 1fr));">
                                     <!-- Grid cells populated dynamically -->
                                 </div>
                             </div>
@@ -219,7 +219,7 @@
 
                         <div class="text-center pt-4">
                             <button id="use-help-link" class="text-xs text-primary-container hover:text-primary underline underline-offset-4 tracking-wider transition-colors inline-flex items-center">
-                                Nasıl çalışır? (XOR Visualizer'ı Gör)
+                                How does it work? (See XOR Visualizer)
                                 <span class="material-symbols-outlined ml-1 text-[14px]">arrow_forward</span>
                             </button>
                         </div>
