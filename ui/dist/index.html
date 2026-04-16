@@ -287,38 +287,46 @@
                                     </div>
                                 </div>
 
-                                <!-- Data Labels Cluster -->
-                                <div class="grid grid-cols-1 gap-4">
-                                     <div class="bg-surface-container-highest p-4 flex justify-between items-center" title="Mean byte value should be close to 127.5 for uniform distribution. Values significantly different indicate byte bias.">
-                                         <div class="space-y-1">
-                                             <p class="text-[10px] text-slate-500 uppercase">Mean Byte Value</p>
-                                             <p id="test-mean-val" class="text-lg font-bold text-[#00FF88]">0.000</p>
-                                         </div>
-                                         <span class="text-[8px] text-slate-600 px-2 py-1 border border-outline-variant italic">IDEAL: 127.5</span>
-                                     </div>
-                                     <div class="bg-surface-container-highest p-4 flex justify-between items-center" title="Chi-square test measures deviation from uniform distribution of byte values. Lower values indicate better randomness.">
-                                         <div class="space-y-1">
-                                             <p class="text-[10px] text-slate-500 uppercase">Chi-Square Distribution</p>
-                                             <p id="test-chi-val" class="text-lg font-bold text-[#00FF88]">0.00</p>
-                                         </div>
-                                         <span class="text-[8px] text-slate-600 px-2 py-1 border border-outline-variant italic">STAT</span>
-                                     </div>
-                                     <div class="bg-surface-container-highest p-4 flex justify-between items-center" title="Longest run is the maximum consecutive sequence of the same bit. Longer runs indicate patterns; shorter runs suggest better randomness.">
-                                         <div class="space-y-1">
-                                             <p class="text-[10px] text-slate-500 uppercase">Longest Run</p>
-                                             <p id="test-longest-run-val" class="text-lg font-bold text-[#00FF88]">0</p>
-                                         </div>
-                                         <span class="text-[8px] text-slate-600 px-2 py-1 border border-outline-variant italic">BITS</span>
-                                     </div>
-                                </div>
+                                 <!-- Data Labels Cluster -->
+                                 <div class="grid grid-cols-1 gap-4">
+                                      <div class="bg-surface-container-highest p-4 flex justify-between items-center" title="Mean byte value should be close to 127.5 for uniform distribution. Values significantly different indicate byte bias.">
+                                          <div class="space-y-1">
+                                              <p class="text-[10px] text-slate-500 uppercase">Mean Byte Value</p>
+                                              <p id="test-mean-val" class="text-lg font-bold text-[#00FF88]">0.000</p>
+                                          </div>
+                                          <span class="text-[8px] text-slate-600 px-2 py-1 border border-outline-variant italic">IDEAL: 127.5</span>
+                                      </div>
+                                      <div class="bg-surface-container-highest p-4 flex justify-between items-center" title="Chi-square test measures deviation from uniform distribution of byte values. Lower values indicate better randomness.">
+                                          <div class="space-y-1">
+                                              <p class="text-[10px] text-slate-500 uppercase">Chi-Square Distribution</p>
+                                              <p id="test-chi-val" class="text-lg font-bold text-[#00FF88]">0.00</p>
+                                          </div>
+                                          <span class="text-[8px] text-slate-600 px-2 py-1 border border-outline-variant italic">STAT</span>
+                                      </div>
+                                      <div class="bg-surface-container-highest p-4 flex justify-between items-center" title="Longest run is the maximum consecutive sequence of the same bit. Longer runs indicate patterns; shorter runs suggest better randomness.">
+                                          <div class="space-y-1">
+                                              <p class="text-[10px] text-slate-500 uppercase">Longest Run</p>
+                                              <p id="test-longest-run-val" class="text-lg font-bold text-[#00FF88]">0</p>
+                                          </div>
+                                          <span class="text-[8px] text-slate-600 px-2 py-1 border border-outline-variant italic">BITS</span>
+                                      </div>
+                                      <div class="bg-surface-container-low border-l-4 border-[#ff8c00] p-4 flex justify-between items-center" title="Weighted quality score: Shannon entropy (50%), Min-entropy (30%), Mean closeness to 127.5 (20%).">
+                                          <div class="space-y-1">
+                                              <p class="text-[10px] text-slate-500 uppercase">Overall Quality Score</p>
+                                              <p id="test-score-val" class="text-2xl font-black text-[#ff8c00]">0.0</p>
+                                          </div>
+                                          <span class="text-[8px] text-slate-600 px-2 py-1 border border-outline-variant italic">/100</span>
+                                      </div>
+                                 </div>
                             </div>
 
                             <!-- NIST SP 800-22 Results Table -->
                             <div class="space-y-4">
                                 <div class="flex items-center space-x-2">
                                     <span class="w-2 h-2 bg-secondary animate-pulse"></span>
-                                    <h3 class="text-sm font-bold uppercase tracking-widest">NIST SP 800-22 Revision 1a Results</h3>
+                                    <h3 class="text-sm font-bold uppercase tracking-widest">NIST SP 800-22 Tests</h3>
                                 </div>
+                                <p class="text-xs text-slate-400 italic">P-values ≥ 0.01 indicate randomness (Pass)</p>
                                 <div class="w-full overflow-hidden border border-outline-variant/30">
                                     <table class="w-full text-left border-collapse">
                                         <thead>

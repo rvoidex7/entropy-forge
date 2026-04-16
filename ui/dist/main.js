@@ -241,6 +241,7 @@
           document.getElementById("test-mean-val").textContent = result.mean.toFixed(3);
           document.getElementById("test-chi-val").textContent = result.chi_square.toFixed(2);
           document.getElementById("test-longest-run-val").textContent = result.longest_run.toString();
+          document.getElementById("test-score-val").textContent = result.overall_score.toFixed(1);
           if (tbody) {
             tbody.innerHTML = "";
             result.nist_results.forEach((t) => {
