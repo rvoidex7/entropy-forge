@@ -243,39 +243,39 @@
 
                 <!-- TEST TAB -->
                 <section id="tab-test" class="tab-panel h-full">
-                    <div class="p-4 md:p-8 space-y-8 pb-32">
-                        <!-- Header & Control Cluster -->
-                        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                            <div class="space-y-1">
-                                <span class="text-[10px] text-[#00FF88] tracking-widest uppercase">Analysis Suite // Module 02</span>
-                                <h2 class="text-2xl md:text-3xl font-black tracking-tight text-[#00FF88] uppercase">Cryptographic Testing</h2>
-                                <p class="text-slate-500 text-sm italic max-w-lg">Validating stochastic properties through NIST SP 800-22 statistical batteries.</p>
-                            </div>
-                            <div class="glass-panel p-6 border border-outline-variant/20 flex flex-col sm:flex-row gap-8 items-center w-full sm:w-auto">
-                                <div class="space-y-3 w-full sm:w-64">
-                                    <div class="flex justify-between text-[10px] uppercase tracking-tighter text-slate-400">
-                                        <span>Sample Size</span>
-                                        <span id="test-size-label" class="text-[#00FF88]">512,000 BYTES</span>
-                                    </div>
-                                    <input id="test-size-slider" class="w-full h-1 bg-surface-container-high appearance-none cursor-pointer accent-[#00FF88]" max="6" min="3" step="0.1" type="range" value="4"/>
-                                    <div class="flex justify-between text-[8px] text-slate-600">
-                                        <span>1K</span>
-                                        <span>1M</span>
-                                    </div>
-                                </div>
-                                <button id="test-run-btn" class="bg-[#00FF88] text-[#003919] px-8 py-3 font-bold text-xs uppercase tracking-widest hover:bg-[#131314] hover:text-[#00FF88] border border-[#00FF88] transition-all flex items-center justify-center w-full sm:w-auto whitespace-nowrap">
-                                    <span class="material-symbols-outlined mr-2 text-base">play_arrow</span>
-                                    Run System Tests
-                                </button>
-                            </div>
-                        </div>
+                    <div class="p-4 md:p-8 space-y-4 pb-32">
+                         <!-- Header & Control Cluster -->
+                         <div class="flex flex-col md:flex-row md:items-end justify-between gap-3">
+                             <div class="space-y-1">
+                                 <span class="text-[10px] text-[#00FF88] tracking-widest uppercase">Analysis Suite // Module 02</span>
+                                 <h2 class="text-2xl md:text-3xl font-black tracking-tight text-[#00FF88] uppercase">Cryptographic Testing</h2>
+                                 <p class="text-slate-500 text-sm italic max-w-lg">Validating stochastic properties through NIST SP 800-22 statistical batteries.</p>
+                             </div>
+                             <div class="glass-panel p-4 border border-outline-variant/20 flex flex-col sm:flex-row gap-3 items-center w-full sm:w-auto">
+                                 <div class="space-y-2 w-full sm:w-60">
+                                     <div class="flex justify-between text-[10px] uppercase tracking-tighter text-slate-400">
+                                         <span>Sample Size</span>
+                                         <span id="test-size-label" class="text-[#00FF88]">512,000 BYTES</span>
+                                     </div>
+                                     <input id="test-size-slider" class="w-full h-1 bg-surface-container-high appearance-none cursor-pointer accent-[#00FF88]" max="6" min="3" step="0.1" type="range" value="4"/>
+                                     <div class="flex justify-between text-[8px] text-slate-600">
+                                         <span>1K</span>
+                                         <span>1M</span>
+                                     </div>
+                                 </div>
+                                 <button id="test-run-btn" class="bg-[#00FF88] text-[#003919] px-6 py-2 font-bold text-xs uppercase tracking-widest hover:bg-[#131314] hover:text-[#00FF88] border border-[#00FF88] transition-all flex items-center justify-center w-full sm:w-auto whitespace-nowrap">
+                                     <span class="material-symbols-outlined mr-2 text-base">play_arrow</span>
+                                     Run Tests
+                                 </button>
+                             </div>
+                         </div>
 
-                        <!-- Results Section -->
-                        <div id="test-results-section" class="space-y-8 hidden">
-                            <!-- Bento Grid - Metrics -->
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                <!-- Shannon Entropy Card -->
-                                 <div class="bg-surface-container-low border-l-4 border-[#00FF88] p-6 flex flex-col justify-between h-48" title="Shannon Entropy measures the average information content. 8.0 bits/byte = perfect randomness. Lower values indicate patterns.">
+                         <!-- Results Section -->
+                         <div id="test-results-section" class="space-y-4 hidden">
+                             <!-- Bento Grid - Metrics -->
+                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                 <!-- Shannon Entropy Card -->
+                                  <div class="bg-surface-container-low border-l-4 border-[#00FF88] p-4 flex flex-col justify-between h-44" title="Shannon Entropy measures the average information content. 8.0 bits/byte = perfect randomness. Lower values indicate patterns.">
                                      <div class="flex justify-between items-start">
                                          <span class="text-xs font-bold uppercase tracking-widest text-[#00FF88]">Shannon Entropy</span>
                                          <span class="material-symbols-outlined text-slate-600">query_stats</span>
@@ -289,7 +289,7 @@
                                 </div>
 
                                  <!-- Min-Entropy Card -->
-                                 <div class="bg-surface-container-low border-l-4 border-secondary p-6 flex flex-col justify-between h-48" title="Min-Entropy is the worst-case entropy, critical for cryptographic security. The minimum entropy must be high to ensure unpredictability.">
+                                 <div class="bg-surface-container-low border-l-4 border-secondary p-4 flex flex-col justify-between h-44" title="Min-Entropy is the worst-case entropy, critical for cryptographic security. The minimum entropy must be high to ensure unpredictability.">
                                      <div class="flex justify-between items-start">
                                          <span class="text-xs font-bold uppercase tracking-widest text-secondary">Min-Entropy</span>
                                          <span class="material-symbols-outlined text-slate-600">data_thresholding</span>
@@ -363,23 +363,23 @@
 
                 <!-- BENCH TAB -->
                 <section id="tab-benchmark" class="tab-panel h-full">
-                    <div class="p-4 md:p-8 space-y-8 pb-32">
-                        <!-- Header -->
-                        <div class="space-y-1">
-                            <h2 class="text-2xl md:text-3xl font-black uppercase tracking-tight text-[#00FF88]">Performance Benchmark</h2>
-                            <p class="text-slate-500 text-sm">Measure entropy generation speed.</p>
-                        </div>
+                    <div class="p-4 md:p-8 space-y-4 pb-32">
+                         <!-- Header -->
+                         <div class="space-y-1">
+                             <h2 class="text-2xl md:text-3xl font-black uppercase tracking-tight text-[#00FF88]">Performance Benchmark</h2>
+                             <p class="text-slate-500 text-sm">Measure entropy generation speed.</p>
+                         </div>
 
-                        <!-- Benchmark Size Slider -->
-                        <div class="space-y-4">
-                            <div class="flex justify-between text-[10px] uppercase tracking-tighter text-slate-400">
-                                <span>Benchmark size:</span>
-                                <span id="bench-size-label" class="text-[#00FF88]">1,000,000 bytes</span>
-                            </div>
-                            <input id="bench-size-slider" class="w-full h-1 bg-surface-container-high appearance-none cursor-pointer accent-[#00FF88]" max="10" min="4" step="0.1" type="range" value="6"/>
-                            <div class="flex justify-between text-[8px] text-slate-600">
-                                <span>10K</span>
-                                <span>10M</span>
+                         <!-- Benchmark Size Slider -->
+                         <div class="space-y-2">
+                             <div class="flex justify-between text-[10px] uppercase tracking-tighter text-slate-400">
+                                 <span>Benchmark size:</span>
+                                 <span id="bench-size-label" class="text-[#00FF88]">1,000,000 bytes</span>
+                             </div>
+                             <input id="bench-size-slider" class="w-full h-1 bg-surface-container-high appearance-none cursor-pointer accent-[#00FF88]" max="10" min="4" step="0.1" type="range" value="6"/>
+                             <div class="flex justify-between text-[8px] text-slate-600">
+                                 <span>10K</span>
+                                 <span>10M</span>
                             </div>
                         </div>
 
@@ -390,11 +390,11 @@
                         </button>
 
                         <!-- Results Section (hidden initially) -->
-                        <div id="bench-results-section" class="space-y-6 hidden">
+                        <div id="bench-results-section" class="space-y-3 hidden">
                             <h3 class="text-sm font-bold uppercase tracking-widest text-[#00FF88]">Results</h3>
                             
                             <!-- Throughput -->
-                            <div class="bg-surface-container-low p-6 border-l-4 border-[#00FF88]">
+                            <div class="bg-surface-container-low p-4 border-l-4 border-[#00FF88]">
                                 <div class="flex justify-between items-start mb-2">
                                     <span class="text-xs font-bold uppercase tracking-widest text-[#00FF88]">Throughput</span>
                                     <button class="material-symbols-outlined text-slate-500 hover:text-[#00FF88] cursor-help text-sm" title="Speed for bulk operations like file encryption and video streaming." aria-label="Throughput information">info</button>
@@ -405,7 +405,7 @@
                             </div>
 
                             <!-- Latency -->
-                            <div class="bg-surface-container-low p-6 border-l-4 border-secondary">
+                            <div class="bg-surface-container-low p-4 border-l-4 border-secondary">
                                 <div class="flex justify-between items-start mb-2">
                                     <span class="text-xs font-bold uppercase tracking-widest text-secondary">Latency per byte</span>
                                     <button class="material-symbols-outlined text-slate-500 hover:text-secondary cursor-help text-sm" title="Per-byte delay relevant to key generation and protocol handshakes." aria-label="Latency information">info</button>
@@ -425,7 +425,7 @@
 
                 <!-- LEARN TAB -->
                 <section id="tab-learn" class="tab-panel h-full">
-                    <div class="p-4 md:p-8 max-w-6xl mx-auto space-y-8 pb-32">
+                    <div class="p-4 md:p-8 max-w-6xl mx-auto space-y-4 pb-32">
                         <!-- Lesson Header & Selector -->
                         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-outline-variant/20 pb-8">
                             <div>
@@ -441,8 +441,8 @@
                         </div>
 
                         <!-- XOR Lesson -->
-                        <div id="learn-xor" class="learn-section active space-y-6">
-                            <div class="grid grid-cols-12 gap-8 items-start">
+                        <div id="learn-xor" class="learn-section active space-y-3">
+                            <div class="grid grid-cols-12 gap-4 items-start">
                                 <!-- Visualization Stage -->
                                 <div class="col-span-12 lg:col-span-8 space-y-6">
                                     <div class="bg-surface-container-lowest border border-outline-variant/10 p-8 relative overflow-hidden">
