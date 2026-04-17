@@ -65,24 +65,43 @@ document.addEventListener("DOMContentLoaded", () => {
 
      // Learn sub-categories navigation (desktop sidebar only)
      const subTabLinks = document.querySelectorAll('.sub-tab-link');
-     subTabLinks.forEach(link => {
-         link.addEventListener('click', (e) => {
-             e.preventDefault();
-             // First switch to tab-learn
-             switchTab('tab-learn');
-             
-             // Then scroll to specific sub-section
-             const target = (e.currentTarget as HTMLElement).getAttribute('data-target');
-             if (target) {
-                 const section = document.getElementById(target);
-                 if (section) {
-                     setTimeout(() => {
-                         section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                     }, 100);
-                 }
-             }
-         });
-     });
+      subTabLinks.forEach(link => {
+          link.addEventListener('click', (e) => {
+              e.preventDefault();
+              // First switch to tab-learn
+              switchTab('tab-learn');
+              
+              // Get the target learn section (learn-xor, learn-entropy, learn-nist)
+              const target = (e.currentTarget as HTMLElement).getAttribute('data-target');
+              if (target) {
+                  // Extract the learn type (xor, entropy, nist) from data-target
+                  const learnType = target.replace('learn-', '');
+                  
+                  // Activate the correct learn section
+                  const learnSections = document.querySelectorAll('.learn-section');
+                  learnSections.forEach(section => {
+                      if (section.id === target) {
+                          section.classList.add('active');
+                      } else {
+                          section.classList.remove('active');
+                      }
+                  });
+                  
+                  // Update learn buttons to show which is active
+                  const learnBtns = document.querySelectorAll('.learn-btn');
+                  learnBtns.forEach(btn => {
+                      const btnTarget = btn.getAttribute('data-learn');
+                      if (btnTarget === learnType) {
+                          btn.classList.remove('bg-surface-container', 'text-slate-400');
+                          btn.classList.add('active', 'bg-primary-container', 'text-on-primary-container');
+                      } else {
+                          btn.classList.remove('active', 'bg-primary-container', 'text-on-primary-container');
+                          btn.classList.add('bg-surface-container', 'text-slate-400');
+                      }
+                  });
+              }
+          });
+      });
 
     // ==========================================
     // 2. Use Tab Logic
