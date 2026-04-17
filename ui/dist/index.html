@@ -205,17 +205,17 @@
                                    </section>
 
                                    <!-- Hex Output Toggle + Generate Button -->
-                                   <div class="flex items-center gap-2">
-                                       <label class="flex items-center gap-2">
-                                           <input type="checkbox" id="use-hex-check" class="sr-only peer" checked>
-                                           <div class="w-8 h-5 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary-container relative"></div>
-                                           <span class="text-xs font-bold text-slate-400 uppercase tracking-wide whitespace-nowrap">Hex</span>
-                                       </label>
-                                       <button id="use-encrypt-btn" class="bg-gradient-to-br from-primary-container to-[#6f00be] text-on-surface px-6 py-2 font-black uppercase tracking-tighter text-xs group hover:scale-[0.98] transition-transform active:scale-95 whitespace-nowrap">
-                                           <span class="material-symbols-outlined mr-2 group-hover:rotate-90 transition-transform inline-block" style="font-size: 14px; font-variation-settings: 'FILL' 1; vertical-align: middle;">lock</span>
-                                           Generate
-                                       </button>
-                                   </div>
+                                        <div class="flex items-center gap-2">
+                                        <label class="flex items-center gap-2" for="use-hex-check" aria-label="Toggle hexadecimal output format">
+                                            <input type="checkbox" id="use-hex-check" class="sr-only peer" checked aria-label="Hexadecimal output toggle">
+                                            <div class="w-8 h-5 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary-container relative" role="presentation"></div>
+                                            <span class="text-xs font-bold text-slate-400 uppercase tracking-wide whitespace-nowrap">Hex</span>
+                                        </label>
+                                        <button id="use-encrypt-btn" class="bg-gradient-to-br from-primary-container to-[#6f00be] text-on-surface px-6 py-2 font-black uppercase tracking-tighter text-xs group hover:scale-[0.98] transition-transform active:scale-95 whitespace-nowrap" aria-label="Generate encrypted output" title="Encrypt plaintext using keystream (Enter to activate)">
+                                            <span class="material-symbols-outlined mr-2 group-hover:rotate-90 transition-transform inline-block" style="font-size: 14px; font-variation-settings: 'FILL' 1; vertical-align: middle;" aria-hidden="true">lock</span>
+                                            Generate
+                                        </button>
+                                    </div>
                                </div>
                           </div>
 
@@ -243,7 +243,7 @@
 
                 <!-- TEST TAB -->
                 <section id="tab-test" class="tab-panel h-full">
-                    <div class="p-4 md:p-8 space-y-8 pb-32">
+                    <div class="p-4 md:p-8 space-y-4 pb-32">
                         <!-- Header & Control Cluster -->
                         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
                             <div class="space-y-1">
@@ -257,13 +257,13 @@
                                         <span>Sample Size</span>
                                         <span id="test-size-label" class="text-[#00FF88]">512,000 BYTES</span>
                                     </div>
-                                    <input id="test-size-slider" class="w-full h-1 bg-surface-container-high appearance-none cursor-pointer accent-[#00FF88]" max="6" min="3" step="0.1" type="range" value="4"/>
+                                    <input id="test-size-slider" class="w-full h-1 bg-surface-container-high appearance-none cursor-pointer accent-[#00FF88]" max="6" min="3" step="0.1" type="range" value="4" aria-label="Sample size for quality tests (1K to 1M bytes)" aria-describedby="test-size-label"/>
                                     <div class="flex justify-between text-[8px] text-slate-600">
                                         <span>1K</span>
                                         <span>1M</span>
                                     </div>
                                 </div>
-                                <button id="test-run-btn" class="bg-[#00FF88] text-[#003919] px-8 py-3 font-bold text-xs uppercase tracking-widest hover:bg-[#131314] hover:text-[#00FF88] border border-[#00FF88] transition-all flex items-center justify-center w-full sm:w-auto whitespace-nowrap">
+                                <button id="test-run-btn" class="bg-[#00FF88] text-[#003919] px-8 py-3 font-bold text-xs uppercase tracking-widest hover:bg-[#131314] hover:text-[#00FF88] border border-[#00FF88] transition-all flex items-center justify-center w-full sm:w-auto whitespace-nowrap" aria-label="Run cryptographic quality tests" title="Analyze sample for Shannon entropy, min-entropy, Chi-square, and NIST tests">
                                     <span class="material-symbols-outlined mr-2 text-base">play_arrow</span>
                                     Run System Tests
                                 </button>
@@ -363,7 +363,7 @@
 
                 <!-- BENCH TAB -->
                 <section id="tab-benchmark" class="tab-panel h-full">
-                    <div class="p-4 md:p-8 space-y-8 pb-32">
+                    <div class="p-4 md:p-8 space-y-4 pb-32">
                         <!-- Header -->
                         <div class="space-y-1">
                             <h2 class="text-2xl md:text-3xl font-black uppercase tracking-tight text-[#00FF88]">Performance Benchmark</h2>
@@ -376,7 +376,7 @@
                                 <span>Benchmark size:</span>
                                 <span id="bench-size-label" class="text-[#00FF88]">1,000,000 bytes</span>
                             </div>
-                            <input id="bench-size-slider" class="w-full h-1 bg-surface-container-high appearance-none cursor-pointer accent-[#00FF88]" max="10" min="4" step="0.1" type="range" value="6"/>
+                            <input id="bench-size-slider" class="w-full h-1 bg-surface-container-high appearance-none cursor-pointer accent-[#00FF88]" max="10" min="4" step="0.1" type="range" value="6" aria-label="Benchmark size (16 bytes to 1 gigabyte)" aria-describedby="bench-size-label"/>
                             <div class="flex justify-between text-[8px] text-slate-600">
                                 <span>10K</span>
                                 <span>10M</span>
@@ -384,7 +384,7 @@
                         </div>
 
                         <!-- Run Button -->
-                        <button id="bench-run-btn" class="w-full bg-[#00FF88] text-[#003919] px-8 py-4 font-bold text-sm uppercase tracking-widest hover:bg-[#131314] hover:text-[#00FF88] border border-[#00FF88] transition-all flex items-center justify-center">
+                        <button id="bench-run-btn" class="w-full bg-[#00FF88] text-[#003919] px-8 py-4 font-bold text-sm uppercase tracking-widest hover:bg-[#131314] hover:text-[#00FF88] border border-[#00FF88] transition-all flex items-center justify-center" aria-label="Run performance benchmark" title="Measure throughput, latency, and entropy generation efficiency">
                             <span class="material-symbols-outlined mr-2 text-base">lightning_bolt</span>
                             Run Benchmark
                         </button>
@@ -425,7 +425,7 @@
 
                 <!-- LEARN TAB -->
                 <section id="tab-learn" class="tab-panel h-full">
-                    <div class="p-4 md:p-8 max-w-6xl mx-auto space-y-8 pb-32">
+                    <div class="p-4 md:p-8 max-w-6xl mx-auto space-y-4 pb-32">
                         <!-- Lesson Header & Selector -->
                         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-outline-variant/20 pb-8">
                             <div>
@@ -454,7 +454,7 @@
 
                                         <div class="mb-8">
                                             <label class="block text-[10px] text-on-surface-variant uppercase tracking-widest mb-2">&gt; Input text</label>
-                                            <input type="text" id="learn-input" class="w-full bg-surface-container-highest border-b-2 border-primary-container focus:ring-0 text-primary p-2 font-mono text-lg" value="Hi">
+                                            <input type="text" id="learn-input" class="w-full bg-surface-container-highest border-b-2 border-primary-container focus:ring-0 text-primary p-2 font-mono text-lg" value="Hi" aria-label="Text input for XOR encryption step-by-step learning" placeholder="Enter text to encrypt" title="Enter any text (press Enter for next step)">
                                         </div>
 
                                         <!-- Step-by-Step Breakdown -->
@@ -495,7 +495,7 @@
 
                                          <!-- How it Works (Collapsible) -->
                                          <div class="pt-8 border-t border-outline-variant/20">
-                                             <button id="learn-xor-collapsible" class="w-full flex items-center justify-between bg-surface-container-low p-4 rounded hover:bg-surface-container-highest transition-colors">
+                                             <button id="learn-xor-collapsible" class="w-full flex items-center justify-between bg-surface-container-low p-4 rounded hover:bg-surface-container-highest transition-colors" aria-expanded="false" aria-controls="learn-xor-details" title="View detailed explanation of XOR encryption (press Escape to close)">
                                                  <span class="text-sm font-bold text-primary">▶ How XOR Encryption Works</span>
                                                  <span class="material-symbols-outlined text-primary">expand_more</span>
                                              </button>
@@ -577,7 +577,7 @@
 
                                  <div class="mb-8">
                                      <label class="block text-[10px] text-on-surface-variant uppercase tracking-widest mb-2">&gt; Input text</label>
-                                     <input type="text" id="learn-entropy-input" class="w-full bg-surface-container-highest border-b-2 border-primary-container focus:ring-0 text-primary p-2 font-mono text-lg" value="Hello World">
+                                     <input type="text" id="learn-entropy-input" class="w-full bg-surface-container-highest border-b-2 border-primary-container focus:ring-0 text-primary p-2 font-mono text-lg" value="Hello World" aria-label="Text input for Shannon entropy calculation" placeholder="Enter text" title="Enter any text (press Enter to calculate entropy)">
                                  </div>
 
                                  <div class="flex flex-col md:flex-row gap-4 mb-6">
@@ -607,7 +607,7 @@
 
                                   <!-- Learn More: Shannon Formula -->
                                   <div class="mt-6 pt-6 border-t border-outline-variant/20">
-                                      <button id="learn-entropy-collapsible" class="w-full flex items-center justify-between bg-surface-container-low p-4 rounded hover:bg-surface-container-highest transition-colors">
+                                      <button id="learn-entropy-collapsible" class="w-full flex items-center justify-between bg-surface-container-low p-4 rounded hover:bg-surface-container-highest transition-colors" aria-expanded="false" aria-controls="learn-entropy-details" title="View Shannon entropy formula and explanation (press Escape to close)">
                                           <span class="text-sm font-bold text-[#00FF88]">▶ Shannon Entropy Formula</span>
                                           <span class="material-symbols-outlined text-[#00FF88]">expand_more</span>
                                       </button>
@@ -640,7 +640,7 @@
                                      <div>
                                          <label class="block text-[10px] text-on-surface-variant uppercase tracking-widest mb-2">&gt; Analyze text</label>
                                          <div class="flex gap-2">
-                                             <input type="text" id="learn-nist-input" class="flex-1 bg-surface-container-highest border-b-2 border-[#A855F7] focus:ring-0 text-primary p-2 font-mono text-sm" placeholder="Enter text...">
+                                             <input type="text" id="learn-nist-input" class="flex-1 bg-surface-container-highest border-b-2 border-[#A855F7] focus:ring-0 text-primary p-2 font-mono text-sm" placeholder="Enter text..." aria-label="Text input for NIST frequency test" title="Enter text to analyze for randomness (press Enter to analyze)">
                                              <button id="learn-nist-analyze" class="bg-[#A855F7] text-white px-4 py-2 text-sm font-bold rounded hover:bg-[#9945dd] transition-colors">Analyze</button>
                                          </div>
                                      </div>
@@ -673,7 +673,7 @@
 
                                   <!-- Learn More: NIST Formula -->
                                   <div class="mt-6 pt-6 border-t border-outline-variant/20">
-                                      <button id="learn-nist-collapsible" class="w-full flex items-center justify-between bg-surface-container-low p-4 rounded hover:bg-surface-container-highest transition-colors">
+                                      <button id="learn-nist-collapsible" class="w-full flex items-center justify-between bg-surface-container-low p-4 rounded hover:bg-surface-container-highest transition-colors" aria-expanded="false" aria-controls="learn-nist-details" title="View NIST frequency test formula and explanation (press Escape to close)">
                                           <span class="text-sm font-bold text-[#A855F7]">▶ NIST Frequency Test Formula</span>
                                           <span class="material-symbols-outlined text-[#A855F7]">expand_more</span>
                                       </button>

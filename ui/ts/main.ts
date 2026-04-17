@@ -524,9 +524,11 @@ if (useHelpLink) {
       if (xorCollapsibleBtn && xorDetailsDiv) {
           xorCollapsibleBtn.addEventListener('click', () => {
               xorDetailsDiv.classList.toggle('hidden');
+              const isExpanded = !xorDetailsDiv.classList.contains('hidden');
+              xorCollapsibleBtn.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
               const icon = xorCollapsibleBtn.querySelector('.material-symbols-outlined') as HTMLElement;
               if (icon) {
-                  icon.textContent = xorDetailsDiv.classList.contains('hidden') ? 'expand_more' : 'expand_less';
+                  icon.textContent = isExpanded ? 'expand_less' : 'expand_more';
               }
           });
       }
@@ -537,9 +539,11 @@ if (useHelpLink) {
       if (entCollapsibleBtn && entDetailsDiv) {
           entCollapsibleBtn.addEventListener('click', () => {
               entDetailsDiv.classList.toggle('hidden');
+              const isExpanded = !entDetailsDiv.classList.contains('hidden');
+              entCollapsibleBtn.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
               const icon = entCollapsibleBtn.querySelector('.material-symbols-outlined') as HTMLElement;
               if (icon) {
-                  icon.textContent = entDetailsDiv.classList.contains('hidden') ? 'expand_more' : 'expand_less';
+                  icon.textContent = isExpanded ? 'expand_less' : 'expand_more';
               }
           });
       }
@@ -550,9 +554,11 @@ if (useHelpLink) {
       if (nistCollapsibleBtn && nistDetailsDiv) {
           nistCollapsibleBtn.addEventListener('click', () => {
               nistDetailsDiv.classList.toggle('hidden');
+              const isExpanded = !nistDetailsDiv.classList.contains('hidden');
+              nistCollapsibleBtn.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
               const icon = nistCollapsibleBtn.querySelector('.material-symbols-outlined') as HTMLElement;
               if (icon) {
-                  icon.textContent = nistDetailsDiv.classList.contains('hidden') ? 'expand_more' : 'expand_less';
+                  icon.textContent = isExpanded ? 'expand_less' : 'expand_more';
               }
           });
       }
@@ -1035,7 +1041,125 @@ if (useHelpLink) {
          });
      }
 
-     // Load NIST randomly once on startup
-     setTimeout(() => loadNistSteps(true), 500);
+      // Load NIST randomly once on startup
+      setTimeout(() => loadNistSteps(true), 500);
 
+      // ==========================================
+      // KEYBOARD NAVIGATION
+      // ==========================================
+
+      // Enter key on input fields to trigger actions
+      useInput?.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+              // Shift+Enter allows multiline input, but Enter alone triggers encrypt
+              e.preventDefault();
+              useEncryptBtn?.click();
+          }
+      });
+
+      learnInput?.addEventListener('keydown', (e: KeyboardEvent) => {
+          if (e.key === 'Enter') {
+              e.preventDefault();
+              // Auto-generate next steps or navigate
+              if (btnXorNext) {
+                  btnXorNext.click();
+              }
+          }
+      });
+
+      learnEntInput?.addEventListener('keydown', (e: KeyboardEvent) => {
+          if (e.key === 'Enter') {
+              e.preventDefault();
+              btnEntCalculate?.click();
+          }
+      });
+
+      nistInput?.addEventListener('keydown', (e: KeyboardEvent) => {
+          if (e.key === 'Enter') {
+              e.preventDefault();
+              btnNistAnalyze?.click();
+          }
+      });
+
+       // Escape key to close collapsibles
+       document.addEventListener('keydown', (e) => {
+           if (e.key === 'Escape') {
+               const xorDetails = document.getElementById('learn-xor-details');
+               const entDetails = document.getElementById('learn-entropy-details');
+               const nistDetails = document.getElementById('learn-nist-details');
+
+               if (xorDetails && !xorDetails.classList.contains('hidden')) {
+                   xorDetails.classList.add('hidden');
+                   xorCollapsibleBtn?.setAttribute('aria-expanded', 'false');
+                   const icon = xorCollapsibleBtn?.querySelector('.material-symbols-outlined');
+                   if (icon) icon.textContent = 'expand_more';
+               }
+
+               if (entDetails && !entDetails.classList.contains('hidden')) {
+                   entDetails.classList.add('hidden');
+                   entCollapsibleBtn?.setAttribute('aria-expanded', 'false');
+                   const icon = entCollapsibleBtn?.querySelector('.material-symbols-outlined');
+                   if (icon) icon.textContent = 'expand_more';
+               }
+
+               if (nistDetails && !nistDetails.classList.contains('hidden')) {
+                   nistDetails.classList.add('hidden');
+                   nistCollapsibleBtn?.setAttribute('aria-expanded', 'false');
+                   const icon = nistCollapsibleBtn?.querySelector('.material-symbols-outlined');
+                   if (icon) icon.textContent = 'expand_more';
+               }
+           }
+       });
+
+      // Arrow key support for next/previous step navigation in Learn tab
+      document.addEventListener('keydown', (e) => {
+          const activeTab = document.querySelector('.tab-panel.active');
+          if (!activeTab || activeTab.id !== 'tab-learn') return;
+
+          if (e.key === 'ArrowRight' && (e.ctrlKey || e.metaKey)) {
+              e.preventDefault();
+              // Move to next step in active learn section
+              const activeSection = activeTab.querySelector('.learn-section.active');
+              if (activeSection?.id === 'learn-xor') btnXorNext?.click();
+              else if (activeSection?.id === 'learn-entropy') btnEntNext?.click();
+              else if (activeSection?.id === 'learn-nist') btnNistNext?.click();
+          }
+
+          if (e.key === 'ArrowLeft' && (e.ctrlKey || e.metaKey)) {
+              e.preventDefault();
+              // Move to previous step in active learn section
+              const activeSection = activeTab.querySelector('.learn-section.active');
+              if (activeSection?.id === 'learn-xor') btnXorPrev?.click();
+              else if (activeSection?.id === 'learn-entropy') btnEntPrev?.click();
+              else if (activeSection?.id === 'learn-nist') btnNistPrev?.click();
+          }
+
+          // Space bar to play/pause
+          if (e.key === ' ' && e.ctrlKey) {
+              e.preventDefault();
+              const activeSection = activeTab.querySelector('.learn-section.active');
+              if (activeSection?.id === 'learn-xor') btnXorPlayPause?.click();
+              else if (activeSection?.id === 'learn-entropy') btnEntPlayPause?.click();
+              else if (activeSection?.id === 'learn-nist') btnNistPlayPause?.click();
+          }
+      });
+
+      // Keyboard shortcuts for tab switching (Ctrl+1, Ctrl+2, etc.)
+      document.addEventListener('keydown', (e) => {
+          if (e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey) {
+              const keyNum = parseInt(e.key, 10);
+              if (keyNum >= 1 && keyNum <= 4) {
+                  e.preventDefault();
+                  const tabMap: Record<number, string> = {
+                      1: 'tab-use',
+                      2: 'tab-test',
+                      3: 'tab-bench',
+                      4: 'tab-learn'
+                  };
+                  const tabId = tabMap[keyNum];
+                  if (tabId) switchTab(tabId);
+              }
+          }
+      });
+ 
 });
