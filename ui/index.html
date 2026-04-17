@@ -190,33 +190,33 @@
                                    </section>
                               </div>
 
-                              <!-- Output + Controls Column -->
-                              <div class="space-y-3 flex flex-col">
-                                  <!-- Output Section -->
-                                  <section class="space-y-3 flex-1">
-                                      <div class="flex items-center justify-between">
-                                          <span class="text-[10px] text-outline uppercase tracking-[0.2em] font-bold">Ciphertext Output</span>
-                                          <span class="text-[10px] text-secondary font-mono">Hex</span>
-                                      </div>
-                                      <div class="bg-surface-container-low p-3 relative border border-outline-variant/10 flex-1 overflow-y-auto">
-                                          <div class="absolute top-0 left-0 w-1 h-full bg-primary-container animate-pulse"></div>
-                                          <textarea id="use-output" class="w-full bg-transparent border-0 focus:ring-0 font-mono text-xs text-primary-fixed resize-none h-full p-2" readonly placeholder="Awaiting sequence initiation"></textarea>
-                                      </div>
-                                  </section>
+                               <!-- Output + Controls Column -->
+                               <div class="space-y-3 flex flex-col">
+                                   <!-- Output Section -->
+                                   <section class="space-y-3 flex-1">
+                                       <div class="flex items-center justify-between">
+                                           <span class="text-[10px] text-outline uppercase tracking-[0.2em] font-bold">Ciphertext Output</span>
+                                           <span class="text-[10px] text-secondary font-mono">Hex</span>
+                                       </div>
+                                       <div class="bg-surface-container-low p-3 relative border border-outline-variant/10 flex-1 overflow-y-auto">
+                                           <div class="absolute top-0 left-0 w-1 h-full bg-primary-container animate-pulse"></div>
+                                           <textarea id="use-output" class="w-full bg-transparent border-0 focus:ring-0 font-mono text-xs text-primary-fixed resize-none h-full p-2" readonly placeholder="Awaiting sequence initiation"></textarea>
+                                       </div>
+                                   </section>
 
-                                  <!-- Hex Output Toggle + Generate Button (Row) -->
-                                  <div class="flex items-center gap-3 flex-wrap">
-                                      <label class="flex items-center gap-2 flex-shrink-0">
-                                          <input type="checkbox" id="use-hex-check" class="sr-only peer" checked>
-                                          <div class="w-8 h-5 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary-container relative"></div>
-                                          <span class="text-xs font-bold text-slate-400 uppercase tracking-wide whitespace-nowrap">Hex</span>
-                                      </label>
-                                      <button id="use-encrypt-btn" class="flex-1 min-w-[140px] bg-gradient-to-br from-primary-container to-[#6f00be] text-on-surface px-4 py-2 font-black uppercase tracking-tighter text-xs group hover:scale-[0.98] transition-transform active:scale-95 whitespace-nowrap">
-                                          <span class="material-symbols-outlined mr-2 group-hover:rotate-90 transition-transform inline-block" style="font-size: 14px; font-variation-settings: 'FILL' 1; vertical-align: middle;">lock</span>
-                                          Generate
-                                      </button>
-                                  </div>
-                              </div>
+                                   <!-- Hex Output Toggle + Generate Button -->
+                                   <div class="flex items-center gap-2">
+                                       <label class="flex items-center gap-2">
+                                           <input type="checkbox" id="use-hex-check" class="sr-only peer" checked>
+                                           <div class="w-8 h-5 bg-surface-variant peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary-container relative"></div>
+                                           <span class="text-xs font-bold text-slate-400 uppercase tracking-wide whitespace-nowrap">Hex</span>
+                                       </label>
+                                       <button id="use-encrypt-btn" class="bg-gradient-to-br from-primary-container to-[#6f00be] text-on-surface px-6 py-2 font-black uppercase tracking-tighter text-xs group hover:scale-[0.98] transition-transform active:scale-95 whitespace-nowrap">
+                                           <span class="material-symbols-outlined mr-2 group-hover:rotate-90 transition-transform inline-block" style="font-size: 14px; font-variation-settings: 'FILL' 1; vertical-align: middle;">lock</span>
+                                           Generate
+                                       </button>
+                                   </div>
+                               </div>
                           </div>
 
                           <!-- Lattice Visualizer (Full Width) -->
