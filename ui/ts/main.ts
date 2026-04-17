@@ -1,15 +1,11 @@
 import { invoke } from "@tauri-apps/api/core";
 
 const safeInvoke = async (command: string, args: any = {}) => {
-    try {
-        if ((window as any).__TAURI_INTERNALS__) {
-            return await invoke(command, args);
-        } else {
-            console.warn(`[Tauri Mock] Called invoke('${command}') with args:`, args);
-            throw new Error("Tauri API is not available in the browser.");
-        }
-    } catch (e) {
-        throw e;
+    if ((window as any).__TAURI_INTERNALS__) {
+        return await invoke(command, args);
+    } else {
+        console.warn(`[Tauri Mock] Called invoke('${command}') with args:`, args);
+        throw new Error("Tauri API is not available in the browser.");
     }
 };
 
@@ -368,15 +364,15 @@ if (useHelpLink) {
          const step = currentXorSteps[currentXorStepIdx];
          if (xorStepInfo) xorStepInfo.textContent = `STEP_IDX: ${(currentXorStepIdx + 1).toString().padStart(3, '0')} / ${currentXorSteps.length.toString().padStart(3, '0')}`;
 
-         let prog = Math.round(((currentXorStepIdx + 1) / currentXorSteps.length) * 100);
+         const prog = Math.round(((currentXorStepIdx + 1) / currentXorSteps.length) * 100);
          if (xorProgText) xorProgText.textContent = `${prog}%`;
          if (xorProgSlider) xorProgSlider.value = prog.toString();
 
          if (xorContent) {
              // Render HTML for XOR visualization with colored bits
-             let ptBitsHtml = step.input_binary.split('').map((b: string) => `<span class="w-6 h-8 bg-surface-container-highest flex items-center justify-center font-bold text-cyan-400">${b}</span>`).join('');
-             let keyBitsHtml = step.keystream_binary.split('').map((b: string) => `<span class="w-6 h-8 bg-surface-container-highest flex items-center justify-center font-bold text-orange-400">${b}</span>`).join('');
-             let resBitsHtml = step.result_binary.split('').map((b: string) => `<span class="w-6 h-8 bg-primary-container/10 border border-green-400/30 flex items-center justify-center font-black text-green-400">${b}</span>`).join('');
+             const ptBitsHtml = step.input_binary.split('').map((b: string) => `<span class="w-6 h-8 bg-surface-container-highest flex items-center justify-center font-bold text-cyan-400">${b}</span>`).join('');
+             const keyBitsHtml = step.keystream_binary.split('').map((b: string) => `<span class="w-6 h-8 bg-surface-container-highest flex items-center justify-center font-bold text-orange-400">${b}</span>`).join('');
+             const resBitsHtml = step.result_binary.split('').map((b: string) => `<span class="w-6 h-8 bg-primary-container/10 border border-green-400/30 flex items-center justify-center font-black text-green-400">${b}</span>`).join('');
 
              xorContent.innerHTML = `
              <div class="space-y-6">
@@ -686,50 +682,51 @@ if (useHelpLink) {
                      </div>`;
                      break;
 
-                 case 'SumEntropy':
-                 case 'Interpret':
-                     const efficiency = step.max_entropy > 0 ? (step.total_entropy / step.max_entropy) * 100 : 0;
-                     let interpretation = 'Moderate entropy.';
-                     let interpretIcon = '⚠️';
+                  case 'SumEntropy':
+                  case 'Interpret': {
+                      const efficiency = step.max_entropy > 0 ? (step.total_entropy / step.max_entropy) * 100 : 0;
+                      let interpretation = 'Moderate entropy.';
+                      let interpretIcon = '⚠️';
 
-                     if (step.current_entropy_sum < 2.0) {
-                         interpretation = 'Low entropy. The input is very predictable.';
-                         interpretIcon = '📉';
-                     } else if (efficiency > 80) {
-                         interpretation = 'High entropy! The input looks quite random or uses many different characters.';
-                         interpretIcon = '🔥';
-                     }
+                      if (step.current_entropy_sum < 2.0) {
+                          interpretation = 'Low entropy. The input is very predictable.';
+                          interpretIcon = '📉';
+                      } else if (efficiency > 80) {
+                          interpretation = 'High entropy! The input looks quite random or uses many different characters.';
+                          interpretIcon = '🔥';
+                      }
 
-                     explanationHtml = `<div class="mt-6 space-y-4">
-                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                             <div class="bg-surface-container-low p-4 rounded border border-primary/30">
-                                 <div class="text-xs text-slate-400 uppercase mb-1">Total Entropy</div>
-                                 <div class="text-2xl font-bold text-primary">${step.current_entropy_sum.toFixed(4)}</div>
-                                 <div class="text-xs text-slate-500 mt-1">bits/byte</div>
-                             </div>
-                             <div class="bg-surface-container-low p-4 rounded border border-primary/30">
-                                 <div class="text-xs text-slate-400 uppercase mb-1">Maximum Possible</div>
-                                 <div class="text-2xl font-bold text-primary">${step.max_entropy.toFixed(4)}</div>
-                                 <div class="text-xs text-slate-500 mt-1">bits/byte (${sortedBytes.length} unique)</div>
-                             </div>
-                             <div class="bg-surface-container-low p-4 rounded border border-[#A855F7]/30">
-                                 <div class="text-xs text-slate-400 uppercase mb-1">Efficiency</div>
-                                 <div class="text-2xl font-bold text-[#A855F7]">${efficiency.toFixed(1)}%</div>
-                                 <div class="text-xs text-slate-500 mt-1">how close to max</div>
-                             </div>
-                         </div>
+                      explanationHtml = `<div class="mt-6 space-y-4">
+                          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <div class="bg-surface-container-low p-4 rounded border border-primary/30">
+                                  <div class="text-xs text-slate-400 uppercase mb-1">Total Entropy</div>
+                                  <div class="text-2xl font-bold text-primary">${step.current_entropy_sum.toFixed(4)}</div>
+                                  <div class="text-xs text-slate-500 mt-1">bits/byte</div>
+                              </div>
+                              <div class="bg-surface-container-low p-4 rounded border border-primary/30">
+                                  <div class="text-xs text-slate-400 uppercase mb-1">Maximum Possible</div>
+                                  <div class="text-2xl font-bold text-primary">${step.max_entropy.toFixed(4)}</div>
+                                  <div class="text-xs text-slate-500 mt-1">bits/byte (${sortedBytes.length} unique)</div>
+                              </div>
+                              <div class="bg-surface-container-low p-4 rounded border border-[#A855F7]/30">
+                                  <div class="text-xs text-slate-400 uppercase mb-1">Efficiency</div>
+                                  <div class="text-2xl font-bold text-[#A855F7]">${efficiency.toFixed(1)}%</div>
+                                  <div class="text-xs text-slate-500 mt-1">how close to max</div>
+                              </div>
+                          </div>
 
-                         <div class="p-4 bg-surface-container-low rounded border-l-2 border-[#A855F7]">
-                             <p class="text-sm text-slate-300 mb-2">
-                                 <strong>${interpretIcon} Interpretation:</strong>
-                             </p>
-                             <p class="text-sm text-slate-300">
-                                 ${interpretation}
-                             </p>
-                             ${step.current_entropy_sum < 2.0 ? `<p class="text-sm text-slate-400 mt-2 italic">For cryptography, you generally want entropy > 7 bits/byte for strong randomness.</p>` : ''}
-                         </div>
-                     </div>`;
-                     break;
+                          <div class="p-4 bg-surface-container-low rounded border-l-2 border-[#A855F7]">
+                              <p class="text-sm text-slate-300 mb-2">
+                                  <strong>${interpretIcon} Interpretation:</strong>
+                              </p>
+                              <p class="text-sm text-slate-300">
+                                  ${interpretation}
+                              </p>
+                              ${step.current_entropy_sum < 2.0 ? `<p class="text-sm text-slate-400 mt-2 italic">For cryptography, you generally want entropy > 7 bits/byte for strong randomness.</p>` : ''}
+                          </div>
+                      </div>`;
+                      break;
+                  }
              }
 
              entContent.innerHTML = tableHtml + explanationHtml;
@@ -930,38 +927,39 @@ if (useHelpLink) {
                      </div>`;
                      break;
 
-                 case 'Interpret':
-                     const statusColor = step.passed ? '#00FF88' : '#ff6b6b';
-                     const statusIcon = step.passed ? '✅' : '❌';
-                     const statusText = step.passed ? 'PASS' : 'FAIL';
-                     const statusMsg = step.passed ? 'The sequence looks RANDOM!' : 'The sequence is BIASED toward 1s or 0s.';
+                  case 'Interpret': {
+                      const statusColor = step.passed ? '#00FF88' : '#ff6b6b';
+                      const statusIcon = step.passed ? '✅' : '❌';
+                      const statusText = step.passed ? 'PASS' : 'FAIL';
+                      const statusMsg = step.passed ? 'The sequence looks RANDOM!' : 'The sequence is BIASED toward 1s or 0s.';
 
-                     explanationHtml = `<div class="space-y-4">
-                         <div class="p-4 rounded border-l-4" style="border-color: ${statusColor}; background: rgba(0,0,0,0.2);">
-                             <div class="flex items-center gap-2 mb-2">
-                                 <span style="color: ${statusColor}" class="text-2xl font-bold">${statusIcon} ${statusText}</span>
-                             </div>
-                             <p class="text-lg text-slate-300 font-bold mb-2">${statusMsg}</p>
-                         </div>
+                      explanationHtml = `<div class="space-y-4">
+                          <div class="p-4 rounded border-l-4" style="border-color: ${statusColor}; background: rgba(0,0,0,0.2);">
+                              <div class="flex items-center gap-2 mb-2">
+                                  <span style="color: ${statusColor}" class="text-2xl font-bold">${statusIcon} ${statusText}</span>
+                              </div>
+                              <p class="text-lg text-slate-300 font-bold mb-2">${statusMsg}</p>
+                          </div>
 
-                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                             <div class="bg-surface-container-low p-4 rounded">
-                                 <div class="text-xs text-slate-400 uppercase mb-1">Test Statistic (S_obs)</div>
-                                 <div class="text-2xl font-bold text-slate-300">${step.s_obs.toFixed(4)}</div>
-                             </div>
-                             <div class="bg-surface-container-low p-4 rounded">
-                                 <div class="text-xs text-slate-400 uppercase mb-1">P-Value</div>
-                                 <div class="text-2xl font-bold" style="color: ${statusColor};">${step.p_value.toFixed(4)}</div>
-                                 <div class="text-xs text-slate-500 mt-1">vs Threshold: 0.01</div>
-                             </div>
-                         </div>
+                          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div class="bg-surface-container-low p-4 rounded">
+                                  <div class="text-xs text-slate-400 uppercase mb-1">Test Statistic (S_obs)</div>
+                                  <div class="text-2xl font-bold text-slate-300">${step.s_obs.toFixed(4)}</div>
+                              </div>
+                              <div class="bg-surface-container-low p-4 rounded">
+                                  <div class="text-xs text-slate-400 uppercase mb-1">P-Value</div>
+                                  <div class="text-2xl font-bold" style="color: ${statusColor};">${step.p_value.toFixed(4)}</div>
+                                  <div class="text-xs text-slate-500 mt-1">vs Threshold: 0.01</div>
+                              </div>
+                          </div>
 
-                         <div class="p-4 bg-surface-container-low rounded border border-outline-variant/20 text-sm text-slate-300">
-                             <p><strong>Why this matters:</strong> P-value ≥ 0.01 indicates the data passes randomness test. Lower values suggest bias.</p>
-                             <p class="mt-2 text-xs text-slate-400">For cryptography, randomness is critical. Biased sequences can be predicted and exploited.</p>
-                         </div>
-                     </div>`;
-                     break;
+                          <div class="p-4 bg-surface-container-low rounded border border-outline-variant/20 text-sm text-slate-300">
+                              <p><strong>Why this matters:</strong> P-value ≥ 0.01 indicates the data passes randomness test. Lower values suggest bias.</p>
+                              <p class="mt-2 text-xs text-slate-400">For cryptography, randomness is critical. Biased sequences can be predicted and exploited.</p>
+                          </div>
+                      </div>`;
+                      break;
+                  }
              }
 
              content += explanationHtml + '</div>';

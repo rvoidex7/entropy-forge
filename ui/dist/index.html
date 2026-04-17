@@ -8,9 +8,13 @@
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100;300;400;500;700;800&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    <!-- Custom CSS (before Tailwind for priority) -->
+     <!-- Custom CSS (before Tailwind for priority) -->
     <link rel="stylesheet" href="styles/main.css">
     <link rel="stylesheet" href="styles/responsive.css">
+    <link rel="stylesheet" href="styles/use-tab.css">
+    <link rel="stylesheet" href="styles/test-tab.css">
+    <link rel="stylesheet" href="styles/bench-tab.css">
+    <link rel="stylesheet" href="styles/learn-tab.css">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script id="tailwind-config">
         tailwind.config = {
@@ -102,9 +106,7 @@
         .tab-panel.active { display: block; }
         .learn-section { display: none; }
         .learn-section.active { display: block; }
-    </style>
-    <link rel="stylesheet" href="styles/main.css">
-    <link rel="stylesheet" href="styles/responsive.css">
+     </style>
 </head>
 <body class="overflow-hidden selection:bg-primary-container selection:text-on-primary-container">
     <div class="flex h-screen w-screen">

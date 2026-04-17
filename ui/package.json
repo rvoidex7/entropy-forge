@@ -2,13 +2,23 @@
   "name": "entropy-forge-ui",
   "version": "1.0.0",
   "scripts": {
-    "build": "esbuild ts/main.ts --bundle --outdir=dist --target=ES2016 --minify && npm run copy-assets",
+    "build": "npm run type-check && npm run lint:warnings && esbuild ts/main.ts --bundle --outdir=dist --target=ES2016 --minify && npm run copy-assets",
     "copy-assets": "node scripts/copy-assets.js",
-    "dev": "esbuild ts/main.ts --bundle --outdir=dist --watch --target=ES2016"
+    "dev": "esbuild ts/main.ts --bundle --outdir=dist --watch --target=ES2016",
+    "lint": "eslint ts/**/*.ts --max-warnings 0",
+    "lint:warnings": "eslint ts/**/*.ts",
+    "lint:fix": "eslint ts/**/*.ts --fix",
+    "type-check": "tsc --noEmit",
+    "format": "prettier --write .",
+    "validate": "npm run type-check && npm run lint"
   },
   "devDependencies": {
     "@tauri-apps/api": "^2.10.1",
     "@tauri-apps/cli": "^2",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.50.0",
+    "prettier": "^3.0.0",
     "typescript": "^5"
   },
   "dependencies": {
