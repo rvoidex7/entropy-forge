@@ -261,94 +261,100 @@
                             </div>
                         </div>
 
-                        <!-- Results Section -->
-                        <div id="test-results-section" class="space-y-8 hidden">
-                            <!-- Bento Grid - Metrics -->
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                <!-- Shannon Entropy Card -->
-                                 <div class="bg-surface-container-low border-l-4 border-[#00FF88] p-6 flex flex-col justify-between h-48" title="Shannon Entropy measures the average information content. 8.0 bits/byte = perfect randomness. Lower values indicate patterns.">
-                                     <div class="flex justify-between items-start">
-                                         <span class="text-xs font-bold uppercase tracking-widest text-[#00FF88]">Shannon Entropy</span>
-                                         <span class="material-symbols-outlined text-slate-600">query_stats</span>
-                                     </div>
-                                    <div>
-                                        <div class="text-4xl font-black text-on-surface"><span id="test-shannon-val">0.0000</span> <span class="text-xs text-slate-500 font-normal">bits/byte</span></div>
-                                        <div class="mt-4 w-full h-1 bg-surface-container-highest">
-                                            <div id="test-shannon-bar" class="h-full bg-[#00FF88]" style="width: 0%"></div>
-                                        </div>
-                                    </div>
-                                </div>
+                         <!-- Results Section -->
+                         <div id="test-results-section" class="space-y-8 hidden">
+                             <!-- Left Column: Entropy Cards + NIST Table -->
+                             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                                 <!-- Left Section (Entropy Metrics + NIST) -->
+                                 <div class="lg:col-span-2 space-y-6">
+                                     <!-- Bento Grid - Metrics -->
+                                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                         <!-- Shannon Entropy Card -->
+                                         <div class="bg-surface-container-low border-l-4 border-[#00FF88] p-4 flex flex-col justify-between h-auto" title="Shannon Entropy measures the average information content. 8.0 bits/byte = perfect randomness. Lower values indicate patterns.">
+                                             <div class="flex justify-between items-start">
+                                                 <span class="text-xs font-bold uppercase tracking-widest text-[#00FF88]">Shannon Entropy</span>
+                                                 <span class="material-symbols-outlined text-slate-600">query_stats</span>
+                                             </div>
+                                             <div>
+                                                 <div class="text-3xl font-black text-on-surface"><span id="test-shannon-val">0.0000</span> <span class="text-xs text-slate-500 font-normal">bits/byte</span></div>
+                                                 <div class="mt-2 w-full h-1 bg-surface-container-highest">
+                                                     <div id="test-shannon-bar" class="h-full bg-[#00FF88]" style="width: 0%"></div>
+                                                 </div>
+                                             </div>
+                                         </div>
 
-                                 <!-- Min-Entropy Card -->
-                                 <div class="bg-surface-container-low border-l-4 border-secondary p-6 flex flex-col justify-between h-48" title="Min-Entropy is the worst-case entropy, critical for cryptographic security. The minimum entropy must be high to ensure unpredictability.">
-                                     <div class="flex justify-between items-start">
-                                         <span class="text-xs font-bold uppercase tracking-widest text-secondary">Min-Entropy</span>
-                                         <span class="material-symbols-outlined text-slate-600">data_thresholding</span>
+                                         <!-- Min-Entropy Card -->
+                                         <div class="bg-surface-container-low border-l-4 border-secondary p-4 flex flex-col justify-between h-auto" title="Min-Entropy is the worst-case entropy, critical for cryptographic security. The minimum entropy must be high to ensure unpredictability.">
+                                             <div class="flex justify-between items-start">
+                                                 <span class="text-xs font-bold uppercase tracking-widest text-secondary">Min-Entropy</span>
+                                                 <span class="material-symbols-outlined text-slate-600">data_thresholding</span>
+                                             </div>
+                                             <div>
+                                                 <div class="text-3xl font-black text-on-surface"><span id="test-min-val">0.0000</span> <span class="text-xs text-slate-500 font-normal">bits/byte</span></div>
+                                                 <div class="mt-2 w-full h-1 bg-surface-container-highest">
+                                                     <div id="test-min-bar" class="h-full bg-secondary" style="width: 0%"></div>
+                                                 </div>
+                                             </div>
+                                         </div>
                                      </div>
-                                    <div>
-                                        <div class="text-4xl font-black text-on-surface"><span id="test-min-val">0.0000</span> <span class="text-xs text-slate-500 font-normal">bits/byte</span></div>
-                                        <div class="mt-4 w-full h-1 bg-surface-container-highest">
-                                            <div id="test-min-bar" class="h-full bg-secondary" style="width: 0%"></div>
-                                        </div>
-                                    </div>
-                                </div>
 
-                                 <!-- Data Labels Cluster -->
-                                 <div class="grid grid-cols-1 gap-4">
-                                      <div class="bg-surface-container-highest p-4 flex justify-between items-center" title="Mean byte value should be close to 127.5 for uniform distribution. Values significantly different indicate byte bias.">
-                                          <div class="space-y-1">
-                                              <p class="text-[10px] text-slate-500 uppercase">Mean Byte Value</p>
-                                              <p id="test-mean-val" class="text-lg font-bold text-[#00FF88]">0.000</p>
-                                          </div>
-                                          <span class="text-[8px] text-slate-600 px-2 py-1 border border-outline-variant italic">IDEAL: 127.5</span>
-                                      </div>
-                                      <div class="bg-surface-container-highest p-4 flex justify-between items-center" title="Chi-square test measures deviation from uniform distribution of byte values. Lower values indicate better randomness.">
-                                          <div class="space-y-1">
-                                              <p class="text-[10px] text-slate-500 uppercase">Chi-Square Distribution</p>
-                                              <p id="test-chi-val" class="text-lg font-bold text-[#00FF88]">0.00</p>
-                                          </div>
-                                          <span class="text-[8px] text-slate-600 px-2 py-1 border border-outline-variant italic">STAT</span>
-                                      </div>
-                                      <div class="bg-surface-container-highest p-4 flex justify-between items-center" title="Longest run is the maximum consecutive sequence of the same bit. Longer runs indicate patterns; shorter runs suggest better randomness.">
-                                          <div class="space-y-1">
-                                              <p class="text-[10px] text-slate-500 uppercase">Longest Run</p>
-                                              <p id="test-longest-run-val" class="text-lg font-bold text-[#00FF88]">0</p>
-                                          </div>
-                                          <span class="text-[8px] text-slate-600 px-2 py-1 border border-outline-variant italic">BITS</span>
-                                      </div>
-                                      <div class="bg-surface-container-low border-l-4 border-[#ff8c00] p-4 flex justify-between items-center" title="Weighted quality score: Shannon entropy (50%), Min-entropy (30%), Mean closeness to 127.5 (20%).">
-                                          <div class="space-y-1">
-                                              <p class="text-[10px] text-slate-500 uppercase">Overall Quality Score</p>
-                                              <p id="test-score-val" class="text-2xl font-black text-[#ff8c00]">0.0</p>
-                                          </div>
-                                          <span class="text-[8px] text-slate-600 px-2 py-1 border border-outline-variant italic">/100</span>
-                                      </div>
+                                     <!-- NIST SP 800-22 Results Table -->
+                                     <div class="space-y-4">
+                                         <div class="flex items-center space-x-2">
+                                             <span class="w-2 h-2 bg-secondary animate-pulse"></span>
+                                             <h3 class="text-sm font-bold uppercase tracking-widest">NIST SP 800-22 Tests</h3>
+                                         </div>
+                                         <p class="text-xs text-slate-400 italic">P-values ≥ 0.01 indicate randomness (Pass)</p>
+                                         <div class="w-full overflow-hidden border border-outline-variant/30">
+                                             <table class="w-full text-left border-collapse">
+                                                 <thead>
+                                                     <tr class="bg-surface-container text-[10px] uppercase tracking-widest text-slate-400 border-b border-outline-variant">
+                                                         <th class="px-4 py-3 font-bold">Test Name</th>
+                                                         <th class="px-4 py-3 font-bold">P-Value</th>
+                                                         <th class="px-4 py-3 font-bold text-right">Status</th>
+                                                     </tr>
+                                                 </thead>
+                                                 <tbody id="test-nist-tbody" class="text-xs">
+                                                     <!-- Dynamically populated -->
+                                                 </tbody>
+                                             </table>
+                                         </div>
+                                     </div>
                                  </div>
-                            </div>
 
-                            <!-- NIST SP 800-22 Results Table -->
-                            <div class="space-y-4">
-                                <div class="flex items-center space-x-2">
-                                    <span class="w-2 h-2 bg-secondary animate-pulse"></span>
-                                    <h3 class="text-sm font-bold uppercase tracking-widest">NIST SP 800-22 Tests</h3>
-                                </div>
-                                <p class="text-xs text-slate-400 italic">P-values ≥ 0.01 indicate randomness (Pass)</p>
-                                <div class="w-full overflow-hidden border border-outline-variant/30">
-                                    <table class="w-full text-left border-collapse">
-                                        <thead>
-                                            <tr class="bg-surface-container text-[10px] uppercase tracking-widest text-slate-400 border-b border-outline-variant">
-                                                <th class="px-6 py-4 font-bold">Test Name</th>
-                                                <th class="px-6 py-4 font-bold">P-Value</th>
-                                                <th class="px-6 py-4 font-bold text-right">Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="test-nist-tbody" class="text-xs">
-                                            <!-- Dynamically populated -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
+                                 <!-- Right Column: Data Labels -->
+                                 <div class="space-y-4">
+                                     <div class="bg-surface-container-highest p-4 flex justify-between items-center" title="Mean byte value should be close to 127.5 for uniform distribution. Values significantly different indicate byte bias.">
+                                         <div class="space-y-1">
+                                             <p class="text-[10px] text-slate-500 uppercase">Mean Byte Value</p>
+                                             <p id="test-mean-val" class="text-lg font-bold text-[#00FF88]">0.000</p>
+                                         </div>
+                                         <span class="text-[8px] text-slate-600 px-2 py-1 border border-outline-variant italic">IDEAL: 127.5</span>
+                                     </div>
+                                     <div class="bg-surface-container-highest p-4 flex justify-between items-center" title="Chi-square test measures deviation from uniform distribution of byte values. Lower values indicate better randomness.">
+                                         <div class="space-y-1">
+                                             <p class="text-[10px] text-slate-500 uppercase">Chi-Square Distribution</p>
+                                             <p id="test-chi-val" class="text-lg font-bold text-[#00FF88]">0.00</p>
+                                         </div>
+                                         <span class="text-[8px] text-slate-600 px-2 py-1 border border-outline-variant italic">STAT</span>
+                                     </div>
+                                     <div class="bg-surface-container-highest p-4 flex justify-between items-center" title="Longest run is the maximum consecutive sequence of the same bit. Longer runs indicate patterns; shorter runs suggest better randomness.">
+                                         <div class="space-y-1">
+                                             <p class="text-[10px] text-slate-500 uppercase">Longest Run</p>
+                                             <p id="test-longest-run-val" class="text-lg font-bold text-[#00FF88]">0</p>
+                                         </div>
+                                         <span class="text-[8px] text-slate-600 px-2 py-1 border border-outline-variant italic">BITS</span>
+                                     </div>
+                                     <div class="bg-surface-container-low border-l-4 border-[#ff8c00] p-4 flex justify-between items-center" title="Weighted quality score: Shannon entropy (50%), Min-entropy (30%), Mean closeness to 127.5 (20%).">
+                                         <div class="space-y-1">
+                                             <p class="text-[10px] text-slate-500 uppercase">Overall Quality Score</p>
+                                             <p id="test-score-val" class="text-2xl font-black text-[#ff8c00]">0.0</p>
+                                         </div>
+                                         <span class="text-[8px] text-slate-600 px-2 py-1 border border-outline-variant italic">/100</span>
+                                     </div>
+                                 </div>
+                             </div>
+                         </div>
                     </div>
                 </section>
 
