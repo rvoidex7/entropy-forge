@@ -397,7 +397,7 @@ if (useHelpLink) {
              <div class="space-y-6">
                  <h3 class="text-lg font-bold text-primary">Step ${currentXorStepIdx + 1} of ${currentXorSteps.length}: Encrypting '${step.character}'</h3>
                  
-                 <div class="bg-surface-container-low p-4 relative overflow-hidden border-l-2 border-[#00FF88] rounded">
+                 <div class="bg-surface-container-low p-4 relative overflow-hidden border-l-2 border-[#00FF88]">
                      <div class="flex justify-between items-start mb-4">
                          <div>
                              <span class="text-[10px] text-secondary uppercase font-bold">Input Character</span>
@@ -457,7 +457,7 @@ if (useHelpLink) {
          let html = '';
          currentXorSteps.forEach((step: any, idx: number) => {
              const resultByte = step.result_byte.toString(16).toUpperCase().padStart(2, '0');
-             let classes = 'px-3 py-2 rounded font-mono text-sm font-bold transition-colors ';
+             let classes = 'px-3 py-2 font-mono text-sm font-bold transition-colors ';
 
              if (idx === currentXorStepIdx) {
                  classes += 'bg-green-500/30 border border-green-400 text-green-300';
@@ -658,7 +658,7 @@ if (useHelpLink) {
                  if (stepType === 'CalculateContributions' || stepType === 'SumEntropy' || stepType === 'Interpret') {
                      tableHtml += `<td class="p-2 font-mono text-slate-300">${contrib.toFixed(3)} bits</td>`;
                  }
-                 tableHtml += `<td class="p-2"><div class="h-6 bg-surface-container rounded" style="width: ${barWidth}%; background-color: ${barColor};"></div></td>
+                 tableHtml += `<td class="p-2"><div class="h-6 bg-surface-container" style="width: ${barWidth}%; background-color: ${barColor};"></div></td>
                      </tr>`;
              }
 
@@ -668,7 +668,7 @@ if (useHelpLink) {
              let explanationHtml = '';
              switch (stepType) {
                  case 'CountBytes':
-                     explanationHtml = `<div class="mt-6 p-4 bg-surface-container-low rounded border-l-2 border-primary">
+                     explanationHtml = `<div class="mt-6 p-4 bg-surface-container-low border-l-2 border-primary">
                          <p class="text-sm text-slate-300">
                              <strong>💡 What's happening:</strong> We count how many times each unique byte appears in the input. This frequency distribution is the foundation for entropy calculation.
                          </p>
@@ -677,7 +677,7 @@ if (useHelpLink) {
 
                  case 'CalculateProbabilities':
                      explanationHtml = `<div class="mt-6 space-y-3">
-                         <div class="p-4 bg-surface-container-low rounded border-l-2 border-primary">
+                         <div class="p-4 bg-surface-container-low border-l-2 border-primary">
                              <p class="text-sm text-slate-300 mb-2">
                                  <strong>💡 Formula:</strong> P(x) = Count(x) ÷ Total Bytes
                              </p>
@@ -685,7 +685,7 @@ if (useHelpLink) {
                                  This tells us the likelihood of each byte appearing in the input. Higher probability = more common byte.
                              </p>
                          </div>
-                         <button class="w-full p-2 bg-surface-container rounded text-xs text-slate-400 hover:bg-surface-container-highest transition-colors text-left">
+                         <button class="w-full p-2 bg-surface-container text-xs text-slate-400 hover:bg-surface-container-highest transition-colors text-left">
                              ▶ Learn More: Why does this matter?
                          </button>
                      </div>`;
@@ -693,7 +693,7 @@ if (useHelpLink) {
 
                  case 'CalculateContributions':
                      explanationHtml = `<div class="mt-6 space-y-3">
-                         <div class="p-4 bg-surface-container-low rounded border-l-2 border-primary">
+                         <div class="p-4 bg-surface-container-low border-l-2 border-primary">
                              <p class="text-sm text-slate-300 mb-2">
                                  <strong>💡 Formula:</strong> Contribution = -P(x) × log₂(P(x))
                              </p>
@@ -701,7 +701,7 @@ if (useHelpLink) {
                                  Rare events provide MORE information when they occur. A common byte (50%) is less surprising than a rare one (5%).
                              </p>
                          </div>
-                         <button class="w-full p-2 bg-surface-container rounded text-xs text-slate-400 hover:bg-surface-container-highest transition-colors text-left">
+                         <button class="w-full p-2 bg-surface-container text-xs text-slate-400 hover:bg-surface-container-highest transition-colors text-left">
                              ▶ Learn More: Information Theory Background
                          </button>
                      </div>`;
@@ -723,24 +723,24 @@ if (useHelpLink) {
 
                       explanationHtml = `<div class="mt-6 space-y-4">
                           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                              <div class="bg-surface-container-low p-4 rounded border border-primary/30">
+                              <div class="bg-surface-container-low p-4 border border-primary/30">
                                   <div class="text-xs text-slate-400 uppercase mb-1">Total Entropy</div>
                                   <div class="text-2xl font-bold text-primary">${step.current_entropy_sum.toFixed(4)}</div>
                                   <div class="text-xs text-slate-500 mt-1">bits/byte</div>
                               </div>
-                              <div class="bg-surface-container-low p-4 rounded border border-primary/30">
+                              <div class="bg-surface-container-low p-4 border border-primary/30">
                                   <div class="text-xs text-slate-400 uppercase mb-1">Maximum Possible</div>
                                   <div class="text-2xl font-bold text-primary">${step.max_entropy.toFixed(4)}</div>
                                   <div class="text-xs text-slate-500 mt-1">bits/byte (${sortedBytes.length} unique)</div>
                               </div>
-                              <div class="bg-surface-container-low p-4 rounded border border-[#A855F7]/30">
+                              <div class="bg-surface-container-low p-4 border border-[#A855F7]/30">
                                   <div class="text-xs text-slate-400 uppercase mb-1">Efficiency</div>
                                   <div class="text-2xl font-bold text-[#A855F7]">${efficiency.toFixed(1)}%</div>
                                   <div class="text-xs text-slate-500 mt-1">how close to max</div>
                               </div>
                           </div>
 
-                          <div class="p-4 bg-surface-container-low rounded border-l-2 border-[#A855F7]">
+                          <div class="p-4 bg-surface-container-low border-l-2 border-[#A855F7]">
                               <p class="text-sm text-slate-300 mb-2">
                                   <strong>${interpretIcon} Interpretation:</strong>
                               </p>
@@ -867,7 +867,7 @@ if (useHelpLink) {
 
                  <div>
                      <h4 class="text-sm font-bold text-slate-300 mb-2">Bit Sequence (${step.bits.length} bits):</h4>
-                     <div class="bg-surface-container-lowest p-4 rounded border border-outline-variant/20 font-mono text-sm break-all">
+                     <div class="bg-surface-container-lowest p-4 border border-outline-variant/20 font-mono text-sm break-all">
                          ${bitsHtml}
                      </div>
                  </div>`;
@@ -878,11 +878,11 @@ if (useHelpLink) {
              if (stepType !== 'ConvertToBits') {
                  // Ones/Zeros counter boxes
                  content += `<div class="grid grid-cols-2 gap-4">
-                     <div class="bg-surface-container-low p-4 rounded border border-outline-variant/20">
+                     <div class="bg-surface-container-low p-4 border border-outline-variant/20">
                          <div class="text-xs text-slate-400 uppercase font-bold mb-1">Ones Count</div>
                          <div class="text-3xl font-bold text-[#00FF88]">${step.ones_count}</div>
                      </div>
-                     <div class="bg-surface-container-low p-4 rounded border border-outline-variant/20">
+                     <div class="bg-surface-container-low p-4 border border-outline-variant/20">
                          <div class="text-xs text-slate-400 uppercase font-bold mb-1">Zeros Count</div>
                          <div class="text-3xl font-bold text-slate-400">${step.zeros_count}</div>
                      </div>
@@ -891,7 +891,7 @@ if (useHelpLink) {
                  <!-- Balance Visualization -->
                  <div>
                      <h4 class="text-sm font-bold text-slate-300 mb-2">Distribution Balance (Ideal: 50% Ones)</h4>
-                     <div class="relative h-12 bg-slate-600 rounded overflow-hidden">
+                     <div class="relative h-12 bg-slate-600 overflow-hidden">
                          <div class="absolute h-full bg-[#00FF88] transition-all" style="width: ${onesPct}%;"></div>
                          <div class="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 w-0.5 h-full bg-black"></div>
                          <div class="absolute inset-0 flex items-center justify-center font-bold text-sm text-white mix-blend-multiply">
@@ -905,7 +905,7 @@ if (useHelpLink) {
              let explanationHtml = '';
              switch (stepType) {
                  case 'ConvertToBits':
-                     explanationHtml = `<div class="p-4 bg-surface-container-low rounded border-l-2 border-[#A855F7]">
+                     explanationHtml = `<div class="p-4 bg-surface-container-low border-l-2 border-[#A855F7]">
                          <p class="text-sm text-slate-300">
                              <strong>💡 What's happening:</strong> Each byte becomes 8 binary digits. White = 0, Green = 1.
                          </p>
@@ -913,7 +913,7 @@ if (useHelpLink) {
                      break;
 
                  case 'CountOnesZeros':
-                     explanationHtml = `<div class="p-4 bg-surface-container-low rounded border-l-2 border-[#A855F7]">
+                     explanationHtml = `<div class="p-4 bg-surface-container-low border-l-2 border-[#A855F7]">
                          <p class="text-sm text-slate-300 mb-2">
                              <strong>💡 What's happening:</strong> If the data is truly random, we expect roughly 50% ones and 50% zeros, like fair coin flips.
                          </p>
@@ -925,14 +925,14 @@ if (useHelpLink) {
 
                  case 'CalculateStatistic':
                      explanationHtml = `<div class="space-y-3">
-                         <div class="bg-surface-container-low p-4 rounded border-l-2 border-[#A855F7]">
+                         <div class="bg-surface-container-low p-4 border-l-2 border-[#A855F7]">
                              <p class="text-sm text-slate-300 mb-2">
                                  <strong>💡 Formula:</strong> S_obs = |Sum| ÷ √(n)
                              </p>
                              <p class="text-sm text-slate-400">Where Sum = (count_ones × +1) + (count_zeros × -1)</p>
                              <p class="text-sm text-slate-400">Result: ${step.sum} ÷ √${total} = ${step.s_obs.toFixed(4)}</p>
                          </div>
-                         <div class="p-3 bg-surface-container rounded text-xs text-slate-400">
+                         <div class="p-3 bg-surface-container text-xs text-slate-400">
                              <p>S_obs tells us how far from balanced (0) the sequence is. Closer to 0 = more balanced and random-looking.</p>
                          </div>
                      </div>`;
@@ -940,13 +940,13 @@ if (useHelpLink) {
 
                  case 'CalculatePValue':
                      explanationHtml = `<div class="space-y-3">
-                         <div class="bg-surface-container-low p-4 rounded border-l-2 border-[#A855F7]">
+                         <div class="bg-surface-container-low p-4 border-l-2 border-[#A855F7]">
                              <p class="text-sm text-slate-300 mb-2">
                                  <strong>💡 Formula:</strong> P-value = erfc(S_obs ÷ √2)
                              </p>
                              <p class="text-sm text-slate-400">Result: erfc(${step.s_obs.toFixed(4)} ÷ 1.414) = ${step.p_value.toFixed(4)}</p>
                          </div>
-                         <div class="p-3 bg-surface-container rounded text-xs text-slate-400">
+                         <div class="p-3 bg-surface-container text-xs text-slate-400">
                              <p><strong>Interpretation:</strong> P-value = ${(step.p_value * 100).toFixed(1)}% probability that a truly random sequence would show this much deviation.</p>
                          </div>
                      </div>`;
@@ -959,7 +959,7 @@ if (useHelpLink) {
                       const statusMsg = step.passed ? 'The sequence looks RANDOM!' : 'The sequence is BIASED toward 1s or 0s.';
 
                       explanationHtml = `<div class="space-y-4">
-                          <div class="p-4 rounded border-l-4" style="border-color: ${statusColor}; background: rgba(0,0,0,0.2);">
+                          <div class="p-4 border-l-4" style="border-color: ${statusColor}; background: rgba(0,0,0,0.2);">
                               <div class="flex items-center gap-2 mb-2">
                                   <span style="color: ${statusColor}" class="text-2xl font-bold">${statusIcon} ${statusText}</span>
                               </div>
@@ -967,18 +967,18 @@ if (useHelpLink) {
                           </div>
 
                           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                              <div class="bg-surface-container-low p-4 rounded">
+                              <div class="bg-surface-container-low p-4">
                                   <div class="text-xs text-slate-400 uppercase mb-1">Test Statistic (S_obs)</div>
                                   <div class="text-2xl font-bold text-slate-300">${step.s_obs.toFixed(4)}</div>
                               </div>
-                              <div class="bg-surface-container-low p-4 rounded">
+                              <div class="bg-surface-container-low p-4">
                                   <div class="text-xs text-slate-400 uppercase mb-1">P-Value</div>
                                   <div class="text-2xl font-bold" style="color: ${statusColor};">${step.p_value.toFixed(4)}</div>
                                   <div class="text-xs text-slate-500 mt-1">vs Threshold: 0.01</div>
                               </div>
                           </div>
 
-                          <div class="p-4 bg-surface-container-low rounded border border-outline-variant/20 text-sm text-slate-300">
+                          <div class="p-4 bg-surface-container-low border border-outline-variant/20 text-sm text-slate-300">
                               <p><strong>Why this matters:</strong> P-value ≥ 0.01 indicates the data passes randomness test. Lower values suggest bias.</p>
                               <p class="mt-2 text-xs text-slate-400">For cryptography, randomness is critical. Biased sequences can be predicted and exploited.</p>
                           </div>
