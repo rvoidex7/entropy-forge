@@ -17,7 +17,7 @@ sha2 = "0.10"
 hex = "0.4"
 
 # Math & Stats
-statrs = "0.17"
+statrs = "0.18"
 
 # GUI (optional)
 egui = { version = "0.29", optional = true }
