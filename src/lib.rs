@@ -47,16 +47,16 @@
 //! }
 //! ```
 
-pub mod entropy;
-pub mod crypto;
-pub mod quality;
 pub mod bench;
+pub mod crypto;
+pub mod entropy;
 pub mod learn;
+pub mod quality;
 
 #[cfg(feature = "gui")]
 pub mod viz;
 
 // Re-exports for convenience
+pub use crypto::{AvalancheAnalyzer, KeyedStreamCipher, StreamCipher};
 pub use entropy::{EntropySource, SystemEntropy};
-pub use crypto::StreamCipher;
-pub use quality::{QualityMetrics, NistTests};
+pub use quality::{NistTests, QualityMetrics, QualityReport};

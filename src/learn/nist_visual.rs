@@ -1,3 +1,4 @@
+use crate::quality::bits::bytes_to_bits_msb;
 use crate::quality::NistTests;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -43,7 +44,6 @@ impl Default for NistProcess {
     }
 }
 
-
 impl NistProcess {
     pub fn new() -> Self {
         Self::default()
@@ -60,13 +60,8 @@ impl NistProcess {
             return;
         }
 
-        // --- Step 1: Convert to Bits ---
-        let mut bits = Vec::new();
-        for &byte in data {
-            for i in (0..8).rev() {
-                bits.push((byte >> i) & 1);
-            }
-        }
+        // --- Step 1: Convert to Bits (MSB-first, shared helper) ---
+        let bits = bytes_to_bits_msb(data);
 
         self.steps.push(NistFrequencyStep {
             step_type: NistStepType::ConvertToBits,
@@ -152,7 +147,8 @@ impl NistProcess {
         // Re-using SystemEntropy is better as I already have it.
         // SystemEntropy fills bytes. I can map them to chars.
 
-        let chars: String = data.iter()
+        let chars: String = data
+            .iter()
             .map(|&b| {
                 // map to printable ascii range 33-126
                 let c = 33 + (b % (126 - 33));
