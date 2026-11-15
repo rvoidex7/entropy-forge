@@ -7,11 +7,51 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-15
+
 ### Added
 - Interactive "Learn" tab with step-by-step XOR visualization
 - Bit-level encryption visualization
 - Auto-play animation with speed control
 - Educational explanations for cryptographic concepts
+- `KeyedStreamCipher`: real ChaCha20 encryption/decryption with a 256-bit key
+  and 96-bit nonce, plus SHA-256 passphrase key derivation
+- `AvalancheAnalyzer`: real SHA-256 strict avalanche criterion analysis
+- Shared zero-allocation MSB-first bit reader (`quality::bits`)
+- NIST SP 800-22 Block Frequency and Cumulative Sums tests
+- NIST SP 800-90B MCV min-entropy (99% confidence bound), Markov-1
+  conditional min-entropy and lag-1 serial correlation metrics
+- `tests/crypto_nist_golden.rs` NIST golden vectors and adversarial cases
+- `tests/mobile_ui_test.rs` headless 360x800 narrow-screen rendering test
+- Use tab: explicit Encrypt/Decrypt actions and a "Ciphertext as hex" option
+  that describes only the ciphertext representation
+- Shared GUI spacing tokens (`FIELD_GAP`, `SECTION_GAP`) for consistent form
+  layout across screens
+- Widget-level encrypt/decrypt round-trip test and 360 px bounding-box
+  assertions for every tab
+
+### Changed
+- Rewrote the Runs, Longest Run, Serial and Frequency tests against the NIST
+  SP 800-22 algorithms and validated them with the official sample vectors
+- Quality score is capped at 30 for deterministic or structurally unsound
+  sequences, even when Shannon entropy is 8.0
+- `Test` and `Benchmark` jobs run on background threads instead of blocking the
+  UI thread
+- Learn tab now operates on UTF-8 bytes instead of truncating characters, and
+  reports entropy against the absolute 8 bits/byte scale
+- GUI migrated to egui/eframe 0.37 and egui_kittest 0.37
+- Text fields and sliders expose accessible labels; fixed widths that overflow
+  a 360 px phone screen were removed
+
+### Fixed
+- Decrypting in the GUI no longer hex-encodes the recovered plaintext; the hex
+  option applies only to the ciphertext representation
+- Invalid hex ciphertext is reported instead of being silently treated as raw
+  text bytes
+
+### Removed
+- Misleading `avalanche_effect` method on the educational XOR `StreamCipher`
+  (XOR has no plaintext avalanche effect by construction)
 
 ## [0.1.0] - 2025-01-XX
 
@@ -35,5 +75,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/rvoidex7/entropy-forge/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/rvoidex7/entropy-forge/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/rvoidex7/entropy-forge/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/rvoidex7/entropy-forge/releases/tag/v0.1.0
