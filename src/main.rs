@@ -12,13 +12,11 @@ fn main() -> Result<(), eframe::Error> {
             .with_icon(load_icon()),
         ..Default::default()
     };
-    
+
     eframe::run_native(
         "Entropy Forge",
         options,
-        Box::new(|_cc| {
-            Ok(Box::new(EntropyForgeApp::default()))
-        }),
+        Box::new(|_cc| Ok(Box::new(EntropyForgeApp::default()))),
     )
 }
 
@@ -32,10 +30,10 @@ fn load_icon() -> egui::IconData {
         for x in 0..icon_size {
             let idx = (y * icon_size + x) * 4;
             let value = ((x + y) * 8) as u8;
-            rgba[idx] = value;     // R
+            rgba[idx] = value; // R
             rgba[idx + 1] = value; // G
             rgba[idx + 2] = value; // B
-            rgba[idx + 3] = 255;   // A
+            rgba[idx + 3] = 255; // A
         }
     }
 
