@@ -2,69 +2,69 @@ name: CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [main]
   pull_request:
-    branches: [ "main" ]
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  # Superseded runs on the same PR are pointless; never cancel main.
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
 
 env:
   CARGO_TERM_COLOR: always
-  RUSTFLAGS: "-Dwarnings"
 
 jobs:
-  build:
-    name: Build & Test
+  test:
+    name: Test (Linux)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Install Rust toolchain
+
+      - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
-        
-      - name: Cache cargo registry
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-cargo-
-      
-      - name: Build
-        run: cargo build --verbose
-        
+
+      - name: Cache cargo and target
+        uses: Swatinem/rust-cache@v2
+
       - name: Run tests
-        run: cargo test --verbose
-        
-      - name: Build release
-        run: cargo build --release --verbose
+        run: cargo test --all-features --locked
 
   lint:
-    name: Lint & Format
+    name: Format and Clippy
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Install Rust toolchain
+
+      - name: Install Rust
         uses: dtolnay/rust-toolchain@stable
         with:
           components: rustfmt, clippy
-          
+
+      - name: Cache cargo and target
+        uses: Swatinem/rust-cache@v2
+
       - name: Check formatting
         run: cargo fmt --all -- --check
-        
-      - name: Clippy
-        run: cargo clippy --all-targets --all-features -- -D warnings
 
-  security:
-    name: Security Audit
-    runs-on: ubuntu-latest
+      - name: Run Clippy
+        run: cargo clippy --all-targets --all-features --locked -- -D warnings
+
+  windows:
+    name: Check (Windows)
+    runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-      
-      - name: Install cargo-audit
-        run: cargo install cargo-audit
-        
-      - name: Security audit
-        run: cargo audit
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo and target
+        uses: Swatinem/rust-cache@v2
+
+      - name: Type-check all targets
+        run: cargo check --all-targets --all-features --locked
