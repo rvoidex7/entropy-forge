@@ -3,7 +3,6 @@
 /.cargo/
 **/*.rs.bk
 *.pdb
-Cargo.lock
 
 # IDE
 .vscode/
@@ -26,4 +25,5 @@ Thumbs.db
 *.log
 
 # Others
+# Private development notes, kept local on purpose.
 docs/
