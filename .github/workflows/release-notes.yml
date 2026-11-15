@@ -1,0 +1,59 @@
+name: Release notes
+
+# Every version tag creates (or refreshes) a GitHub release whose body is the
+# matching section of CHANGELOG.md. No compilation happens here, so a tag push
+# is cheap and a broken build can never block a release from existing.
+#
+# Binaries are attached later by "Build release assets", on demand.
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  release:
+    name: Create release from CHANGELOG
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify tag matches Cargo.toml
+        run: |
+          tag_version="${GITHUB_REF_NAME#v}"
+          crate_version="$(grep -m1 '^version' Cargo.toml | cut -d'"' -f2)"
+          if [ "$tag_version" != "$crate_version" ]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match Cargo.toml version $crate_version"
+            exit 1
+          fi
+          echo "Tag $GITHUB_REF_NAME matches Cargo.toml version $crate_version."
+
+      - name: Extract CHANGELOG section
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          awk -v ver="$version" '
+            index($0, "## [" ver "]") == 1 { found = 1; next }
+            found && index($0, "## [") == 1 { exit }
+            found { print }
+          ' CHANGELOG.md > release-notes.md
+
+          if [ ! -s release-notes.md ]; then
+            echo "::warning::No CHANGELOG.md section found for $version"
+            echo "See CHANGELOG.md for the changes in this version." > release-notes.md
+          fi
+
+          echo "--- release notes ---"
+          cat release-notes.md
+
+      - name: Create or update release
+        uses: softprops/action-gh-release@v2
+        with:
+          body_path: release-notes.md
+          # Commit messages are not a changelog; never generate notes from them.
+          generate_release_notes: false
+          prerelease: ${{ contains(github.ref_name, '-') }}

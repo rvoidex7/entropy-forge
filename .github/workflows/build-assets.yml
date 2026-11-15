@@ -1,0 +1,95 @@
+name: Build release assets
+
+# Manual only: pick an existing release tag and attach desktop binaries to it.
+# This is deliberately separate from "Release notes" so that tags stay cheap and
+# a failing build never prevents a release from existing.
+#
+# Usage: Actions -> Build release assets -> Run workflow -> tag: v0.2.0
+#    or: gh workflow run build-assets.yml -f tag=v0.2.0
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag to attach binaries to (e.g. v0.2.0)
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    name: Build ${{ matrix.asset }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Oldest supported Ubuntu keeps the glibc requirement low; the binary
+          # then runs on newer distributions too.
+          - os: ubuntu-22.04
+            asset: linux-x86_64
+          - os: windows-latest
+            asset: windows-x86_64
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.tag }}
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo and target
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build release binary
+        run: cargo build --release --locked
+
+      - name: Package (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          mkdir -p dist
+          tar -C target/release -czf \
+            "dist/entropy-forge-${{ inputs.tag }}-linux-x86_64.tar.gz" \
+            entropy-forge
+
+      - name: Package (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist | Out-Null
+          Compress-Archive `
+            -Path target/release/entropy-forge.exe `
+            -DestinationPath "dist/entropy-forge-${{ inputs.tag }}-windows-x86_64.zip"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: assets-${{ matrix.asset }}
+          path: dist/*
+          if-no-files-found: error
+
+  attach:
+    name: Attach to release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Verify release exists
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release view "${{ inputs.tag }}" > /dev/null
+
+      - name: Upload binaries
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: gh release upload "${{ inputs.tag }}" dist/* --clobber
