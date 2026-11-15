@@ -8,13 +8,13 @@ use std::time::{Duration, Instant};
 pub struct BenchmarkResult {
     /// Throughput in megabytes per second
     pub throughput_mbps: f64,
-    
+
     /// Average latency per byte in microseconds
     pub latency_us: f64,
-    
+
     /// Total bytes generated
     pub bytes_generated: usize,
-    
+
     /// Total time taken
     pub duration: Duration,
 }
@@ -44,17 +44,20 @@ impl PerformanceBench {
     /// println!("Throughput: {:.2} MB/s", result.throughput_mbps);
     /// println!("Latency: {:.2} µs/byte", result.latency_us);
     /// ```
-    pub fn benchmark<E: ?Sized + EntropySource>(source: &mut E, total_bytes: usize) -> BenchmarkResult {
+    pub fn benchmark<E: ?Sized + EntropySource>(
+        source: &mut E,
+        total_bytes: usize,
+    ) -> BenchmarkResult {
         let mut buffer = vec![0u8; total_bytes];
-        
+
         let start = Instant::now();
         source.fill_bytes(&mut buffer);
         let duration = start.elapsed();
-        
+
         let duration_secs = duration.as_secs_f64();
         let throughput_mbps = (total_bytes as f64 / duration_secs) / 1_000_000.0;
         let latency_us = (duration_secs * 1_000_000.0) / total_bytes as f64;
-        
+
         BenchmarkResult {
             throughput_mbps,
             latency_us,
@@ -62,7 +65,7 @@ impl PerformanceBench {
             duration,
         }
     }
-    
+
     /// Run multiple iterations and return average
     pub fn benchmark_avg<E: ?Sized + EntropySource>(
         source: &mut E,
@@ -73,14 +76,14 @@ impl PerformanceBench {
         let mut total_latency = 0.0;
         let mut total_duration = Duration::ZERO;
         let total_bytes = bytes_per_iteration * iterations;
-        
+
         for _ in 0..iterations {
             let result = Self::benchmark(source, bytes_per_iteration);
             total_throughput += result.throughput_mbps;
             total_latency += result.latency_us;
             total_duration += result.duration;
         }
-        
+
         BenchmarkResult {
             throughput_mbps: total_throughput / iterations as f64,
             latency_us: total_latency / iterations as f64,
@@ -109,22 +112,22 @@ impl BenchmarkResult {
 mod tests {
     use super::*;
     use crate::entropy::SystemEntropy;
-    
+
     #[test]
     fn test_benchmark() {
         let mut source = SystemEntropy::new();
         let result = PerformanceBench::benchmark(&mut source, 10_000);
-        
+
         assert!(result.throughput_mbps > 0.0);
         assert!(result.latency_us > 0.0);
         assert_eq!(result.bytes_generated, 10_000);
     }
-    
+
     #[test]
     fn test_benchmark_avg() {
         let mut source = SystemEntropy::new();
         let result = PerformanceBench::benchmark_avg(&mut source, 1_000, 5);
-        
+
         assert!(result.throughput_mbps > 0.0);
         assert_eq!(result.bytes_generated, 5_000);
     }

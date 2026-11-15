@@ -3,11 +3,11 @@
 //! This module defines the core `EntropySource` trait that allows any RNG
 //! to be used throughout the Entropy Forge framework.
 
-mod system;
 mod mock;
+mod system;
 
-pub use system::SystemEntropy;
 pub use mock::MockEntropy;
+pub use system::SystemEntropy;
 
 /// Core trait for entropy sources
 ///
@@ -48,7 +48,7 @@ pub trait EntropySource {
     ///
     /// * `dest` - Buffer to fill with random bytes
     fn fill_bytes(&mut self, dest: &mut [u8]);
-    
+
     /// Get a single random byte
     ///
     /// Default implementation uses `fill_bytes`. Override if you have
@@ -58,7 +58,7 @@ pub trait EntropySource {
         self.fill_bytes(&mut buf);
         buf[0]
     }
-    
+
     /// Get a random u32
     ///
     /// Default implementation uses `fill_bytes`. Override if you have
@@ -68,7 +68,7 @@ pub trait EntropySource {
         self.fill_bytes(&mut buf);
         u32::from_le_bytes(buf)
     }
-    
+
     /// Get a random u64
     ///
     /// Default implementation uses `fill_bytes`. Override if you have
@@ -78,7 +78,7 @@ pub trait EntropySource {
         self.fill_bytes(&mut buf);
         u64::from_le_bytes(buf)
     }
-    
+
     /// Get the source name for display purposes
     ///
     /// This is used in the GUI and logging to identify which entropy
@@ -86,7 +86,7 @@ pub trait EntropySource {
     fn name(&self) -> &str {
         "Unknown Source"
     }
-    
+
     /// Optional: Reset the source to initial state
     ///
     /// Some sources may support resetting to a known state for testing.
@@ -101,7 +101,7 @@ impl EntropySource for Box<dyn EntropySource> {
     fn fill_bytes(&mut self, dest: &mut [u8]) {
         (**self).fill_bytes(dest)
     }
-    
+
     fn name(&self) -> &str {
         (**self).name()
     }
@@ -121,28 +121,26 @@ impl<T: ?Sized + EntropySource> EntropySource for &mut T {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_system_entropy() {
         let mut entropy = SystemEntropy::new();
         let mut buf = [0u8; 32];
         entropy.fill_bytes(&mut buf);
-        
+
         // Should not be all zeros (probability is negligible)
         assert!(buf.iter().any(|&b| b != 0));
     }
-    
+
     #[test]
     fn test_next_methods() {
         let mut entropy = SystemEntropy::new();
-        
+
         let byte = entropy.next_byte();
         let u32_val = entropy.next_u32();
         let u64_val = entropy.next_u64();
-        
-        // Just check they don't panic
-        assert!(byte <= 255);
-        assert!(u32_val <= u32::MAX);
-        assert!(u64_val <= u64::MAX);
+
+        // Calling these must not panic. Consume the values so the bindings are used.
+        let _ = (byte, u32_val, u64_val);
     }
 }

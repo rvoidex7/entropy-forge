@@ -2,4 +2,4 @@
 
 mod performance;
 
-pub use performance::{PerformanceBench, BenchmarkResult};
+pub use performance::{BenchmarkResult, PerformanceBench};
