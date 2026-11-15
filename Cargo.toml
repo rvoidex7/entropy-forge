@@ -9,12 +9,17 @@ repository = "https://github.com/rvoidex7/entropy-forge"
 keywords = ["cryptography", "entropy", "rng", "visualization", "nist"]
 categories = ["cryptography", "visualization"]
 
+[lib]
+name = "entropy_forge"
+crate-type = ["cdylib", "rlib"]
+
 [dependencies]
 # Crypto
 rand = "0.8"
 getrandom = "0.2"
 sha2 = "0.10"
 hex = "0.4"
+chacha20 = "0.10"
 
 # Math & Stats
 statrs = "0.17"

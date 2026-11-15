@@ -1,5 +1,6 @@
 # Rust
 /target
+/.cargo/
 **/*.rs.bk
 *.pdb
 Cargo.lock
@@ -23,3 +24,6 @@ Thumbs.db
 
 # Test outputs
 *.log
+
+# Others
+docs/

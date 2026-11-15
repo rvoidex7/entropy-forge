@@ -1,23 +1,8 @@
-# Clippy configuration
-# Run with: cargo clippy
-
-[workspace]
-# Deny certain lints
-deny = [
-    "unsafe_code",
-]
-
-# Warn on these
-warn = [
-    "clippy::all",
-    "clippy::pedantic",
-    "clippy::nursery",
-]
-
-# Allow these (too noisy or not applicable)
-allow = [
-    "clippy::module_name_repetitions",
-    "clippy::must_use_candidate",
-    "clippy::missing_errors_doc",
-    "clippy::missing_panics_doc",
-]
+# Clippy configuration.
+#
+# Lint levels are enforced by the quality gate:
+#   cargo clippy --all-targets --all-features -- -D warnings
+#
+# Note: `deny` / `warn` / `allow` arrays are not valid `clippy.toml` fields.
+# Lint levels belong in `Cargo.toml` under `[lints.clippy]`. Keep this file for
+# lint-specific options such as `disallowed-methods` or `too-many-arguments-threshold`.
