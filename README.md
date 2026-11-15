@@ -10,7 +10,7 @@ Pluggable entropy framework for cryptographic applications with built-in quality
 
 - **🔌 Trait-based Design**: Any RNG can be plugged in via the `EntropySource` trait
 - **🔬 Quality Testing**: NIST SP 800-22 tests, Shannon entropy, min-entropy calculations
-- **🔐 Cryptographic Use**: Stream cipher implementation using your entropy source
+- **🔐 Cryptographic Use**: Real ChaCha20 encryption plus an educational XOR one-time pad
 - **📊 Real-time Visualization**: egui-based GUI for interactive exploration
 - **⚡ Performance Benchmarks**: Measure throughput and latency of entropy sources
 - **🎓 Interactive Learning**: Step-by-step visualizations of cryptographic operations
@@ -45,14 +45,18 @@ cargo run --example quality_check
 ## GUI Tabs
 
 ### 📝 Use Tab
-Encrypt and decrypt data using the stream cipher with real-time keystream visualization.
+Encrypt and decrypt UTF-8 text with ChaCha20 (256-bit key, 96-bit nonce). The
+passphrase is hashed with SHA-256 and the nonce can be regenerated at any time.
+Encryption and decryption are exact inverses for the same key and nonce.
 
 ### 🔬 Test Tab
 Analyze entropy quality with:
 - Shannon Entropy (bits/byte)
-- Min-Entropy (conservative estimate)
-- Chi-Square uniformity test
-- NIST SP 800-22 statistical tests (Frequency, Runs, Longest Run, Serial, Chi-Square)
+- Min-Entropy (NIST SP 800-90B MCV, 99% upper confidence bound)
+- Markov-1 conditional min-entropy and lag-1 serial correlation
+- Chi-Square uniformity test (with a suspiciously-uniform warning)
+- NIST SP 800-22 statistical tests (Frequency, Block Frequency, Runs,
+  Longest Run, Serial, Cumulative Sums)
 
 ### ⚡ Benchmark Tab
 Measure entropy source performance:
@@ -77,14 +81,20 @@ Perfect for understanding how stream ciphers actually work!
 
 ```rust
 use entropy_forge::entropy::SystemEntropy;
-use entropy_forge::crypto::StreamCipher;
+use entropy_forge::crypto::KeyedStreamCipher;
 
-let entropy = SystemEntropy::new();
-let mut cipher = StreamCipher::new(entropy);
+let key = KeyedStreamCipher::derive_key("correct horse battery staple");
+let nonce = [0x24u8; 12];
 
-let plaintext = b"Hello, World!";
-let ciphertext = cipher.process(plaintext);
+let plaintext = "Merhaba dünya! 🔐".as_bytes();
+let ciphertext = KeyedStreamCipher::process_chacha20(&key, &nonce, plaintext);
+let decrypted = KeyedStreamCipher::process_chacha20(&key, &nonce, &ciphertext);
+assert_eq!(decrypted, plaintext);
 ```
+
+The educational one-time pad is still available as
+`StreamCipher::new(SystemEntropy::new())`. It draws a fresh keystream from the
+entropy source and is **not** a substitute for ChaCha20.
 
 ### Implementing a Custom Source
 
@@ -228,8 +238,11 @@ let mut source = ChaoticRNG::new();
 let metrics = QualityMetrics::analyze(&mut source, 1_000_000);
 // Expect: ~7.75 bits/byte, excellent NIST scores
 
-let mut cipher = StreamCipher::new(source);
-// Now using chaotic entropy for cryptography!
+// Feed the chaotic bytes into a real cipher as key material.
+let mut key = [0u8; 32];
+source.fill_bytes(&mut key);
+let nonce = KeyedStreamCipher::random_nonce();
+let ciphertext = KeyedStreamCipher::process_chacha20(&key, &nonce, plaintext);
 ```
 
 ## Contributing
