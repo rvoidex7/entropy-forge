@@ -48,6 +48,11 @@ thiserror = "1.0"
 criterion = "0.5"
 egui_kittest = { version = "0.37", features = ["eframe"] }
 
+# Embeds assets/icons/icon.ico into the Windows executable. Build-time only and
+# only when compiling for Windows.
+[target.'cfg(windows)'.build-dependencies]
+winresource = "0.1"
+
 [features]
 default = ["gui"]
 gui = ["dep:egui", "dep:eframe", "dep:image"]

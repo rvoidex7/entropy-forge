@@ -71,9 +71,18 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           mkdir -p dist
-          tar -C target/release -czf \
-            "dist/entropy-forge-$TAG-linux-x86_64.tar.gz" \
-            entropy-forge
+          # The archive mirrors the install layout: the binary plus the files
+          # that make the icon and app id work on Wayland, where the window
+          # icon is ignored and the panel looks up the .desktop entry instead.
+          stage="entropy-forge-$TAG-linux-x86_64"
+          mkdir -p "$stage/icons/hicolor/256x256/apps"
+          cp target/release/entropy-forge "$stage/"
+          cp assets/linux/entropy-forge.desktop "$stage/"
+          cp LICENSE "$stage/"
+          cp assets/icons/128x128@2x.png \
+            "$stage/icons/hicolor/256x256/apps/entropy-forge.png"
+          tar -czf "dist/$stage.tar.gz" "$stage"
+          rm -rf "$stage"
 
       - name: Package (Windows)
         if: runner.os == 'Windows'
@@ -81,7 +90,7 @@ jobs:
         run: |
           New-Item -ItemType Directory -Force -Path dist | Out-Null
           Compress-Archive `
-            -Path target/release/entropy-forge.exe `
+            -Path target/release/entropy-forge.exe, LICENSE `
             -DestinationPath "dist/entropy-forge-$($env:TAG)-windows-x86_64.zip"
 
       - name: Upload artifact

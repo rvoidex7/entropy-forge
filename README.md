@@ -33,6 +33,29 @@ Pluggable entropy framework for cryptographic applications with built-in quality
 cargo run --release
 ```
 
+### Prebuilt binaries
+
+Every release has Linux and Windows builds on the
+[releases page](https://github.com/rvoidex7/entropy-forge/releases).
+On Windows, unzip the archive and run `entropy-forge.exe`; release builds do not
+open a console window. macOS builds are not published yet.
+
+The Linux archive contains the binary, a `.desktop` entry and a 256x256 icon.
+Installing all three makes the app appear in the menu with its icon, including on
+Wayland panels, which look the icon up through the `.desktop` file:
+
+```bash
+tar -xzf entropy-forge-<version>-linux-x86_64.tar.gz
+cd entropy-forge-<version>-linux-x86_64
+install -Dm755 entropy-forge ~/.local/bin/entropy-forge
+install -Dm644 entropy-forge.desktop \
+  ~/.local/share/applications/entropy-forge.desktop
+install -Dm644 icons/hicolor/256x256/apps/entropy-forge.png \
+  ~/.local/share/icons/hicolor/256x256/apps/entropy-forge.png
+```
+
+`~/.local/bin` must be in `PATH` for the menu entry to launch the app.
+
 ### Run Examples
 
 ```bash

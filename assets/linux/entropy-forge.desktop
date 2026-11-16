@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Entropy Forge
+GenericName=Entropy Lab
+Comment=Explore, test and visualize cryptographic entropy sources
+Exec=entropy-forge
+Icon=entropy-forge
+Terminal=false
+Categories=Education;Math;
+Keywords=entropy;cryptography;rng;nist;random;
+StartupWMClass=entropy-forge

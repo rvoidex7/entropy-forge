@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- The bundled application icon is used for the window, the in-app header and
+  the README instead of a lock emoji
+- Windows release builds embed `assets/icons/icon.ico` into the executable, so
+  Explorer and the taskbar show the real icon
+- Linux release archives include a `.desktop` entry and a 256x256 hicolor icon
+
+### Changed
+- Release builds on Windows no longer open a console window next to the GUI
+- The window declares the `entropy-forge` app id, so Wayland panels can match
+  it with the installed `.desktop` entry
+
 ## [0.2.0] - 2026-11-15
 
 ### Added
