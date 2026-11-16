@@ -10,14 +10,15 @@ name: Release notes
 #     (needed for tags created before this workflow existed, and for tags whose
 #     commit still contains an older release workflow)
 #
-# When the tag only exists locally, pass its commit SHA in the `commit` input so
-# the workflow can read Cargo.toml and CHANGELOG.md from the right tree. The tag
-# itself is then created through the refs API at that commit.
+# The tag must already exist on GitHub: push it with your own credentials
+# (git push origin v0.3.0). GITHUB_TOKEN cannot create it, because GitHub
+# requires the "workflow" scope to point a ref at a commit that modifies a
+# workflow file, and that scope is not available to GITHUB_TOKEN.
 #
 # Never pass --target to "gh release create": when the target commit differs from
-# the default branch in any workflow file, GitHub additionally requires the
-# "workflows: write" permission, which GITHUB_TOKEN cannot be granted. Creating
-# the tag first and then the release avoids that check entirely.
+# the default branch in any workflow file, GitHub additionally requires
+# "workflows: write", which GITHUB_TOKEN cannot be granted either. Attaching the
+# release to an existing tag avoids that check entirely.
 #
 # Binaries are attached later by "Build release assets", on demand.
 
@@ -27,12 +28,8 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: Tag to publish (e.g. v0.2.0)
+        description: Existing tag to publish (e.g. v0.2.0)
         required: true
-        type: string
-      commit:
-        description: Commit SHA to read when the tag is not on GitHub yet
-        required: false
         type: string
 
 permissions:
@@ -50,9 +47,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # Tag push: the pushed tag. Manual run: the given commit (tag not on
-          # GitHub yet) or the given tag (already on GitHub).
-          ref: ${{ inputs.commit || inputs.tag || github.ref_name }}
+          # Tag push: the pushed tag. Manual run: the given tag.
+          ref: ${{ inputs.tag || github.ref_name }}
 
       - name: Verify tag matches Cargo.toml
         run: |
@@ -84,22 +80,14 @@ jobs:
       - name: Ensure the tag exists
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TARGET: ${{ inputs.commit }}
         run: |
           if gh api "repos/${{ github.repository }}/git/ref/tags/$TAG" > /dev/null 2>&1; then
             echo "Tag $TAG already exists."
             exit 0
           fi
 
-          if [ -z "$TARGET" ]; then
-            echo "::error::Tag $TAG does not exist on GitHub. Re-run with the commit input set to the commit to tag."
-            exit 1
-          fi
-
-          gh api -X POST "repos/${{ github.repository }}/git/refs" \
-            -f ref="refs/tags/$TAG" \
-            -f sha="$TARGET"
-          echo "Created tag $TAG at $TARGET."
+          echo "::error::Tag $TAG does not exist on GitHub. Push it first (git push origin $TAG), then re-run this workflow."
+          exit 1
 
       - name: Create or update release
         env:
