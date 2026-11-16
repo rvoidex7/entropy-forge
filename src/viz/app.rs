@@ -13,6 +13,9 @@ use crate::quality::{NistTests, QualityMetrics};
 
 use super::{FIELD_GAP, SECTION_GAP};
 
+/// Height of the header icon, sized to sit beside the two header text lines.
+const HEADER_ICON_SIZE: f32 = 40.0;
+
 /// Result of a background quality-analysis run.
 struct TestOutcome {
     metrics: QualityMetrics,
@@ -54,6 +57,9 @@ pub struct EntropyForgeApp {
     // Current tab.
     current_tab: Tab,
 
+    // Header icon, decoded from the bundled PNG on first frame.
+    icon: Option<egui::TextureHandle>,
+
     // Use tab state.
     passphrase: String,
     nonce_hex: String,
@@ -92,6 +98,7 @@ impl Default for EntropyForgeApp {
         Self {
             entropy: Box::new(SystemEntropy::new()),
             current_tab: Tab::Use,
+            icon: None,
             passphrase: String::from("entropy-forge-demo"),
             nonce_hex: hex::encode(KeyedStreamCipher::random_nonce()),
             cipher_mode: CipherMode::Encrypt,
@@ -147,8 +154,23 @@ impl eframe::App for EntropyForgeApp {
         self.poll_bench_job();
 
         egui::CentralPanel::default().show(ui, |ui| {
-            ui.heading("🔐 Entropy Forge");
-            ui.label(format!("Source: {}", self.entropy.name()));
+            ui.horizontal(|ui| {
+                let icon = self.icon.get_or_insert_with(|| {
+                    ui.ctx().load_texture(
+                        "entropy-forge-icon",
+                        super::icon::color_image(),
+                        egui::TextureOptions::LINEAR,
+                    )
+                });
+                ui.add(egui::Image::new(egui::load::SizedTexture::new(
+                    icon.id(),
+                    egui::vec2(HEADER_ICON_SIZE, HEADER_ICON_SIZE),
+                )));
+                ui.vertical(|ui| {
+                    ui.heading("Entropy Forge");
+                    ui.label(format!("Source: {}", self.entropy.name()));
+                });
+            });
             ui.add_space(5.0);
             ui.separator();
 

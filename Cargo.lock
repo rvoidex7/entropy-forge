@@ -1132,6 +1132,7 @@ dependencies = [
  "egui_kittest",
  "getrandom 0.2.17",
  "hex",
+ "image",
  "rand",
  "sha2",
  "statrs",

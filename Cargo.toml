@@ -36,6 +36,10 @@ eframe = { version = "0.37", optional = true, default-features = false, features
     "wayland",
     "x11",
 ] }
+# Decodes the bundled PNG icon into RGBA for the window icon and header.
+image = { version = "0.25", optional = true, default-features = false, features = [
+    "png",
+] }
 
 # Utilities
 thiserror = "1.0"
@@ -46,7 +50,7 @@ egui_kittest = { version = "0.37", features = ["eframe"] }
 
 [features]
 default = ["gui"]
-gui = ["dep:egui", "dep:eframe"]
+gui = ["dep:egui", "dep:eframe", "dep:image"]
 
 [[bin]]
 name = "entropy-forge"

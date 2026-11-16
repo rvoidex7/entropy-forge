@@ -1,4 +1,8 @@
-# 🔐 Entropy Forge
+<p align="center">
+  <img src="assets/icons/128x128.png" width="96" alt="Entropy Forge icon">
+</p>
+
+<h1 align="center">Entropy Forge</h1>
 
 Pluggable entropy framework for cryptographic applications with built-in quality testing, visualization, and **interactive educational tools**.
 
@@ -10,7 +14,7 @@ Pluggable entropy framework for cryptographic applications with built-in quality
 
 - **🔌 Trait-based Design**: Any RNG can be plugged in via the `EntropySource` trait
 - **🔬 Quality Testing**: NIST SP 800-22 tests, Shannon entropy, min-entropy calculations
-- **🔐 Cryptographic Use**: Real ChaCha20 encryption plus an educational XOR one-time pad
+- **Cryptographic Use**: Real ChaCha20 encryption plus an educational XOR one-time pad
 - **📊 Real-time Visualization**: egui-based GUI for interactive exploration
 - **⚡ Performance Benchmarks**: Measure throughput and latency of entropy sources
 - **🎓 Interactive Learning**: Step-by-step visualizations of cryptographic operations

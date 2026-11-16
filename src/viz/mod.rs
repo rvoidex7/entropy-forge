@@ -1,6 +1,7 @@
 //! GUI visualization using egui.
 
 mod app;
+pub mod icon;
 
 pub use app::{EntropyForgeApp, Tab};
 
