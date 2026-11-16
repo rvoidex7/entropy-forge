@@ -45,7 +45,7 @@ jobs:
     env:
       TAG: ${{ inputs.tag || github.ref_name }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           # Tag push: the pushed tag. Manual run: the given tag.
           ref: ${{ inputs.tag || github.ref_name }}
