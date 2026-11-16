@@ -1,14 +1,39 @@
 name: Release notes
 
-# Every version tag creates (or refreshes) a GitHub release whose body is the
-# matching section of CHANGELOG.md. No compilation happens here, so a tag push
-# is cheap and a broken build can never block a release from existing.
+# Creates (or refreshes) a GitHub release whose body is the matching
+# CHANGELOG.md section. No compilation happens here, so a tag push is cheap and
+# a broken build can never prevent a release from existing.
+#
+# Two ways to trigger it:
+#   * push a version tag           -> automatic
+#   * Actions -> Run workflow      -> publish an existing tag retroactively
+#     (needed for tags created before this workflow existed, and for tags whose
+#     commit still contains an older release workflow)
+#
+# When the tag only exists locally, pass its commit SHA in the `commit` input so
+# the workflow can read Cargo.toml and CHANGELOG.md from the right tree. The tag
+# itself is then created through the refs API at that commit.
+#
+# Never pass --target to "gh release create": when the target commit differs from
+# the default branch in any workflow file, GitHub additionally requires the
+# "workflows: write" permission, which GITHUB_TOKEN cannot be granted. Creating
+# the tag first and then the release avoids that check entirely.
 #
 # Binaries are attached later by "Build release assets", on demand.
 
 on:
   push:
     tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Tag to publish (e.g. v0.2.0)
+        required: true
+        type: string
+      commit:
+        description: Commit SHA to read when the tag is not on GitHub yet
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -18,24 +43,30 @@ env:
 
 jobs:
   release:
-    name: Create release from CHANGELOG
+    name: Publish ${{ inputs.tag || github.ref_name }}
     runs-on: ubuntu-latest
+    env:
+      TAG: ${{ inputs.tag || github.ref_name }}
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Tag push: the pushed tag. Manual run: the given commit (tag not on
+          # GitHub yet) or the given tag (already on GitHub).
+          ref: ${{ inputs.commit || inputs.tag || github.ref_name }}
 
       - name: Verify tag matches Cargo.toml
         run: |
-          tag_version="${GITHUB_REF_NAME#v}"
+          tag_version="${TAG#v}"
           crate_version="$(grep -m1 '^version' Cargo.toml | cut -d'"' -f2)"
           if [ "$tag_version" != "$crate_version" ]; then
-            echo "::error::Tag $GITHUB_REF_NAME does not match Cargo.toml version $crate_version"
+            echo "::error::Tag $TAG does not match Cargo.toml version $crate_version"
             exit 1
           fi
-          echo "Tag $GITHUB_REF_NAME matches Cargo.toml version $crate_version."
+          echo "Tag $TAG matches Cargo.toml version $crate_version."
 
       - name: Extract CHANGELOG section
         run: |
-          version="${GITHUB_REF_NAME#v}"
+          version="${TAG#v}"
           awk -v ver="$version" '
             index($0, "## [" ver "]") == 1 { found = 1; next }
             found && index($0, "## [") == 1 { exit }
@@ -50,10 +81,37 @@ jobs:
           echo "--- release notes ---"
           cat release-notes.md
 
+      - name: Ensure the tag exists
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TARGET: ${{ inputs.commit }}
+        run: |
+          if gh api "repos/${{ github.repository }}/git/ref/tags/$TAG" > /dev/null 2>&1; then
+            echo "Tag $TAG already exists."
+            exit 0
+          fi
+
+          if [ -z "$TARGET" ]; then
+            echo "::error::Tag $TAG does not exist on GitHub. Re-run with the commit input set to the commit to tag."
+            exit 1
+          fi
+
+          gh api -X POST "repos/${{ github.repository }}/git/refs" \
+            -f ref="refs/tags/$TAG" \
+            -f sha="$TARGET"
+          echo "Created tag $TAG at $TARGET."
+
       - name: Create or update release
-        uses: softprops/action-gh-release@v2
-        with:
-          body_path: release-notes.md
-          # Commit messages are not a changelog; never generate notes from them.
-          generate_release_notes: false
-          prerelease: ${{ contains(github.ref_name, '-') }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Never generate notes from commit messages: CHANGELOG.md is the only
+          # source of truth for release notes.
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            gh release edit "$TAG" --title "$TAG" --notes-file release-notes.md
+          elif [[ "$TAG" == *-* ]]; then
+            gh release create "$TAG" --title "$TAG" --notes-file release-notes.md \
+              --prerelease
+          else
+            gh release create "$TAG" --title "$TAG" --notes-file release-notes.md
+          fi

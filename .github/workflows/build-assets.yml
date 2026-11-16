@@ -47,7 +47,15 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Build release binary
-        run: cargo build --release --locked
+        shell: bash
+        run: |
+          # Tags created before the lock file was tracked (v0.2.0 and older)
+          # have no Cargo.lock, so --locked would abort.
+          locked=""
+          if [ -f Cargo.lock ]; then
+            locked="--locked"
+          fi
+          cargo build --release $locked
 
       - name: Package (Linux)
         if: runner.os == 'Linux'
