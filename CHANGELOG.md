@@ -18,6 +18,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Release builds on Windows no longer open a console window next to the GUI
 - The window declares the `entropy-forge` app id, so Wayland panels can match
   it with the installed `.desktop` entry
+- Upgraded `statrs` to 0.19, which drops the unmaintained `paste` transitive
+  dependency (RUSTSEC-2024-0436)
+
+### Removed
+- Unused direct dependencies: `rand`, `thiserror` and `criterion`
 
 ## [0.2.0] - 2026-11-15
 
