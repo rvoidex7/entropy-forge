@@ -15,7 +15,7 @@ crate-type = ["cdylib", "rlib"]
 
 [dependencies]
 # Crypto
-rand = "0.8"
+rand = "0.10"
 getrandom = "0.2"
 sha2 = "0.10"
 hex = "0.4"
