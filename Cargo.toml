@@ -54,6 +54,12 @@ winresource = "0.1"
 default = ["gui"]
 gui = ["dep:egui", "dep:eframe", "dep:image"]
 
+# Cargo's own manifest lints. Denying unused dependencies keeps the warning we
+# saw on Windows from coming back as a silent warning; note that the lint can
+# still miss a dependency that another crate also pulls in transitively.
+[lints.cargo]
+unused_dependencies = "deny"
+
 [[bin]]
 name = "entropy-forge"
 path = "src/main.rs"
