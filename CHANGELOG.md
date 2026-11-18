@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-11-19
+
 ### Added
 - **RNG Arena**: a header source selector plus six new generators — seeded
   ChaCha20, LCG (glibc and RANDU presets), 16-bit LFSR, biased coin with an
@@ -102,6 +104,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
-[Unreleased]: https://github.com/rvoidex7/entropy-forge/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/rvoidex7/entropy-forge/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/rvoidex7/entropy-forge/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/rvoidex7/entropy-forge/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/rvoidex7/entropy-forge/releases/tag/v0.1.0
