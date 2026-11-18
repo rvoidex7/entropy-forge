@@ -3,9 +3,21 @@
 //! This module defines the core `EntropySource` trait that allows any RNG
 //! to be used throughout the Entropy Forge framework.
 
+mod biased;
+mod chacha;
+mod counter;
+mod kind;
+mod lcg;
+mod lfsr;
 mod mock;
 mod system;
 
+pub use biased::BiasedSource;
+pub use chacha::ChaCha20Source;
+pub use counter::CounterSource;
+pub use kind::{SourceKind, ARENA_SEED};
+pub use lcg::{LcgPreset, LcgSource};
+pub use lfsr::Lfsr16Source;
 pub use mock::MockEntropy;
 pub use system::SystemEntropy;
 
@@ -105,6 +117,10 @@ impl EntropySource for Box<dyn EntropySource> {
     fn name(&self) -> &str {
         (**self).name()
     }
+
+    fn reset(&mut self) {
+        (**self).reset()
+    }
 }
 
 // Blanket implementation for mutable references
@@ -115,6 +131,10 @@ impl<T: ?Sized + EntropySource> EntropySource for &mut T {
 
     fn name(&self) -> &str {
         (**self).name()
+    }
+
+    fn reset(&mut self) {
+        (**self).reset()
     }
 }
 
@@ -142,5 +162,20 @@ mod tests {
 
         // Calling these must not panic. Consume the values so the bindings are used.
         let _ = (byte, u32_val, u64_val);
+    }
+
+    #[test]
+    fn boxed_source_forwards_reset() {
+        // Regression: the blanket impl used to inherit the no-op default, so
+        // resetting a `Box<dyn EntropySource>` silently did nothing.
+        let mut boxed: Box<dyn EntropySource> = Box::new(MockEntropy::new(42));
+
+        let mut first = [0u8; 16];
+        let mut second = [0u8; 16];
+        boxed.fill_bytes(&mut first);
+        boxed.reset();
+        boxed.fill_bytes(&mut second);
+
+        assert_eq!(first, second);
     }
 }

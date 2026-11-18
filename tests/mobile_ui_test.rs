@@ -7,6 +7,7 @@
 
 use egui_kittest::kittest::{NodeT, Queryable};
 use egui_kittest::{Harness, Node};
+use entropy_forge::entropy::SourceKind;
 use entropy_forge::viz::{EntropyForgeApp, Tab};
 
 const VIEWPORT_WIDTH: f32 = 360.0;
@@ -58,6 +59,24 @@ fn mobile_360px_viewport_renders_all_tabs_without_overflow_or_id_clash() {
         let pixels_per_point = harness.ctx.pixels_per_point();
         assert_within_viewport_width(&root, &format!("{tab:?}"), pixels_per_point);
     }
+}
+
+#[test]
+fn mobile_360px_header_with_bias_slider_does_not_overflow() {
+    let mut app = EntropyForgeApp::for_tab(Tab::Test);
+    app.select_source(SourceKind::Biased);
+
+    let mut harness = Harness::builder()
+        .with_size(egui::vec2(VIEWPORT_WIDTH, 800.0))
+        .allow_missing_glyphs()
+        .build_eframe(|_cc| app);
+
+    harness.run_steps(3);
+    assert_eq!(harness.state().source_kind(), SourceKind::Biased);
+
+    let root = harness.root();
+    let pixels_per_point = harness.ctx.pixels_per_point();
+    assert_within_viewport_width(&root, "Biased", pixels_per_point);
 }
 
 #[test]

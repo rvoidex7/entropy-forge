@@ -58,5 +58,5 @@ pub mod viz;
 
 // Re-exports for convenience
 pub use crypto::{AvalancheAnalyzer, KeyedStreamCipher, StreamCipher};
-pub use entropy::{EntropySource, SystemEntropy};
+pub use entropy::{EntropySource, SourceKind, SystemEntropy};
 pub use quality::{NistTests, QualityMetrics, QualityReport};

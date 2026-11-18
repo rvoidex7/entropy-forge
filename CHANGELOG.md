@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **RNG Arena**: a header source selector plus six new generators — seeded
+  ChaCha20, LCG (glibc and RANDU presets), 16-bit LFSR, biased coin with an
+  adjustable `P(1)`, and a deterministic counter. The Test and Benchmark tabs
+  now run against the selected source instead of hardcoding `SystemEntropy`.
+  Changing the source or bias clears stale results and cancels running jobs.
+  Deterministic sources use a fixed seed so runs are reproducible.
+- `tests/arena_ui_test.rs`: headless interaction tests for the source selector,
+  the bias slider, and the Test/Benchmark jobs
 - The bundled application icon is used for the window, the in-app header and
   the README instead of a lock emoji
 - Windows release builds embed `assets/icons/icon.ico` into the executable, so
@@ -15,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Linux release archives include a `.desktop` entry and a 256x256 hicolor icon
 
 ### Changed
+- `Box<dyn EntropySource>` and `&mut T` now forward `reset()` to the wrapped
+  source instead of silently using the no-op default
 - Release builds on Windows no longer open a console window next to the GUI
 - The window declares the `entropy-forge` app id, so Wayland panels can match
   it with the installed `.desktop` entry

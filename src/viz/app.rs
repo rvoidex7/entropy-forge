@@ -6,7 +6,7 @@ use eframe::egui;
 
 use crate::bench::{BenchmarkResult, PerformanceBench};
 use crate::crypto::KeyedStreamCipher;
-use crate::entropy::{EntropySource, SystemEntropy};
+use crate::entropy::{EntropySource, SourceKind, ARENA_SEED};
 use crate::learn::entropy_visual::interpret_entropy;
 use crate::learn::{EncryptionProcess, EntropyProcess, NistProcess};
 use crate::quality::{NistTests, QualityMetrics};
@@ -15,6 +15,9 @@ use super::{FIELD_GAP, SECTION_GAP};
 
 /// Height of the header icon, sized to sit beside the two header text lines.
 const HEADER_ICON_SIZE: f32 = 40.0;
+
+/// Default `P(1)` for the biased source.
+const DEFAULT_BIAS: f64 = 0.75;
 
 /// Result of a background quality-analysis run.
 struct TestOutcome {
@@ -50,8 +53,12 @@ pub enum Tab {
 
 /// Main application state.
 pub struct EntropyForgeApp {
-    // Entropy source (used for the displayed name; analysis runs on a worker
-    // thread with its own source so the UI never blocks).
+    // Entropy source selection (the RNG Arena).
+    source_kind: SourceKind,
+    bias_probability: f64,
+
+    // Live source instance, used for the displayed name. Analysis runs on a
+    // worker thread with its own source so the UI never blocks.
     entropy: Box<dyn EntropySource>,
 
     // Current tab.
@@ -96,7 +103,9 @@ pub struct EntropyForgeApp {
 impl Default for EntropyForgeApp {
     fn default() -> Self {
         Self {
-            entropy: Box::new(SystemEntropy::new()),
+            source_kind: SourceKind::default(),
+            bias_probability: DEFAULT_BIAS,
+            entropy: SourceKind::default().build(ARENA_SEED, DEFAULT_BIAS),
             current_tab: Tab::Use,
             icon: None,
             passphrase: String::from("entropy-forge-demo"),
@@ -145,6 +154,83 @@ impl EntropyForgeApp {
     pub fn select_tab(&mut self, tab: Tab) {
         self.current_tab = tab;
     }
+
+    /// Currently selected entropy source.
+    pub fn source_kind(&self) -> SourceKind {
+        self.source_kind
+    }
+
+    /// Select an entropy source.
+    ///
+    /// Any result on screen was produced by the previous source, so it is
+    /// discarded and a running job is abandoned.
+    pub fn select_source(&mut self, kind: SourceKind) {
+        if self.source_kind == kind {
+            return;
+        }
+        self.source_kind = kind;
+        self.rebuild_source();
+    }
+
+    /// Current `P(1)` for the biased source.
+    pub fn bias_probability(&self) -> f64 {
+        self.bias_probability
+    }
+
+    /// Set `P(1)` for the biased source, clamped to `[0, 1]`.
+    pub fn set_bias_probability(&mut self, probability: f64) {
+        let probability = probability.clamp(0.0, 1.0);
+        if (probability - self.bias_probability).abs() < f64::EPSILON {
+            return;
+        }
+        self.bias_probability = probability;
+        self.rebuild_source();
+    }
+
+    /// Number of bytes the Test tab samples.
+    pub fn sample_size(&self) -> usize {
+        self.quality_sample_size
+    }
+
+    /// Override the Test tab sample size (clamped to at least one byte).
+    pub fn set_sample_size(&mut self, bytes: usize) {
+        self.quality_sample_size = bytes.max(1);
+    }
+
+    /// Whether a quality-analysis job is running.
+    pub fn is_testing(&self) -> bool {
+        self.is_testing
+    }
+
+    /// Whether a benchmark job is running.
+    pub fn is_benchmarking(&self) -> bool {
+        self.is_benchmarking
+    }
+
+    /// Metrics from the last completed analysis.
+    pub fn quality_metrics(&self) -> Option<&QualityMetrics> {
+        self.quality_metrics.as_ref()
+    }
+
+    /// Result of the last completed benchmark.
+    pub fn bench_result(&self) -> Option<&BenchmarkResult> {
+        self.bench_result.as_ref()
+    }
+
+    /// Rebuild the live source and drop results that describe the old one.
+    fn rebuild_source(&mut self) {
+        self.entropy = self.source_kind.build(ARENA_SEED, self.bias_probability);
+
+        self.quality_metrics = None;
+        self.nist_results.clear();
+        self.test_error = None;
+        self.test_rx = None;
+        self.is_testing = false;
+
+        self.bench_result = None;
+        self.bench_rx = None;
+        self.is_benchmarking = false;
+    }
 }
 
 impl eframe::App for EntropyForgeApp {
@@ -168,7 +254,45 @@ impl eframe::App for EntropyForgeApp {
                 )));
                 ui.vertical(|ui| {
                     ui.heading("Entropy Forge");
-                    ui.label(format!("Source: {}", self.entropy.name()));
+                    ui.horizontal_wrapped(|ui| {
+                        ui.label("Source:");
+                        let mut selected = self.source_kind;
+                        egui::ComboBox::from_id_salt("entropy-source-selector")
+                            .selected_text(selected.label())
+                            .show_ui(ui, |ui| {
+                                for kind in SourceKind::ALL {
+                                    ui.selectable_value(&mut selected, kind, kind.label());
+                                }
+                            })
+                            .response
+                            .on_hover_text(
+                                "Select the entropy source used by the Test and Benchmark tabs.",
+                            );
+                        if selected != self.source_kind {
+                            self.select_source(selected);
+                        }
+                    });
+
+                    if self.source_kind.has_bias_control() {
+                        ui.horizontal(|ui| {
+                            // The slider, its text and its drag value must all
+                            // fit the header, which shares the row with the icon.
+                            ui.spacing_mut().slider_width =
+                                (ui.available_width() - 110.0).clamp(60.0, 240.0);
+
+                            let mut bias = self.bias_probability;
+                            ui.add(
+                                egui::Slider::new(&mut bias, 0.05..=0.95)
+                                    .fixed_decimals(2)
+                                    .text("P(1)"),
+                            );
+                            if (bias - self.bias_probability).abs() > f64::EPSILON {
+                                self.set_bias_probability(bias);
+                            }
+                        });
+                    }
+
+                    ui.label(egui::RichText::new(self.source_kind.description()).weak());
                 });
             });
             ui.add_space(5.0);
@@ -557,6 +681,7 @@ impl EntropyForgeApp {
     fn render_test_tab(&mut self, ui: &mut egui::Ui) {
         ui.heading("Quality Analysis");
         ui.label("Analyze entropy quality with statistical tests.");
+        ui.label(format!("Analyzing: {}", self.entropy.name()));
         ui.add_space(10.0);
 
         ui.horizontal(|ui| {
@@ -601,10 +726,12 @@ impl EntropyForgeApp {
         self.is_testing = true;
         self.test_error = None;
         let sample_size = self.quality_sample_size;
+        let kind = self.source_kind;
+        let bias = self.bias_probability;
         let (tx, rx) = mpsc::channel();
 
         std::thread::spawn(move || {
-            let mut source = SystemEntropy::new();
+            let mut source = kind.build(ARENA_SEED, bias);
             let mut data = vec![0u8; sample_size];
             source.fill_bytes(&mut data);
 
@@ -764,6 +891,7 @@ impl EntropyForgeApp {
     fn render_benchmark_tab(&mut self, ui: &mut egui::Ui) {
         ui.heading("Performance Benchmark");
         ui.label("Measure entropy generation speed.");
+        ui.label(format!("Benchmarking: {}", self.entropy.name()));
         ui.add_space(10.0);
 
         ui.horizontal(|ui| {
@@ -832,10 +960,12 @@ impl EntropyForgeApp {
     fn start_bench_job(&mut self) {
         self.is_benchmarking = true;
         let size = self.bench_size;
+        let kind = self.source_kind;
+        let bias = self.bias_probability;
         let (tx, rx) = mpsc::channel();
 
         std::thread::spawn(move || {
-            let mut source = SystemEntropy::new();
+            let mut source = kind.build(ARENA_SEED, bias);
             let result = PerformanceBench::benchmark(&mut source, size);
             let _ = tx.send(result);
         });
@@ -1625,5 +1755,53 @@ mod tests {
         app.cipher_hex = true;
         app.refresh_cipher_output();
         assert_eq!(app.cipher_output, hex_output);
+    }
+
+    #[test]
+    fn selecting_a_source_rebuilds_it_and_drops_stale_results() {
+        let mut app = EntropyForgeApp {
+            quality_metrics: Some(QualityMetrics::analyze_slice(&[0u8; 512])),
+            nist_results: vec![("Frequency".to_string(), 0.5)],
+            ..EntropyForgeApp::default()
+        };
+
+        app.select_source(SourceKind::Counter);
+
+        assert_eq!(app.source_kind(), SourceKind::Counter);
+        assert!(app.quality_metrics().is_none());
+        assert!(app.nist_results.is_empty());
+        assert!(app.entropy.name().contains("Counter"));
+    }
+
+    #[test]
+    fn selecting_the_same_source_keeps_results() {
+        let mut app = EntropyForgeApp {
+            quality_metrics: Some(QualityMetrics::analyze_slice(&[0u8; 512])),
+            ..EntropyForgeApp::default()
+        };
+
+        app.select_source(app.source_kind());
+
+        assert!(app.quality_metrics().is_some());
+    }
+
+    #[test]
+    fn bias_probability_is_clamped_and_rebuilds_the_source() {
+        let mut app = EntropyForgeApp::default();
+        app.select_source(SourceKind::Biased);
+
+        app.set_bias_probability(5.0);
+        assert_eq!(app.bias_probability(), 1.0);
+
+        app.set_bias_probability(-1.0);
+        assert_eq!(app.bias_probability(), 0.0);
+        assert!(app.entropy.name().contains("Biased"));
+    }
+
+    #[test]
+    fn sample_size_cannot_be_zero() {
+        let mut app = EntropyForgeApp::default();
+        app.set_sample_size(0);
+        assert_eq!(app.sample_size(), 1);
     }
 }
