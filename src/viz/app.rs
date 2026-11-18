@@ -231,6 +231,90 @@ impl EntropyForgeApp {
         self.bench_rx = None;
         self.is_benchmarking = false;
     }
+
+    /// Render the header: brand on the left, RNG controls to its right when
+    /// there is room. On narrow windows the controls move below the brand, and
+    /// the bias slider gets its own row so nothing overflows.
+    fn render_header(&mut self, ui: &mut egui::Ui) {
+        let inline = if self.source_kind.has_bias_control() {
+            ui.available_width() >= 720.0
+        } else {
+            ui.available_width() >= 380.0
+        };
+
+        if inline {
+            ui.horizontal(|ui| {
+                self.render_brand(ui);
+                ui.add_space(12.0);
+                self.render_source_selector(ui);
+                self.render_bias_control(ui);
+            });
+        } else {
+            ui.horizontal(|ui| self.render_brand(ui));
+            ui.horizontal(|ui| self.render_source_selector(ui));
+            if self.source_kind.has_bias_control() {
+                ui.horizontal(|ui| self.render_bias_control(ui));
+            }
+        }
+    }
+
+    /// The app icon and wordmark.
+    fn render_brand(&mut self, ui: &mut egui::Ui) {
+        let icon = self.icon.get_or_insert_with(|| {
+            ui.ctx().load_texture(
+                "entropy-forge-icon",
+                super::icon::color_image(),
+                egui::TextureOptions::LINEAR,
+            )
+        });
+        ui.add(egui::Image::new(egui::load::SizedTexture::new(
+            icon.id(),
+            egui::vec2(HEADER_ICON_SIZE, HEADER_ICON_SIZE),
+        )));
+        ui.heading("Entropy Forge");
+    }
+
+    /// The RNG selector. Its label names the whole class of options, and the
+    /// hover text explains the current source and where it is used.
+    fn render_source_selector(&mut self, ui: &mut egui::Ui) {
+        ui.label("RNG:");
+        let mut selected = self.source_kind;
+        egui::ComboBox::from_id_salt("entropy-source-selector")
+            .selected_text(selected.label())
+            .show_ui(ui, |ui| {
+                for kind in SourceKind::ALL {
+                    ui.selectable_value(&mut selected, kind, kind.label());
+                }
+            })
+            .response
+            .on_hover_text(format!(
+                "{}\n\nUsed by the Test and Benchmark tabs.",
+                self.source_kind.description()
+            ));
+        if selected != self.source_kind {
+            self.select_source(selected);
+        }
+    }
+
+    /// The `P(1)` slider, shown only for sources that have a bias parameter.
+    fn render_bias_control(&mut self, ui: &mut egui::Ui) {
+        if !self.source_kind.has_bias_control() {
+            return;
+        }
+
+        // Keep the slider, its text and its drag value within the row.
+        ui.spacing_mut().slider_width = (ui.available_width() - 110.0).clamp(60.0, 240.0);
+
+        let mut bias = self.bias_probability;
+        ui.add(
+            egui::Slider::new(&mut bias, 0.05..=0.95)
+                .fixed_decimals(2)
+                .text("P(1)"),
+        );
+        if (bias - self.bias_probability).abs() > f64::EPSILON {
+            self.set_bias_probability(bias);
+        }
+    }
 }
 
 impl eframe::App for EntropyForgeApp {
@@ -240,61 +324,7 @@ impl eframe::App for EntropyForgeApp {
         self.poll_bench_job();
 
         egui::CentralPanel::default().show(ui, |ui| {
-            ui.horizontal(|ui| {
-                let icon = self.icon.get_or_insert_with(|| {
-                    ui.ctx().load_texture(
-                        "entropy-forge-icon",
-                        super::icon::color_image(),
-                        egui::TextureOptions::LINEAR,
-                    )
-                });
-                ui.add(egui::Image::new(egui::load::SizedTexture::new(
-                    icon.id(),
-                    egui::vec2(HEADER_ICON_SIZE, HEADER_ICON_SIZE),
-                )));
-                ui.vertical(|ui| {
-                    ui.heading("Entropy Forge");
-                    ui.horizontal_wrapped(|ui| {
-                        ui.label("Source:");
-                        let mut selected = self.source_kind;
-                        egui::ComboBox::from_id_salt("entropy-source-selector")
-                            .selected_text(selected.label())
-                            .show_ui(ui, |ui| {
-                                for kind in SourceKind::ALL {
-                                    ui.selectable_value(&mut selected, kind, kind.label());
-                                }
-                            })
-                            .response
-                            .on_hover_text(
-                                "Select the entropy source used by the Test and Benchmark tabs.",
-                            );
-                        if selected != self.source_kind {
-                            self.select_source(selected);
-                        }
-                    });
-
-                    if self.source_kind.has_bias_control() {
-                        ui.horizontal(|ui| {
-                            // The slider, its text and its drag value must all
-                            // fit the header, which shares the row with the icon.
-                            ui.spacing_mut().slider_width =
-                                (ui.available_width() - 110.0).clamp(60.0, 240.0);
-
-                            let mut bias = self.bias_probability;
-                            ui.add(
-                                egui::Slider::new(&mut bias, 0.05..=0.95)
-                                    .fixed_decimals(2)
-                                    .text("P(1)"),
-                            );
-                            if (bias - self.bias_probability).abs() > f64::EPSILON {
-                                self.set_bias_probability(bias);
-                            }
-                        });
-                    }
-
-                    ui.label(egui::RichText::new(self.source_kind.description()).weak());
-                });
-            });
+            self.render_header(ui);
             ui.add_space(5.0);
             ui.separator();
 
