@@ -1,13 +1,16 @@
 name: Build release assets
 
-# Builds desktop binaries and attaches them to an existing release.
+# Builds desktop binaries and attaches them to the release for a tag.
 #
 # Two ways to trigger it:
-#   * push a version tag  -> automatic, right after "Release notes"
+#   * push a version tag  -> automatic
 #   * Actions -> Run workflow -> rebuild an existing tag (e.g. v0.2.0)
 #
-# Kept separate from "Release notes" so that a failing build never prevents a
-# release record from existing: notes come from CHANGELOG.md, binaries are extra.
+# This workflow does not wait for "Release notes". The binaries are the real
+# deliverable, so this job creates the release itself (notes come from the same
+# CHANGELOG.md section) when the notes workflow is slow, failed, or never ran.
+# Both workflows are idempotent: whichever creates the release first wins and
+# the other one edits/attaches to it, so the two can run in parallel.
 #
 # Standard runners are free for public repositories, so per-release builds cost
 # nothing. A failed build only leaves a red run behind; the release keeps its
@@ -23,16 +26,28 @@ on:
         required: true
         type: string
 
+# Only the attach job writes. The build job compiles and uploads workflow
+# artifacts, which needs no repository write access.
 permissions:
-  contents: write
+  contents: read
+
+# Two dispatches for the same tag would otherwise build and upload in parallel.
+# Never cancel a release mid-upload; queue instead.
+concurrency:
+  group: build-assets-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
 
 env:
   CARGO_TERM_COLOR: always
+  # Explicit repository so every `gh` call works even if a job ever runs
+  # without a checkout (no local remote to infer it from).
+  GH_REPO: ${{ github.repository }}
 
 jobs:
   build:
     name: Build ${{ matrix.asset }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
     env:
       TAG: ${{ inputs.tag || github.ref_name }}
     strategy:
@@ -104,31 +119,66 @@ jobs:
     name: Attach to release
     needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
     env:
       TAG: ${{ inputs.tag || github.ref_name }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.tag || github.ref_name }}
+
       - name: Download artifacts
         uses: actions/download-artifact@v8
         with:
           path: dist
           merge-multiple: true
 
-      - name: Wait for the release
+      - name: Verify tag matches Cargo.toml
         run: |
-          # "Release notes" runs in parallel and needs only seconds, while the
-          # builds take minutes. Wait anyway so that a slow or retried notes run
-          # cannot race the upload.
-          for attempt in $(seq 1 30); do
-            if gh release view "$TAG" > /dev/null 2>&1; then
-              echo "Release $TAG exists."
-              exit 0
-            fi
-            echo "Release $TAG not visible yet (attempt $attempt/30), waiting..."
-            sleep 10
-          done
-          echo "::error::Release $TAG was not created within 5 minutes. Check the Release notes run and that CHANGELOG.md has a section for it."
-          exit 1
+          tag_version="${TAG#v}"
+          crate_version="$(grep -m1 '^version' Cargo.toml | cut -d'"' -f2)"
+          if [ "$tag_version" != "$crate_version" ]; then
+            echo "::error::Tag $TAG does not match Cargo.toml version $crate_version"
+            exit 1
+          fi
+
+      - name: Extract CHANGELOG section
+        run: |
+          version="${TAG#v}"
+          awk -v ver="$version" '
+            index($0, "## [" ver "]") == 1 { found = 1; next }
+            found && index($0, "## [") == 1 { exit }
+            found { print }
+          ' CHANGELOG.md > release-notes.md
+
+          if [ ! -s release-notes.md ]; then
+            echo "See CHANGELOG.md for the changes in this version." > release-notes.md
+          fi
+
+      - name: Create the release if it does not exist yet
+        run: |
+          # No waiting on "Release notes": this job can publish the release
+          # itself. If that workflow already created it, this is a no-op.
+          if gh release view "$TAG" > /dev/null 2>&1; then
+            echo "Release $TAG already exists."
+            exit 0
+          fi
+
+          prerelease=""
+          if [[ "$TAG" == *-* ]]; then
+            prerelease="--prerelease"
+          fi
+
+          # The notes workflow may create the release between the check above
+          # and this call. Losing that race is fine; only fail if the release
+          # is still missing afterwards.
+          if ! gh release create "$TAG" --verify-tag --title "$TAG" \
+              --notes-file release-notes.md $prerelease; then
+            gh release view "$TAG" > /dev/null
+          fi
 
       - name: Upload binaries
         run: gh release upload "$TAG" dist/* --clobber

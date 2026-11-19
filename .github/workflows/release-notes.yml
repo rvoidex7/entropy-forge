@@ -20,7 +20,8 @@ name: Release notes
 # "workflows: write", which GITHUB_TOKEN cannot be granted either. Attaching the
 # release to an existing tag avoids that check entirely.
 #
-# Binaries are attached later by "Build release assets", on demand.
+# Binaries are attached by "Build release assets", which also creates the
+# release itself when this workflow is slow, failed, or never ran.
 
 on:
   push:
@@ -35,6 +36,13 @@ on:
 permissions:
   contents: write
 
+# One run per tag: a retry while an older run is still publishing would edit
+# the same release twice. Queue instead of cancelling, so a half-published
+# release is never abandoned.
+concurrency:
+  group: release-notes-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
 env:
   CARGO_TERM_COLOR: always
 
@@ -42,6 +50,7 @@ jobs:
   release:
     name: Publish ${{ inputs.tag || github.ref_name }}
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     env:
       TAG: ${{ inputs.tag || github.ref_name }}
     steps:
